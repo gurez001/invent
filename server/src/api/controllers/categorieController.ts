@@ -1,10 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import AsyncHandler from "../../middlewares/AsyncHandler";
 import CategorieService from "../../services/categorieService";
-// import { ImageUplloader } from "../../utils/ImageUpload";
-import { FileManager } from "../../utils/FileManager";
 import ErrorHandler from "../../utils/ErrorHandler";
-// const imageUploader = new ImageUplloader();
 class CategorieController {
   constructor(private categorieService: CategorieService) {}
   add_new_customer = AsyncHandler.handle(
@@ -20,10 +17,11 @@ class CategorieController {
         user,
         next
       );
-   
-      return res.status(201).json({
-        success: true,
-      });
+      if (categorie) {
+        return res.status(201).json({
+          success: true,
+        });
+      }
     }
   );
 }

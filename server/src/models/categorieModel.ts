@@ -11,42 +11,50 @@ export interface Icategory extends Document {
   is_delete?: string; // Optional field
 }
 
-const categorieSchema: Schema<Icategory> = new mongoose.Schema({
-  cat_id: {
-    type: String,
-    trim: true,
-    default: null,
+const categorieSchema: Schema<Icategory> = new mongoose.Schema(
+  {
+    cat_id: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    name: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    description: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    images_id: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Images",
+      },
+    ],
+    status: {
+      type: String,
+      default: "active",
+    },
+    audit_log: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    is_active: {
+      type: String,
+      default: "yes",
+    },
+    is_delete: {
+      type: String,
+      default: "no",
+    },
   },
-  name: {
-    type: String,
-    trim: true,
-    default: null,
-  },
-  images_id: {
-    type: Schema.Types.ObjectId,
-    trim: true,
-    default: null,
-  },
-  status: {
-    type: String,
-    default: "active",
-  },
-  audit_log: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-  },
-  is_active: {
-    type: String,
-    default: "yes",
-  },
-  is_delete: {
-    type: String,
-    default: "no",
-  },
-},
-{
-  timestamps: true, // Automatically adds createdAt and updatedAt fields
-});
+  {
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
+  }
+);
 
 const Categorie_model: Model<Icategory> = mongoose.model<Icategory>(
   "categorie",

@@ -2,7 +2,6 @@ import mongoose, { Document, Model, Types, Schema } from "mongoose";
 
 // Define the Iimages interface to match the image data structure
 export interface IImages extends Document {
-  image_id: string;
   originalname: string;
   encoding: string;
   mimetype: string;
@@ -21,10 +20,6 @@ export interface IImages extends Document {
 // Define the image schema
 const imageSchema: Schema<IImages> = new mongoose.Schema(
   {
-    image_id: {
-      type: String,
-      default: null,
-    },
     originalname: {
       type: String,
       default: null,

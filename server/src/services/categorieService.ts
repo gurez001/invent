@@ -1,6 +1,11 @@
 import { NextFunction } from "express";
 import CategorieRepository from "../repositories/categorieRepository";
 import ErrorHandler from "../utils/ErrorHandler";
+import { ImageUploader } from "../utils/ImageUpload";
+import ImageRepository from "../repositories/imageRepository";
+import { FileManager } from "../utils/FileManager";
+const imageUploader = new ImageUploader();
+const add_image = new ImageRepository();
 
 class CategorieService {
   constructor(private categorieRepository: CategorieRepository) {}
@@ -17,7 +22,35 @@ class CategorieService {
         new ErrorHandler("Categorie with this Name already exists", 400)
       );
     }
-    return await this.categorieRepository.createCategorie(data,files, user_id,next);
+    const image_uploader = await imageUploader.uploadImage(files, next);
+    if (!image_uploader) {
+      return next(
+        new ErrorHandler(
+          "Something wrong image is not uploaded to the server",
+          404
+        )
+      );
+    }
+    const image_data = await add_image.createImage(
+      files,
+      image_uploader,
+      user_id,
+      next
+    );
+    if (!image_data) {
+      return next(
+        new ErrorHandler(
+          "Something wrong image is not added into database",
+          404
+        )
+      );
+    }
+    await FileManager.deleteFiles(files);
+    return await this.categorieRepository.createCategorie(
+      data,
+      image_data,
+      user_id
+    );
   }
 }
 export default CategorieService;
