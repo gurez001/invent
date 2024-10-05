@@ -1,0 +1,262 @@
+import List_table from "@/components/common/table/List_table";
+import debounce from "lodash.debounce";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+    Chip,
+    ChipProps,
+    CircularProgress,
+    Tooltip,
+    User,
+} from "@nextui-org/react";
+import { Trash2, Edit, RotateCcw, Eraser } from "lucide-react";
+import toast from "react-hot-toast";
+import { TimeAgo } from "@/lib/service/time/timeAgo";
+import { useActionCustomerMutation, useGetAllcustomerQuery } from "@/state/customerApi";
+import { useGetAllcategorieQuery } from "@/state/categoriesApi";
+import { categorie_list, Get_CategorieResponse } from "@/types/categorie_type";
+import Image from "next/image";
+
+interface Customer_list_props {
+    set_open: (value: boolean) => void;
+    edit_handler: (value: any) => void;
+}
+const INITIAL_VISIBLE_COLUMNS = ["name", "description", "image", "state", "updatedAt", "audit_log", "actions"];
+
+const columns: any[] = [
+    { name: "Name", uid: "name" },
+    { name: "Description", uid: "description" },
+    { name: "Image", uid: "image" },
+    { name: "Status", uid: "status" },
+    { name: "Last Update", uid: "updatedAt" },
+    { name: "Employ", uid: "audit_log" },
+    { name: "Actions", uid: "actions" }, // Added actions column
+];
+
+const statusColorMap: Record<string, ChipProps["color"]> = {
+    active: "success",
+    inactive: "danger",
+};
+
+const Categorie_list: React.FC<Customer_list_props> = ({ set_open, edit_handler }) => {
+    const [filterValue, setFilterValue] = useState<string>("");
+    const [page_status, set_page_status] = useState<string>("yes");
+    const [debouncedFilterValue, setDebouncedFilterValue] =
+        useState<string>(filterValue);
+    const [statusFilter, setStatusFilter] = useState<string>("all");
+    const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+    const [page, setPage] = useState<number>(1);
+
+
+    //-------------use states for apis 
+    const { data, error, isLoading } = useGetAllcategorieQuery({
+        is_active: page_status,
+        is_delete: page_status && page_status === "final" ? "yes" : "no",
+        keyword: debouncedFilterValue,
+        status: statusFilter,
+        rowsPerPage: rowsPerPage,
+        page: page,
+    });
+    const [
+        actionCustomer,
+        {
+            error: delete_error,
+            isLoading: delete_loading,
+            isSuccess: delete_success,
+        },
+    ] = useActionCustomerMutation();
+    // Debounce the filter value to avoid excessive API calls
+    const handleDebouncedFilter = useMemo(
+        () => debounce((value) => setDebouncedFilterValue(value), 300),
+        []
+    );
+
+    useEffect(() => {
+        handleDebouncedFilter(filterValue);
+    }, [filterValue, handleDebouncedFilter]);
+
+    useEffect(() => {
+        if (delete_error || error) {
+            let errorMessage = "An unexpected error occurred."; // Default message
+
+            // Check if 'error' is defined and has the expected structure
+            if (delete_error && 'data' in delete_error) {
+                errorMessage = (delete_error as { data?: { message?: string } }).data?.message || errorMessage;
+            }
+
+            // Check if 'update_error' is defined and has the expected structure
+            if (error && 'data' in error) {
+                errorMessage = (error as { data?: { message?: string } }).data?.message || errorMessage;
+            }
+
+            toast.error(errorMessage); // Show the error toast
+            return
+        }
+        if (delete_success) {
+            toast.success("Vendor successfuly updated"); // Show the error toast
+        }
+    }, [delete_error, delete_success, toast, error]);
+    // Fetch vendors only when debouncedFilterValue has a valid value
+
+
+    const response: Get_CategorieResponse | undefined = data as
+        | Get_CategorieResponse
+        | undefined;
+    const categorie: Get_CategorieResponse = useMemo(() => {
+        const categorie: categorie_list[] = response?.categorie || [];
+        const resultPerpage: number = response?.resultPerpage || 0;
+        const data_counter: number = response?.data_counter || 0;
+        return { categorie, resultPerpage, data_counter };
+    }, [response]);
+    const renderCell = React.useCallback(
+        (categorie: categorie_list, columnKey: React.Key) => {
+            const cellValue = categorie[columnKey as keyof categorie_list];
+            console.log(categorie)
+
+            const deleteHandler = async (
+                id: string,
+                state: string,
+                hard_delete?: string
+            ) => {
+                await actionCustomer({ id, state, hard_delete });
+            };
+            const restoreHandler = async (
+                id: string,
+                state: string,
+                hard_delete?: string
+            ) => {
+                await actionCustomer({ id, state, hard_delete });
+            };
+            const hard_deleteHandler = async (
+                id: string,
+                state: string,
+                hard_delete?: string
+            ) => {
+                await actionCustomer({ id, state, hard_delete });
+            };
+            const hard_restoreHandler = async (
+                id: string,
+                state: string,
+                hard_delete?: string
+            ) => {
+                await actionCustomer({ id, state, hard_delete });
+            };
+
+            switch (columnKey) {
+                case "name":
+                    return (
+                        <p> {categorie.name}</p>
+                    );
+                    case "image":
+                        return (
+                            <Image 
+                            src="https://firebasestorage.googleapis.com/v0/b/storage-30b82.appspot.com/o/1728109793806-Screenshot_20240922_230545_Photoroom.jpg?alt=media&token=316a26da-1449-4364-8465-f4a8db18f97b"
+                            alt="Screenshot Image"
+                            width={500} 
+                            height={300} 
+                            layout="responsive"
+                          />
+                        );
+                case "status":
+                    return (
+                        <Chip
+                            className="capitalize"
+                            color={statusColorMap[categorie.status.toLocaleLowerCase()]}
+                            size="sm"
+                            variant="flat"
+                        >
+                            {cellValue}
+                        </Chip>
+                    );
+                case "updatedAt":
+                    return (
+                        <TimeAgo time={cellValue} />
+                    );
+                case "audit_log":
+                    return (
+                        <p>{cellValue.name}</p>
+                    );
+                case "actions":
+                    return (
+                        <div className="relative flex justify-end gap-2">
+                            <Tooltip content={categorie.is_active === "yes" ? "Edit categorie" : "Recover categorie"}>
+                                <span className="text-sm text-default-400 cursor-pointer active:opacity-50">
+                                    {categorie && categorie.is_delete === "no" ? (
+                                        categorie.is_active === "yes" ? (
+                                            <Edit size={20} onClick={() => edit_handler(categorie._id)} />
+                                        ) : categorie.is_active === "no" ? (
+                                            <RotateCcw
+                                                onClick={() => restoreHandler(categorie._id, "yes", "no")}
+                                                size={20}
+                                            />
+                                        ) : null /* Handle if no other case applies */
+                                    ) : (
+                                        <RotateCcw
+                                            onClick={() =>
+                                                hard_restoreHandler(categorie._id, "no", "no")
+                                            }
+                                            size={20}
+                                        />
+                                    )}
+                                </span>
+                            </Tooltip>
+
+                            <Tooltip content={categorie.is_active === "yes" ? "Delete categorie" : "Erase categorie"}>
+                                <span className="text-sm text-red-600 cursor-pointer active:opacity-50">
+                                    {
+                                        categorie && categorie.is_delete === "no" ? (
+                                            delete_loading ? (
+                                                <CircularProgress size="sm" aria-label="Loading..." />
+                                            ) : categorie.is_active === "yes" ? (
+                                                <Trash2
+                                                    className="text-red-600"
+                                                    onClick={() => deleteHandler(categorie._id, "no", "no")}
+                                                    size={20}
+                                                />
+                                            ) : (
+                                                <Eraser
+                                                    onClick={() =>
+                                                        hard_deleteHandler(categorie._id, "no", "yes")
+                                                    }
+                                                    size={20}
+                                                />
+                                            )
+                                        ) : null /* Handle if categorie.is_delete is "no" */
+                                    }
+                                </span>
+                            </Tooltip>
+                        </div>
+                    );
+                default:
+                    return cellValue;
+            }
+        },
+        []
+    );
+
+    return (
+        <div>
+            {/* <Test set_open={set_open} data={data} />
+       */}
+            <List_table<categorie_list>
+                data={categorie.categorie}
+                loading={isLoading}
+                columns={columns}
+                resultPerpage={categorie.resultPerpage}
+                setRowsPerPage={setRowsPerPage}
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+                data_length={categorie.data_counter}
+                page={page}
+                setPage={setPage}
+                filterValue={filterValue}
+                setFilterValue={setFilterValue}
+                form_open={set_open}
+                set_page_status={set_page_status}
+                visiable_columns={INITIAL_VISIBLE_COLUMNS}
+                renderCell={renderCell}
+            />
+        </div>
+    );
+};
+
+export default Categorie_list;

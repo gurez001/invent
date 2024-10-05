@@ -6,43 +6,47 @@ export class ImageUploader {
   // Function to handle image uploads
   async uploadImage(files: any, next: NextFunction) {
     if (!files || !Array.isArray(files) || files.length === 0) {
-      return next(new ErrorHandler("No files uploaded.", 400)); // Use next to pass the error
+      return next(new ErrorHandler("No files uploaded.", 400));
     }
 
-    // Assuming 'images' is the field name for the uploaded files
     const uploadPromises = files.map(async (file) => {
-      const bucket = await initFirebase(); // Await here to resolve the Promise
-      const blob = bucket.file(file.filename);
+      if (!file.buffer) {
+        console.error("File buffer is missing for file:", file);
+        return next(new ErrorHandler("File buffer is missing.", 400));
+      }
+
+      const bucket = await initFirebase();
+      const blob = bucket.file(file.originalname);
       const blobStream = blob.createWriteStream({
         resumable: false,
         metadata: {
-          contentType: file.mimetype, // Set the content type
+          contentType: file.mimetype,
         },
       });
 
       return new Promise((resolve, reject) => {
         blobStream.on("error", (error) => {
+          console.error("Blob Stream Error:", error);
           reject(error);
         });
 
         blobStream.on("finish", () => {
           resolve({
             success: true,
-            file: file.filename,
-            url: `https://storage.googleapis.com/${bucket.name}/${blob.name}`, // Construct URL for access
+            file: file.originalname,
+            url: `https://storage.googleapis.com/${bucket.name}/${blob.name}`,
           });
         });
 
-        blobStream.end(file.buffer); // Use file.buffer if you are using multer to handle file uploads
+        blobStream.end(file.buffer); // Using the buffer to upload the file
       });
     });
 
     try {
-      // Wait for all uploads to complete
       return await Promise.all(uploadPromises);
-    } catch (error:any) {
-      // Handle error
-      return next(new ErrorHandler(error.message, 500)); // Pass error to next middleware
+    } catch (error: any) {
+      console.error("Upload Error:", error); // Log the error
+      return next(new ErrorHandler(error.message, 500));
     }
   }
 }

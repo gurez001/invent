@@ -52,5 +52,11 @@ class CategorieService {
       user_id
     );
   }
+  async all_categorie(query: any) {
+    return await this.categorieRepository.all_categorie(query);
+  }
+  async data_counter(query: any) {
+    return await this.categorieRepository.data_counter(query);
+  }
 }
 export default CategorieService;

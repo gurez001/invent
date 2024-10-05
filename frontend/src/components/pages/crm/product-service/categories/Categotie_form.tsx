@@ -20,11 +20,13 @@ interface vender_form_props {
   set_open: (value: boolean) => void;
   onsubmit: (data: any) => void;
   files: File[];
+  isLoading:boolean;
   setFiles: (files: File[]) => void;
 }
 
 const Categotie_form: React.FC<vender_form_props> = ({
   set_open,
+  isLoading,
   onsubmit,
   files, setFiles
 }) => {
@@ -138,7 +140,7 @@ const Categotie_form: React.FC<vender_form_props> = ({
               </Button>
 
               <Button
-                isLoading={false}
+                isLoading={isLoading}
                 className="bg-black text-white"
                 type="submit"
               >
