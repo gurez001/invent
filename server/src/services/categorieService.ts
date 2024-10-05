@@ -45,7 +45,7 @@ class CategorieService {
         )
       );
     }
-    await FileManager.deleteFiles(files);
+    // await FileManager.deleteFiles(files);
     return await this.categorieRepository.createCategorie(
       data,
       image_data,

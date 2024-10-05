@@ -29,7 +29,7 @@ class CategorieController {
       const query = req.query;
 
       const resultPerpage = Number(query.rowsPerPage);
-
+      console.log(query)
       const categorie = await this.categorieService.all_categorie(query);
       const data_counter = await this.categorieService.data_counter(query);
       if (categorie) {

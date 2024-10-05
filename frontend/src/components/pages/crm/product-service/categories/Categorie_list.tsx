@@ -148,13 +148,11 @@ const Categorie_list: React.FC<Customer_list_props> = ({ set_open, edit_handler 
                     );
                     case "image":
                         return (
-                            <Image 
-                            src="https://firebasestorage.googleapis.com/v0/b/storage-30b82.appspot.com/o/1728109793806-Screenshot_20240922_230545_Photoroom.jpg?alt=media&token=316a26da-1449-4364-8465-f4a8db18f97b"
-                            alt="Screenshot Image"
-                            width={500} 
-                            height={300} 
+                            <Image src={categorie.images_id[0].path} alt={categorie.images_id[0].originalname}
+                            width={100} // Specify the width (adjust as necessary)
+                            height={100} // Specify the height (adjust as necessary)
                             layout="responsive"
-                          />
+                            />
                         );
                 case "status":
                     return (

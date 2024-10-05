@@ -24,7 +24,6 @@ class ImageRepository {
       });
 
       const createdImages = await ImageModel.insertMany(images); // Insert multiple images
-
       return createdImages; // Return saved images
     } catch (error) {
       next(error);

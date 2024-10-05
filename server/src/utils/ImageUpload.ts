@@ -1,6 +1,7 @@
 import { NextFunction } from "express";
 import ErrorHandler from "./ErrorHandler"; // Ensure this is correct
 import { initFirebase } from "../firebase";
+import { generateRandomId } from "./generateRandomId";
 
 export class ImageUploader {
   // Function to handle image uploads
@@ -11,16 +12,21 @@ export class ImageUploader {
 
     const uploadPromises = files.map(async (file) => {
       if (!file.buffer) {
-        console.error("File buffer is missing for file:", file);
         return next(new ErrorHandler("File buffer is missing.", 400));
       }
 
+      // Generate a unique filename
+      const uniqueFilename = `${Date.now()}-${file.originalname}`;
       const bucket = await initFirebase();
-      const blob = bucket.file(file.originalname);
+      const blob = bucket.file(uniqueFilename); // Use the unique filename
+
       const blobStream = blob.createWriteStream({
         resumable: false,
         metadata: {
           contentType: file.mimetype,
+          metadata: {
+            firebaseStorageDownloadTokens: generateRandomId(), // Set a token
+          },
         },
       });
 
@@ -30,15 +36,40 @@ export class ImageUploader {
           reject(error);
         });
 
-        blobStream.on("finish", () => {
-          resolve({
-            success: true,
-            file: file.originalname,
-            url: `https://storage.googleapis.com/${bucket.name}/${blob.name}`,
-          });
-        });
+        blobStream.on("finish", async () => {
+          try {
+              const token = generateRandomId(); // Create a new token
+              await blob.setMetadata({
+                  metadata: {
+                      firebaseStorageDownloadTokens: token, // Set the download token
+                  },
+              });
+      
+              const [metadata] = await blob.getMetadata(); // Retrieve updated metadata
+              const downloadToken = metadata.metadata?.firebaseStorageDownloadTokens; // Get the token
+      
+      
+              // Check if metadata.name is defined before using it
+              if (metadata.name) {
+                  const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${metadata.bucket}/o/${encodeURIComponent(metadata.name)}?alt=media&token=${downloadToken}`;
+                  resolve({
+                      success: true,
+                      file: uniqueFilename,
+                      url: downloadUrl,
+                  });
+              } else {
+                  console.error("Metadata name is missing.");
+                  reject(new ErrorHandler("Failed to retrieve metadata name.", 500));
+              }
+          } catch (error) {
+              console.error("Error retrieving metadata:", error);
+              reject(new ErrorHandler("Failed to retrieve metadata.", 500));
+          }
+      });
+      
+      
 
-        blobStream.end(file.buffer); // Using the buffer to upload the file
+        blobStream.end(file.buffer); // Upload the buffer
       });
     });
 
