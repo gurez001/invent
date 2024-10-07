@@ -1,20 +1,25 @@
 export interface categorie_form {
+  id?: string;
   name: string;
   status: string;
   description: string;
   images?: any;
   uuid?: any;
 }
-
+export interface image_details {
+  path: string;
+  originalname: string;
+}
 export interface categorie_list {
   _id: string;
   name: string;
   audit_log: any;
-  descrption: string;
+  description: string;
   status: string;
   is_active: string;
   is_delete: string;
   resultPerpage: number;
+  images_id: image_details[];
   data_counter: number;
 }
 

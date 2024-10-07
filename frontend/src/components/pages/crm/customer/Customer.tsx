@@ -1,12 +1,20 @@
-"use client"
+"use client";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Popover_component from "@/components/Popover_component/Popover_component";
 import { generate32BitUUID } from "@/lib/service/generate32BitUUID";
 import toast from "react-hot-toast";
 import Customer_list from "./Customer_list";
 import Customer_from from "./Customer_from";
-import { useAddNewCustomerMutation, useGetSingleCustomerMutation, useUpdate_customerMutation } from "@/state/customerApi";
-import { customer_form, customer_list, Post_CustomerResponse } from "@/types/Customer_type";
+import {
+  useAddNewCustomerMutation,
+  useGetSingleCustomerMutation,
+  useUpdate_customerMutation,
+} from "@/state/customerApi";
+import {
+  customer_form,
+  customer_list,
+  Post_CustomerResponse,
+} from "@/types/Customer_type";
 
 const Vendor: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -15,7 +23,14 @@ const Vendor: React.FC = () => {
 
   const [addNewCustomer, { error, isSuccess, isLoading }] =
     useAddNewCustomerMutation();
-  const [update_customer, { error: update_error, isSuccess: update_success, isLoading: update_loading }] = useUpdate_customerMutation();
+  const [
+    update_customer,
+    {
+      error: update_error,
+      isSuccess: update_success,
+      isLoading: update_loading,
+    },
+  ] = useUpdate_customerMutation();
   const [getSingleCustomer, { data }] = useGetSingleCustomerMutation();
 
   const response: Post_CustomerResponse | undefined = data as
@@ -34,7 +49,6 @@ const Vendor: React.FC = () => {
           console.error("Customer data is invalid or empty");
           return;
         }
-        console.log('Updating customer:', customer?._id);
         const updated_data = { ...data, id: customer?._id };
 
         try {
@@ -67,13 +81,17 @@ const Vendor: React.FC = () => {
       let errorMessage = "An unexpected error occurred."; // Default message
 
       // Check if 'error' is defined and has the expected structure
-      if (error && 'data' in error) {
-        errorMessage = (error as { data?: { message?: string } }).data?.message || errorMessage;
+      if (error && "data" in error) {
+        errorMessage =
+          (error as { data?: { message?: string } }).data?.message ||
+          errorMessage;
       }
 
       // Check if 'update_error' is defined and has the expected structure
-      if (update_error && 'data' in update_error) {
-        errorMessage = (update_error as { data?: { message?: string } }).data?.message || errorMessage;
+      if (update_error && "data" in update_error) {
+        errorMessage =
+          (update_error as { data?: { message?: string } }).data?.message ||
+          errorMessage;
       }
 
       toast.error(errorMessage);
@@ -98,8 +116,15 @@ const Vendor: React.FC = () => {
     if (!isOpen) {
       setEdit(false);
     }
-  }, [error, isSuccess, isOpen, setEdit, operationSuccess, update_error, update_success]);
-
+  }, [
+    error,
+    isSuccess,
+    isOpen,
+    setEdit,
+    operationSuccess,
+    update_error,
+    update_success,
+  ]);
 
   return (
     <div>

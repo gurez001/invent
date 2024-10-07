@@ -14,7 +14,7 @@ interface Autocomplete_field<T extends FieldValues> {
   errors: FieldErrors<T>;
   name: Path<T>; // Ensure name is a valid path in T
   label_name: string; // Label for the select field
-  options: { value: string; label: string; description?: string }[];
+  options: any;
 }
 
 const Secondary_Autocomplete_field = <T extends FieldValues>({
@@ -66,7 +66,7 @@ const Secondary_Autocomplete_field = <T extends FieldValues>({
             }
             variant="bordered"
           >
-            {options.map((item) => (
+            {options.map((item: any) => (
               <AutocompleteItem key={item.value} textValue={item.label}>
                 <div className="flex justify-between items-center">
                   <div className="flex gap-2 items-center">
@@ -74,7 +74,6 @@ const Secondary_Autocomplete_field = <T extends FieldValues>({
                       <span className="text-small dark:text-dark_color">
                         {item.label}
                       </span>
-                    
                     </div>
                   </div>
                 </div>

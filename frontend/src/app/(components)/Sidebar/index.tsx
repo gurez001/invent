@@ -69,7 +69,6 @@ const SidebarLink = ({
 const Sidebar: React.FC = () => {
   const dispatch = useAppDispatch();
   const [option, setOption] = useState<string>("CRM");
-  console.log(option);
   const isSidebarCollapsed = useAppSelector(
     (state) => state.global.isSidebarCollapsed
   );

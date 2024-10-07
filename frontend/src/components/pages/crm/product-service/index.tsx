@@ -8,6 +8,7 @@ import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import { Layers3, ShoppingCart } from "lucide-react";
 import Categotie_form from "./categories/Categotie_form";
 import Category from "./categories/Category";
+import Product from "./product/Product";
 const Product_servicee = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -29,23 +30,7 @@ const Product_servicee = () => {
           >
             <Card>
               <CardBody>
-                <Button onClick={() => setIsOpen(true)}>Add new</Button>
-                {/* {isOpen && (
-                  <Popover_component
-                    open={isOpen}
-                    set_open={setIsOpen}
-                    components={
-                      <Product_form
-                        // isLoading={false}
-                        // edit={edit}
-                        // open={isOpen}
-                        set_open={setIsOpen}
-                        // vendor_data={vendor}
-                        onsubmit={onSubmit}
-                      />
-                    }
-                  />
-                )} */}
+                <Product />
               </CardBody>
             </Card>
           </Tab>
@@ -60,7 +45,7 @@ const Product_servicee = () => {
           >
             <Card>
               <CardBody>
-              <Category/>
+                <Category />
               </CardBody>
             </Card>
           </Tab>

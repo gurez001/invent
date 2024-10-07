@@ -31,7 +31,7 @@ export class ImageUploader {
       });
 
       return new Promise((resolve, reject) => {
-        blobStream.on("error", (error) => {
+        blobStream.on("error", (error:any) => {
           console.error("Blob Stream Error:", error);
           reject(error);
         });
