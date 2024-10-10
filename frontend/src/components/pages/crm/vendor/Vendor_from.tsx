@@ -143,7 +143,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
                   label="Name"
                 />
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Phone_number_field
                   control={control}
                   errors={errors}
@@ -152,7 +152,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
                 />
               </div>
 
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -167,7 +167,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
           </div>
           <div className="bg-white">
             <div className="flex flex-wrap gap-2">
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -175,7 +175,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
                   label="Company"
                 />
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -187,7 +187,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
               <div className="w-full">
                 <p className="text-lg">Shipping Address</p>
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -195,7 +195,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
                   label="Address Line 1"
                 />
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -203,7 +203,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
                   label="Address Line 2"
                 />
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -211,7 +211,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
                   label="Pin Code"
                 />
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -219,7 +219,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
                   label="State"
                 />
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -227,7 +227,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
                   label="City"
                 />
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -238,7 +238,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
               <div className="w-full">
                 <p className="text-lg">Billing Address - Opptional</p>
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -246,7 +246,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
                   label="Address Line 1"
                 />
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -254,7 +254,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
                   label="Address Line 2"
                 />
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -262,7 +262,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
                   label="Pin Code"
                 />
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -270,7 +270,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
                   label="State"
                 />
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}
@@ -278,7 +278,7 @@ const Vendor_from: React.FC<vender_form_props> = ({
                   label="City"
                 />
               </div>
-              <div className="w-[49%]">
+              <div className="w-[48.5%] lg:w-[49%]">
                 <Input_field
                   control={control}
                   errors={errors}

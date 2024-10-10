@@ -7,31 +7,31 @@ const vendorRoutes = (vendorController: VendorController) => {
   router.post(
     "/add",
     isAuthenticatedUser,
-    authorizeRoles("admin"),
+  authorizeRoles("admin", "employee"),
     vendorController.add_new.bind(vendorController)
   ); // Defining vendor route
   router.post(
     "/update",
     isAuthenticatedUser,
-    authorizeRoles("admin"),
+  authorizeRoles("admin", "employee"),
     vendorController.update_details.bind(vendorController)
   ); // Defining vendor route
   router.get(
     "/all-vendors",
     isAuthenticatedUser,
-    authorizeRoles("admin"),
+  authorizeRoles("admin", "employee"),
     vendorController.all_vendors.bind(vendorController)
   ); // Defining vendor route
   router.post(
     "/remove/:id",
     isAuthenticatedUser,
-    authorizeRoles("admin"),
+  authorizeRoles("admin", "employee"),
     vendorController.removeVendor.bind(vendorController)
   );
   router.get(
     "/data/:id",
     isAuthenticatedUser,
-    authorizeRoles("admin"),
+  authorizeRoles("admin", "employee"),
     vendorController.get_vendor.bind(vendorController)
   );
 

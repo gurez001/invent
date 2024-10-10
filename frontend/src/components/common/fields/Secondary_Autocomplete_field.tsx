@@ -1,6 +1,7 @@
+"use client";
 import { Autocomplete, AutocompleteItem, Avatar } from "@nextui-org/react";
 import { SearchIcon } from "../svg-icons/Search_icon";
-import React from "react";
+import React, { useState } from "react";
 import {
   Control,
   Controller,
@@ -15,6 +16,7 @@ interface Autocomplete_field<T extends FieldValues> {
   name: Path<T>; // Ensure name is a valid path in T
   label_name: string; // Label for the select field
   options: any;
+  setFilterValue?: ((value: string) => void) | undefined;
 }
 
 const Secondary_Autocomplete_field = <T extends FieldValues>({
@@ -23,6 +25,7 @@ const Secondary_Autocomplete_field = <T extends FieldValues>({
   name,
   label_name,
   options,
+  setFilterValue,
 }: Autocomplete_field<T>) => {
   const hasError = !!errors[name]; // Check if there's an error for the field
 
@@ -33,9 +36,10 @@ const Secondary_Autocomplete_field = <T extends FieldValues>({
       render={({ field }) => (
         <>
           <Autocomplete
-            value={field.value}
+            selectedKey={field.value} // Use selectedKey for the default selected item
             onSelectionChange={field.onChange}
             defaultItems={options}
+            onInputChange={(value: string) => setFilterValue?.(value)}
             inputProps={{
               classNames: {
                 input: `ml-1 dark:text-dark_color ${

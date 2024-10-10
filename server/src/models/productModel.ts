@@ -4,19 +4,19 @@ export interface Iproduct extends Document {
   prod_id: string;
   name?: string;
   status?: string;
-  selling_price?: string;
+  selling_price?: number;
   tax?: string;
   primary_unit?: string;
   sku?: string;
   hsn?: string;
-  purchase_price?: string;
+  purchase_price?: number;
   categorie?: Types.ObjectId;
-  total_quantity?: string;
+  total_quantity?: number;
   barcode?: string;
-  weight?: string;
-  depth?: string;
-  width?: string;
-  height?: string;
+  weight?: number;
+  depth?: number;
+  width?: number;
+  height?: number;
   description: string;
   images_id: Types.ObjectId;
   audit_log: Types.ObjectId;
@@ -42,8 +42,8 @@ const productschema: Schema<Iproduct> = new mongoose.Schema(
       default: null,
     },
     selling_price: {
-      type: String,
-      default: null,
+      type: Number,
+      default: 0,
     },
     tax: {
       type: String,
@@ -62,37 +62,37 @@ const productschema: Schema<Iproduct> = new mongoose.Schema(
       default: null,
     },
     purchase_price: {
-      type: String,
-      default: null,
+      type: Number,
+      default: 0,
     },
     categorie: {
       type: Schema.Types.ObjectId,
-      ref: "Images",
+      ref: "Categorie",
     },
 
     total_quantity: {
-      type: String,
-      default: null,
+      type: Number,
+      default: 0,
     },
     barcode: {
       type: String,
       default: null,
     },
     weight: {
-      type: String,
-      default: null,
+      type: Number,
+      default: 0,
     },
     depth: {
-      type: String,
-      default: null,
+      type: Number,
+      default: 0,
     },
     width: {
-      type: String,
-      default: null,
+      type: Number,
+      default: 0,
     },
     height: {
-      type: String,
-      default: null,
+      type: Number,
+      default: 0,
     },
     images_id: [
       {
@@ -123,7 +123,7 @@ const productschema: Schema<Iproduct> = new mongoose.Schema(
 );
 
 const Product_model: Model<Iproduct> = mongoose.model<Iproduct>(
-  "categorie",
+  "Products",
   productschema
 );
 export default Product_model;

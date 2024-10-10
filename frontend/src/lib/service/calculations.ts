@@ -6,10 +6,13 @@ export const calculateNetAmount = (
   return quantity * unitPrice - discount;
 };
 
-export const calculateTotalIncludingGST = (unitPrice: number): number => {
+export const calculateTotalIncludingGST = (
+  unitPrice: number,
+  gst: number = 12
+): number => {
   const price: number = Number(unitPrice);
 
-  const gstAmount = (price * 12) / 100;
+  const gstAmount = (price * gst) / 100;
   const totalunitPrice = price + gstAmount;
 
   return parseFloat(totalunitPrice.toFixed(2));
@@ -59,6 +62,6 @@ export const calculate_without_GST_amount = (
   // console.log(total_amount,gst)
   const price: number = Number(total_amount);
   const gstAmount = (price * gst) / 100;
-  const total = price - gstAmount ;
+  const total = price - gstAmount;
   return parseFloat(total.toFixed(2));
 };

@@ -57,7 +57,7 @@ const categorieSchema: Schema<Icategory> = new mongoose.Schema(
 );
 
 const Categorie_model: Model<Icategory> = mongoose.model<Icategory>(
-  "categorie",
+  "Categorie",
   categorieSchema
 );
 export default Categorie_model;

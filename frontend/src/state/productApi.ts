@@ -21,16 +21,18 @@ export const productApi = createApi({
   endpoints: (builder) => ({
     addNewProduct: builder.mutation<any, product_type_form>({
       query: (data) => {
+        console.log(data);
         const formData = new FormData();
-        // if (data.images) {
-        //   data.images.forEach((file: any) => formData.append("images", file)); // Assuming 'images' is an array of files
-        // }
+        for (let [key, value] of Object.entries(data)) {
+          if (key === "images" && Array.isArray(value)) {
+            // Assuming 'images' is an array of files, append each file separately
+            value.forEach((file: any) => formData.append("images", file));
+          } else {
+            formData.append(key, value === undefined ? "" : value);
 
-        // // Append other data fields
-        // formData.append("name", data.name);
-        // formData.append("description", data.description);
-        // formData.append("uuid", data.uuid);
-        // formData.append("status", data.status);
+            // For all other fields, just append key-value pairs
+          }
+        }
 
         return {
           url: "/product/add",
@@ -44,16 +46,15 @@ export const productApi = createApi({
       query: (data) => {
         console.log(data);
         const formData = new FormData();
-        // if (data.images) {
-        //   data.images.forEach((file: any) => formData.append("images", file)); // Assuming 'images' is an array of files
-        // }
-
-        // formData.append("name", data.name);
-        // if (data.id) {
-        //   formData.append("id", data.id);
-        // }
-        // formData.append("description", data.description);
-        // formData.append("status", data.status);
+        for (let [key, value] of Object.entries(data)) {
+          if (key === "images" && Array.isArray(value)) {
+            // console.log(value)
+            // Assuming 'images' is an array of files, append each file separately
+            value.forEach((file: any) => formData.append("images", file));
+          } else {
+            formData.append(key, value === undefined ? "" : value);
+          }
+        }
         return {
           url: "/product/update",
           method: "POST",

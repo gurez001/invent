@@ -73,9 +73,11 @@ export const makeStore = () => {
     reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
-        serializableCheck: {
-          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-        },
+        immutableCheck: false, // Disable ImmutableStateInvariantMiddleware
+        serializableCheck: false, // Optionally disable serializableCheck if it's also causing performance issues
+        // serializableCheck: {
+        //   ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        // },
       }).concat(api.middleware).concat(usersApi.middleware).concat(vendorApi.middleware).concat(customerApi.middleware)
         .concat(categorieApi.middleware).concat(productApi.middleware)
   });

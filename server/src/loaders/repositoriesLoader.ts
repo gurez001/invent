@@ -2,6 +2,7 @@
 
 import CategorieRepository from "../repositories/categorieRepository";
 import CustomerRepository from "../repositories/customerRepository";
+import ProductRepository from "../repositories/productRepository";
 import UserRepository from "../repositories/userRepository";
 import VendorRepository from "../repositories/vendorRepository";
 
@@ -10,5 +11,12 @@ export const repositoriesLoader = () => {
   const vendorRepository = new VendorRepository();
   const customerRepository = new CustomerRepository();
   const categorieRepository = new CategorieRepository();
-  return { userRepository, vendorRepository,customerRepository,categorieRepository };
+  const productRepository = new ProductRepository();
+  return {
+    userRepository,
+    vendorRepository,
+    customerRepository,
+    categorieRepository,
+    productRepository,
+  };
 };

@@ -1,61 +1,82 @@
 export const status_arr = [
-    { label: "Active", value: "active" },
-    { label: "Inactive", value: "inactive" },
-  ];
-  export const gst_arr = [
-    {
-      value: "0",
-      label: "0%",
-    },
-    {
-      value: "0.1",
-      label: "0.1%",
-    },
-    {
-      value: "0.25",
-      label: "0.25%",
-    },
-    {
-      value: "1",
-      label: "1%",
-    },
-    {
-      value: "1.5",
-      label: "1.5%",
-    },
-    {
-      value: "3",
-      label: "3%",
-    },
-    {
-      value: "5",
-      label: "5%",
-    },
-    {
-      value: "6",
-      label: "6%",
-    },
-    {
-      value: "7.5",
-      label: "7.5%",
-    },
-    {
-      value: "12",
-      label: "12%",
-    },
-  
-    {
-      value: "18",
-      label: "18%",
-    },
-    {
-      value: "28",
-      label: "28%",
-    },
-  ];
+  { label: "Active", value: "active" },
+  { label: "Inactive", value: "inactive" },
+];
+export const order_status_arr = [
+  { label: "Pending Payment", value: "pending payment" },
+  { label: "Processing", value: "processing" },
+  { label: "On hold", value: "on-hold" },
+  { label: "Completed", value: "completed" },
+  { label: "Cancelled", value: "cancelled" },
+  { label: "Refunded", value: "refunded" },
+  { label: "Draft", value: "Draft" },
+];
+export const dispatch_mod_arr = [
+  { label: "Glow road", value: "Glow road" },
+  { label: "meesho", value: "meesho" },
+  { label: "flipkart", value: "flipkart" },
+];
+export const Payment_mode_arr = [
+  { label: "COD", value: "cod" },
+  { label: "Phonepe", value: "phonepe" },
+  { label: "Card", value: "card" },
+  { label: "Paytm", value: "paytm" },
+  { label: "G-pay", value: "g-pay" },
+  { label: "Other", value: "other" },
+];
+export const gst_arr = [
+  {
+    value: "0",
+    label: "0%",
+  },
+  {
+    value: "0.1",
+    label: "0.1%",
+  },
+  {
+    value: "0.25",
+    label: "0.25%",
+  },
+  {
+    value: "1",
+    label: "1%",
+  },
+  {
+    value: "1.5",
+    label: "1.5%",
+  },
+  {
+    value: "3",
+    label: "3%",
+  },
+  {
+    value: "5",
+    label: "5%",
+  },
+  {
+    value: "6",
+    label: "6%",
+  },
+  {
+    value: "7.5",
+    label: "7.5%",
+  },
+  {
+    value: "12",
+    label: "12%",
+  },
 
-  
-  export const Primary_units_arr = [
+  {
+    value: "18",
+    label: "18%",
+  },
+  {
+    value: "28",
+    label: "28%",
+  },
+];
+
+export const Primary_units_arr = [
   { value: "oth", label: "OTH OTHERS" },
   { value: "pcs", label: "PCS PIECES" },
   { value: "nos", label: "NOS NUMBERS" },

@@ -7,31 +7,31 @@ const customerRoutes = (customerController: CustomerController) => {
   router.post(
     "/add",
     isAuthenticatedUser,
-    authorizeRoles("admin"),
+authorizeRoles("admin", "employee"),
     customerController.add_new_customer.bind(customerController)
   ); // Defining vendor route
   router.post(
     "/update",
     isAuthenticatedUser,
-    authorizeRoles("admin"),
+authorizeRoles("admin", "employee"),
     customerController.update_details.bind(customerController)
   ); // Defining vendor route
   router.get(
     "/all-customers",
     isAuthenticatedUser,
-    authorizeRoles("admin"),
+authorizeRoles("admin", "employee"),
     customerController.all_customers.bind(customerController)
   ); // Defining vendor route
   router.post(
     "/remove/:id",
     isAuthenticatedUser,
-    authorizeRoles("admin"),
+authorizeRoles("admin", "employee"),
     customerController.removeCustomer.bind(customerController)
   );
   router.get(
     "/data/:id",
     isAuthenticatedUser,
-    authorizeRoles("admin"),
+authorizeRoles("admin", "employee"),
     customerController.get_customer.bind(customerController)
   );
   return router; // Return router so it can be used in app.ts

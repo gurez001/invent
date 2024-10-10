@@ -8,6 +8,7 @@ interface Paths {
     product_service: string;
     vendor: string;
     customer: string;
+    order: string;
   };
 }
 
@@ -21,5 +22,6 @@ export const paths: Paths = {
     product_service: "/crm/product",
     customer: "/crm/customer",
     vendor: "/crm/vendor",
+    order: "/crm/order",
   },
 };

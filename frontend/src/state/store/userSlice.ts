@@ -1,4 +1,5 @@
 // userSlice.ts
+import { RootState } from '@/app/redux';
 import { User_Data } from '@/types/auth_type';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -27,6 +28,6 @@ const userSlice = createSlice({
         },
     },
 });
-
+export const selectUser = (state: RootState) => state.user.user;
 export const { setUser, logout } = userSlice.actions;
 export default userSlice.reducer;

@@ -200,7 +200,7 @@ const Categotie_form: React.FC<vender_form_props> = ({
                   </div>
                 ) : (
                   <>
-                    <div className="w-60 p-4 lg:p-2">
+                    <div className="w-full p-4">
                       <div>
                         <Drag_input_field onDrop={handleDrop} />
                       </div>

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Button,
   Dropdown,
@@ -11,6 +11,8 @@ import { ChevronDownIcon, PlusIcon, SearchIcon } from "lucide-react";
 import React, { useState } from "react";
 import Select_normal from "../fields/Select_normal";
 import { capitalize } from "@/lib/service/capitalize";
+import { useSelector } from "react-redux";
+import { selectUser } from "@/state/store/userSlice";
 interface props {
   filterValue: string;
   statusFilter: string;
@@ -45,6 +47,7 @@ const TableTopContent: React.FC<props> = ({
   set_page_status,
 }) => {
   const [page_state, set_state] = useState<number>(1);
+  const user = useSelector(selectUser);
 
   const onSearchChange = React.useCallback((value?: string) => {
     if (value) {
@@ -68,9 +71,9 @@ const TableTopContent: React.FC<props> = ({
     []
   );
 
-  const hander_page_state = (value: string ) => {
+  const hander_page_state = (value: string) => {
     set_page_status(value);
-    set_state(value === "yes" ? 1 : value === "no"?2:3);
+    set_state(value === "yes" ? 1 : value === "no" ? 2 : 3);
   };
 
   return (
@@ -137,27 +140,41 @@ const TableTopContent: React.FC<props> = ({
 
           <Button
             size="sm"
-
             onClick={() => hander_page_state("yes")}
-            className={page_state===1?`bg-[#65a30d] text-white text-small`:"bg-white text-default-400 text-small"}
+            className={
+              page_state === 1
+                ? `bg-[#65a30d] text-white text-small`
+                : "bg-white text-default-400 text-small"
+            }
           >
             Publish
           </Button>
           <Button
             size="sm"
             onClick={() => hander_page_state("no")}
-            className={page_state===2?`bg-danger text-white text-small`:"bg-white text-default-400 text-small"}
+            className={
+              page_state === 2
+                ? `bg-danger text-white text-small`
+                : "bg-white text-default-400 text-small"
+            }
           >
             Trash
           </Button>
-          <Button
-            size="sm"
-            onClick={() => hander_page_state("final")}
-            className={page_state===3?`bg-black text-white text-small`:"bg-white text-default-400 text-small"}
-
-          >
-            Deleted
-          </Button>
+          {user && user.role === "admin" && (
+            <>
+              <Button
+                size="sm"
+                onClick={() => hander_page_state("final")}
+                className={
+                  page_state === 3
+                    ? `bg-black text-white text-small`
+                    : "bg-white text-default-400 text-small"
+                }
+              >
+                Deleted
+              </Button>
+            </>
+          )}
         </div>
         <label className="flex items-center text-default-400 text-small">
           Rows per page:

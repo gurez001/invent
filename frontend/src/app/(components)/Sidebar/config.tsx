@@ -64,6 +64,12 @@ export const navItems: MenuListProps[] = [
         icon: 'UserX',
         href: paths.crm.vendor,
       },
+      {
+        title: "Order",
+        label: "Order",
+        icon: 'UserX',
+        href: paths.crm.order,
+      },
 
     ],
   },
