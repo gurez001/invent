@@ -9,6 +9,8 @@ import CategorieService from "../services/categorieService";
 import CategorieRepository from "../repositories/categorieRepository";
 import ProductService from "../services/productService";
 import ProductRepository from "../repositories/productRepository";
+import OrderService from "../services/orderService";
+import OrderRepository from "../repositories/orderRepository";
 
 const servicesLoader = (repositories: {
   userRepository: UserRepository;
@@ -16,6 +18,7 @@ const servicesLoader = (repositories: {
   customerRepository: CustomerRepository;
   categorieRepository: CategorieRepository;
   productRepository: ProductRepository;
+  orderRepository: OrderRepository;
 }) => {
   const userService = new UserService(repositories.userRepository);
   const vendorService = new VendorService(repositories.vendorRepository);
@@ -24,6 +27,7 @@ const servicesLoader = (repositories: {
     repositories.categorieRepository
   );
   const productService = new ProductService(repositories.productRepository);
+  const orderService= new OrderService(repositories.orderRepository);
 
   return {
     userService,
@@ -31,6 +35,7 @@ const servicesLoader = (repositories: {
     customerService,
     categorieService,
     productService,
+    orderService
   };
 };
 

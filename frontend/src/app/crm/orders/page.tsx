@@ -1,8 +1,9 @@
-import Order from "@/components/pages/crm/order/Order";
+
+import List from "@/components/pages/crm/order/list/List";
 import React from "react";
 export const metadata = { title: `Order` };
 const page = () => {
-  return <Order />;
+  return <List />;
 };
 
 export default page;

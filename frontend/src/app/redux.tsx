@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useRef } from "react";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import {
@@ -29,6 +29,7 @@ import userSlice from "@/state/store/userSlice";
 import { customerApi } from "@/state/customerApi";
 import { categorieApi } from "@/state/categoriesApi";
 import { productApi } from "@/state/productApi";
+import { orderApi } from "@/state/orderApi";
 
 /* REDUX PERSISTENCE */
 const createNoopStorage = () => {
@@ -64,6 +65,7 @@ const rootReducer = combineReducers({
   [customerApi.reducerPath]: customerApi.reducer,
   [categorieApi.reducerPath]: categorieApi.reducer,
   [productApi.reducerPath]: productApi.reducer,
+  [orderApi.reducerPath]: orderApi.reducer,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
@@ -78,8 +80,14 @@ export const makeStore = () => {
         // serializableCheck: {
         //   ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         // },
-      }).concat(api.middleware).concat(usersApi.middleware).concat(vendorApi.middleware).concat(customerApi.middleware)
-        .concat(categorieApi.middleware).concat(productApi.middleware)
+      })
+        .concat(api.middleware)
+        .concat(usersApi.middleware)
+        .concat(vendorApi.middleware)
+        .concat(customerApi.middleware)
+        .concat(categorieApi.middleware)
+        .concat(productApi.middleware)
+        .concat(orderApi.middleware),
   });
 };
 

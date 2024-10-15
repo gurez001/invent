@@ -5,6 +5,7 @@ export interface IImages extends Document {
   originalname: string;
   encoding: string;
   mimetype: string;
+  fieldname: string;
   filename: string;
   path: string;
   size: number;
@@ -29,6 +30,10 @@ const imageSchema: Schema<IImages> = new mongoose.Schema(
       default: null,
     },
     filename: {
+      type: String,
+      default: null,
+    },
+    fieldname: {
       type: String,
       default: null,
     },
