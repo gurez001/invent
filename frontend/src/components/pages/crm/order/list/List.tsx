@@ -2,19 +2,18 @@
 import List_table from "@/components/common/table/List_table";
 import debounce from "lodash.debounce";
 import React, { useEffect, useMemo, useState } from "react";
-import { Chip, ChipProps, CircularProgress, Tooltip } from "@nextui-org/react";
+import { Chip, CircularProgress, Tooltip } from "@nextui-org/react";
 import { Trash2, Edit, RotateCcw, Eraser } from "lucide-react";
 import toast from "react-hot-toast";
 import { TimeAgo } from "@/lib/service/time/timeAgo";
-import Server_image_card from "@/components/image_compress/Server_image_card";
-import { useActionMutation, useGetAllproductsQuery } from "@/state/productApi";
+import { useActionMutation } from "@/state/productApi";
 import { Get_Response, product_type_list } from "@/types/Product_types";
-import { formatCurrency } from "@/lib/service/currencyUtils";
 import { useGetAllOrdersQuery } from "@/state/orderApi";
+import { statusColorMap } from "@/components/common/table/data";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface list_props {
-  set_open: (value: boolean) => void;
-  edit_handler: (value: any) => void;
 }
 const INITIAL_VISIBLE_COLUMNS = [
   "order_no",
@@ -41,12 +40,11 @@ const columns: any[] = [
   { name: "Actions", uid: "actions" }, // Added actions column
 ];
 
-const statusColorMap: Record<string, ChipProps["color"]> = {
-  active: "success",
-  inactive: "danger",
-};
 
-const List: React.FC<list_props> = ({ set_open, edit_handler }) => {
+
+const List: React.FC<list_props> = () => {
+  const router = useRouter();
+  const [open, set_open] = useState<Boolean>(false);
   const [filterValue, setFilterValue] = useState<string>("");
   const [page_status, set_page_status] = useState<string>("yes");
   const [debouncedFilterValue, setDebouncedFilterValue] =
@@ -64,7 +62,7 @@ const List: React.FC<list_props> = ({ set_open, edit_handler }) => {
     rowsPerPage: rowsPerPage,
     page: page,
   });
-  console.log(data)
+
   const [
     action,
     {
@@ -110,17 +108,19 @@ const List: React.FC<list_props> = ({ set_open, edit_handler }) => {
   }, [delete_error, delete_success, toast, error]);
   // Fetch vendors only when debouncedFilterValue has a valid value
 
+
+
   const response: Get_Response | undefined = data as Get_Response | undefined;
-  const product: Get_Response = useMemo(() => {
-    const product: product_type_list[] = response?.product || [];
+  const orders: Get_Response = useMemo(() => {
+    const orders: product_type_list[] = response?.orders || [];
     const resultPerpage: number = response?.resultPerpage || 0;
     const data_counter: number = response?.data_counter || 0;
-    return { product, resultPerpage, data_counter };
+    return { orders, resultPerpage, data_counter };
   }, [response]);
 
   const renderCell = React.useCallback(
-    (product: product_type_list, columnKey: React.Key) => {
-      const cellValue = product[columnKey as keyof product_type_list];
+    (orders: product_type_list, columnKey: React.Key) => {
+      const cellValue = orders[columnKey as keyof product_type_list];
 
       const deleteHandler = async (
         id: string,
@@ -162,11 +162,11 @@ const List: React.FC<list_props> = ({ set_open, edit_handler }) => {
           return (
             <Chip
               className="capitalize"
-              color={statusColorMap[product.status.toLocaleLowerCase()]}
+              color={statusColorMap[orders.status.toLocaleLowerCase()]}
               size="sm"
               variant="flat"
             >
-              {product.status ?? "Unknown"}
+              {orders.status ?? "Unknown"}
             </Chip>
           );
         case "updatedAt":
@@ -178,28 +178,29 @@ const List: React.FC<list_props> = ({ set_open, edit_handler }) => {
             <div className="relative flex justify-end gap-2">
               <Tooltip
                 content={
-                  product.is_active === "yes"
-                    ? "Edit product"
-                    : "Recover product"
+                  orders.is_active === "yes"
+                    ? "Edit order"
+                    : "Recover order"
                 }
               >
                 <span className="text-sm text-default-400 cursor-pointer active:opacity-50">
-                  {product && product.is_delete === "no" ? (
-                    product.is_active === "yes" ? (
-                      <Edit
-                        size={20}
-                        onClick={() => edit_handler(product._id)}
-                      />
-                    ) : product.is_active === "no" ? (
+                  {orders && orders.is_delete === "no" ? (
+                    orders.is_active === "yes" ? (
+                      <Link href={`/crm/orders/form/${orders._id}`}>
+                        <Edit
+                          size={20}
+                        />
+                      </Link>
+                    ) : orders.is_active === "no" ? (
                       <RotateCcw
-                        onClick={() => restoreHandler(product._id, "yes", "no")}
+                        onClick={() => restoreHandler(orders._id, "yes", "no")}
                         size={20}
                       />
                     ) : null /* Handle if no other case applies */
                   ) : (
                     <RotateCcw
                       onClick={() =>
-                        hard_restoreHandler(product._id, "no", "no")
+                        hard_restoreHandler(orders._id, "no", "no")
                       }
                       size={20}
                     />
@@ -209,31 +210,31 @@ const List: React.FC<list_props> = ({ set_open, edit_handler }) => {
 
               <Tooltip
                 content={
-                  product.is_active === "yes"
-                    ? "Delete product"
-                    : "Erase product"
+                  orders.is_active === "yes"
+                    ? "Delete order"
+                    : "Erase order"
                 }
               >
                 <span className="text-sm text-red-600 cursor-pointer active:opacity-50">
                   {
-                    product && product.is_delete === "no" ? (
+                    orders && orders.is_delete === "no" ? (
                       delete_loading ? (
                         <CircularProgress size="sm" aria-label="Loading..." />
-                      ) : product.is_active === "yes" ? (
+                      ) : orders.is_active === "yes" ? (
                         <Trash2
                           className="text-red-600"
-                          onClick={() => deleteHandler(product._id, "no", "no")}
+                          onClick={() => deleteHandler(orders._id, "no", "no")}
                           size={20}
                         />
                       ) : (
                         <Eraser
                           onClick={() =>
-                            hard_deleteHandler(product._id, "no", "yes")
+                            hard_deleteHandler(orders._id, "no", "yes")
                           }
                           size={20}
                         />
                       )
-                    ) : null /* Handle if product.is_delete is "no" */
+                    ) : null /* Handle if orders.is_delete is "no" */
                   }
                 </span>
               </Tooltip>
@@ -249,14 +250,14 @@ const List: React.FC<list_props> = ({ set_open, edit_handler }) => {
   return (
     <div>
       <List_table<product_type_list>
-        data={product.product}
+        data={orders.orders}
         loading={isLoading}
         columns={columns}
-        resultPerpage={product.resultPerpage}
+        resultPerpage={orders.resultPerpage}
         setRowsPerPage={setRowsPerPage}
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
-        data_length={product.data_counter}
+        data_length={orders.data_counter}
         page={page}
         setPage={setPage}
         filterValue={filterValue}

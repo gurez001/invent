@@ -23,7 +23,11 @@ import { useUpdateMutation } from "@/state/categoriesApi";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-export const Order_form = () => {
+interface order_form_props {
+  data_Loading: boolean;
+  data: any;
+}
+export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) => {
   const router = useRouter();
   const [invoice_files, set_invoice_Files] = useState<File[]>([]);
   const [doket_files, set_doket_Files] = useState<File[]>([]);
@@ -143,11 +147,87 @@ export const Order_form = () => {
     // Handle success messages
     if (isSuccess) {
       toast.success("Order added successfully");
-      router.push('/crm/orders')
+      // router.push('/crm/orders')
     } else if (update_success) {
       toast.success("Order updated successfully");
     }
-  }, [error, isSuccess, update_error, update_success,router]);
+  }, [error, isSuccess, update_error, update_success, router]);
+
+
+
+  const memoizedVendorData = useMemo(() => {
+    if (data && typeof data === "object" && !Array.isArray(data)) {
+      return {
+        name: data.name,
+        customer: data.customer,
+        dispatch_mod: data.dispatch_mod,
+        invoice_no: data.invoice_no,
+        payment_mode: data.payment_mode,
+        status: data.status,
+        order_date: data.order_date,
+        order_status: data.order_status,
+        company: data.company,
+        email: data.email,
+        phone: data.phone,
+        gstin: data.gstin,
+        shipping_address: {
+          address_line_1: data.shipping_address?.address_line_1 || '',
+          address_line_2: data.shipping_address?.address_line_2 || '',
+          city: data.shipping_address?.city || '',
+          state: data.shipping_address?.state || '',
+          pin_code: data.shipping_address?.pin_code || '',
+          country: data.shipping_address?.country || '',
+        },
+
+      };
+    }
+    return {} as Partial<order_type_form>; // Use Partial<vendr_form> to allow for missing keys
+  }, [data]);
+
+  useEffect(() => {
+    if (Object.keys(memoizedVendorData).length > 0) {
+      // Validate if memoizedVendorData has the correct structure
+      const isValidVendorData = (data: any): data is order_type_form => {
+        return data && typeof data === "object" && "name" in data; // Adjust according to your requirements
+      };
+
+      // Set product list from order details
+      set_Poduct_list(data.order_details?.product_details || []); // Use default empty array if not defined
+
+      if (isValidVendorData(memoizedVendorData)) {
+        // Recursive function to handle nested objects
+        const setNestedValues = (data: any, parentKey: string = '') => {
+          Object.keys(data).forEach((key) => {
+            const value = data[key];
+            const fullKey = parentKey ? `${parentKey}.${key}` : key; // Build the full key
+
+            if (value !== undefined) {
+              if (typeof value === "object" && value !== null) {
+                // If value is an object, recursively call the function
+                setNestedValues(value, fullKey);
+              } else {
+                // Set value for top-level keys and nested keys
+                console.log(`Setting value for ${fullKey}:`, value);
+                setValue(fullKey as keyof order_type_form, value); // Remove explicit cast to string for type safety
+              }
+            }
+          });
+        };
+
+        // Start setting values from the root object
+        setNestedValues(memoizedVendorData);
+      }
+    } else if (Object.keys(memoizedVendorData).length === 0) {
+      // Clear form if not in edit mode
+      (Object.keys(memoizedVendorData) as (keyof order_type_form)[]).forEach(
+        (key) => setValue(key, "")
+      );
+    }
+  }, [memoizedVendorData, setValue, data, set_Poduct_list]);
+
+
+
+
 
   return (
     <>

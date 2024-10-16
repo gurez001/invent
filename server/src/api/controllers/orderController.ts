@@ -18,7 +18,7 @@ class OrderController {
         user,
         next
       );
-      console.log(result)
+      console.log(result);
       if (result) {
         return res.status(201).json({
           success: true,
@@ -52,33 +52,32 @@ class OrderController {
 
       const resultPerpage = Number(query.rowsPerPage);
 
-      const product = await this.orderService.all(query);
-      console.log(query)
-      console.log(product)
+      const orders = await this.orderService.all(query);
+
       const data_counter = await this.orderService.data_counter(query);
-      if (product) {
+      if (orders) {
         return res.status(201).json({
           success: true,
-          product,
+          orders,
           resultPerpage,
           data_counter,
         });
       }
     }
   );
-  // get_single_data = AsyncHandler.handle(
-  //   async (req: Request, res: Response, next: NextFunction) => {
-  //     const { id } = req.params;
-  //     const product = await this.productService.find_by_id(id, next);
+  get_single_data = AsyncHandler.handle(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { id } = req.params;
+      const order = await this.orderService.find_by_id(id, next);
 
-  //     if (product) {
-  //       return res.status(201).json({
-  //         success: true,
-  //         product,
-  //       });
-  //     }
-  //   }
-  // );
+      if (order) {
+        return res.status(201).json({
+          success: true,
+          order,
+        });
+      }
+    }
+  );
   // remove = AsyncHandler.handle(
   //   async (req: Request, res: Response, next: NextFunction) => {
   //     const id: string = req.params.id;

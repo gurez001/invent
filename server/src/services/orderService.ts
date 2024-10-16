@@ -127,8 +127,8 @@ class OrderService {
   // async find_by_id_and_update(id: string, data: any, next: NextFunction) {
   //   return await this.productRepository.find_by_id_and_update(id, data, next);
   // }
-  // async find_by_id(id: string, next: NextFunction) {
-  //   return await this.productRepository.find_by_id(id, next);
-  // }
+  async find_by_id(id: string, next: NextFunction) {
+    return await this.orderRepository.find_by_id(id, next);
+  }
 }
 export default OrderService;

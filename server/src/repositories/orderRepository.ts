@@ -33,13 +33,13 @@ class OrderRepository {
       }
       return acc;
     }, {});
-
-    const shipping_data = { ...data.shipping_address, audit_log: user_id };
+    const parse_shipping = JSON.parse(data.shipping_address)
+    const shipping_data = { ...parse_shipping, audit_log: user_id };
     const [shipping_a] = await Promise.all([
       AddressModel.create(shipping_data),
     ]);
     const order_number = await Order_model.countDocuments();
-    
+
     // Build updated_data object
     const updated_data = {
       order_no: order_number,
@@ -156,8 +156,63 @@ class OrderRepository {
     const apiFeatures = new ApiFeatures(Order_model.find(), query);
     apiFeatures.search().filter().sort().pagination(resultPerPage);
 
-    const result = await apiFeatures.getQuery() // Use the public getter
-    .populate([
+    const result = await apiFeatures
+      .getQuery() // Use the public getter
+      .populate([
+        {
+          path: "customer",
+          model: "Customer",
+        },
+        {
+          path: "shipping_address",
+          model: "Address",
+        },
+        {
+          path: "order_details",
+          model: "Orders_details",
+        },
+        {
+          path: "image_id",
+          model: "Images",
+        },
+        {
+          path: "doket_id",
+          model: "Images",
+        },
+        {
+          path: "invoice_id",
+          model: "Images",
+        },
+        {
+          path: "audit_log",
+          model: "User",
+        },
+      ])
+      .sort({ updated_at: -1 })
+      .exec();
+
+    return result;
+  }
+
+  async data_counter(query: any) {
+    const apiFeatures = new ApiFeatures(Order_model.find(), query);
+    apiFeatures.search().filter();
+    const result = await apiFeatures.exec();
+    return result.length;
+  }
+  //   async find_by_id_and_update(id: string, data: any, next: NextFunction) {
+  //     const product = await Product_model.findById(id);
+
+  //     if (!product) {
+  //       return next(new ErrorHandler(`Product with ID ${id} not found`, 404));
+  //     }
+  //     product.is_active = data.state;
+  //     product.is_delete = data.hard_delete;
+  //     await product.save();
+  //     return product;
+  //   }
+  async find_by_id(id: string, next: NextFunction) {
+    const order = await Order_model.findById(id).populate([
       {
         path: "customer",
         model: "Customer",
@@ -186,50 +241,12 @@ class OrderRepository {
         path: "audit_log",
         model: "User",
       },
-    ])
-    .sort({ updated_at: -1 })
-    .exec();
+    ]);
 
-    return result;
+    if (!order) {
+      return next(new ErrorHandler(`Order with ID ${id} not found`, 404));
+    }
+    return order;
   }
-
-  async data_counter(query: any) {
-    const apiFeatures = new ApiFeatures(Order_model.find(), query);
-    apiFeatures.search().filter();
-    const result = await apiFeatures.exec();
-    return result.length;
-  }
-  //   async find_by_id_and_update(id: string, data: any, next: NextFunction) {
-  //     const product = await Product_model.findById(id);
-
-  //     if (!product) {
-  //       return next(new ErrorHandler(`Product with ID ${id} not found`, 404));
-  //     }
-  //     product.is_active = data.state;
-  //     product.is_delete = data.hard_delete;
-  //     await product.save();
-  //     return product;
-  //   }
-  //   async find_by_id(id: string, next: NextFunction) {
-  //     const product = await Product_model.findById(id).populate([
-  //       {
-  //         path: "audit_log",
-  //         model: "User",
-  //       },
-  //       {
-  //         path: "images_id",
-  //         model: "Images",
-  //       },
-  //       {
-  //         path: "categorie",
-  //         model: "Categorie",
-  //       },
-  //     ]);
-
-  //     if (!product) {
-  //       return next(new ErrorHandler(`Product with ID ${id} not found`, 404));
-  //     }
-  //     return product;
-  //   }
 }
 export default OrderRepository;

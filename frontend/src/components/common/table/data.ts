@@ -1,3 +1,5 @@
+import { ChipProps } from "@nextui-org/react";
+
 const columns = [
   { key: "producct_name", label: "Product Name" },
   { key: "qnty", label: "Quantity" },
@@ -8,7 +10,10 @@ const columns = [
   { key: "total", label: "Total" },
   { key: "actions", label: "Total" },
 ];
-
+export const statusColorMap: Record<string, ChipProps["color"]> = {
+  active: "success",
+  inactive: "danger",
+};
 const columns2 = [
   {name: "ID", uid: "id", sortable: true},
   {name: "NAME", uid: "name", sortable: true},
