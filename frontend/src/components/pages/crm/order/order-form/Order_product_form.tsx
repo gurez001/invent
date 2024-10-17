@@ -36,21 +36,37 @@ interface Order_product_form_props {
   product_list: any; set_Poduct_list: any; set_services?: any; services: any;
 }
 const Order_product_form: React.FC<Order_product_form_props> = ({ services, set_services, product_list, set_Poduct_list }) => {
-  const {
-    isOpen: isProductFormOpen,
-    onOpen: onProductFormOpen,
-    onClose: onProductFormClose,
-  } = useDisclosure();
+  const productFormDisclosure = useDisclosure();
+  const serviceFormDisclosure = useDisclosure();
+  console.log(product_list)
+  // Memoize total amount with GST to avoid recalculations on each render
+  const amount_with_gst = useMemo(() => {
+    return product_list.reduce((accumulator: number, item: any) => {
+      let sellingPrice = 0;
+      let tax = 0;
+      let quantity = 1; // Default to 1 if no quantity is found
+  
+      // Check if the item has a product field (structure with quantity)
+      if (item.product) {
+        sellingPrice = Number(item.product?.selling_price) || 0; // Extract from product field
+        tax = Number(item.product?.tax) || 0; // Extract from product field
+        quantity = item.quantity; // Use the quantity from the item
+      } else {
+        // Structure without product field
+        sellingPrice = Number(item.selling_price) || 0; // Extract directly from item
+        tax = Number(item.tax) || 0; // Extract directly from item
+        quantity = item.quantity; // Use the quantity from the item
+      }
+  
+      // Calculate total price with GST
+      const totalPrice = calculateTotalIncludingGST(sellingPrice, tax) * quantity;
+  
+      // Add the total price to the accumulator
+      return accumulator + totalPrice;
+    }, 0);
+  }, [product_list]);
+  
 
-  const {
-    isOpen: isServiceFormOpen,
-    onOpen: onServiceFormOpen,
-    onClose: onServiceFormClose,
-  } = useDisclosure();
-
-  const amount_with_gst = product_list.reduce((accumulator: any, product: any) => {
-    return accumulator + calculateTotalIncludingGST(Number(product.product.selling_price), Number(product.product.tax)) * product.quantity;
-  }, 0)
   return (
     <div>
       <Card>
@@ -65,88 +81,68 @@ const Order_product_form: React.FC<Order_product_form_props> = ({ services, set_
         </CardHeader>
         <Divider />
         <CardBody>
-          {product_list && product_list.map((item: any, i: number) => (
-            <div className="flex w-full mt-3">
-              <p className="w-[60%]">{item.product.name}</p>
-              <p className="w-[10%] text-center">{formatCurrency(item.product.selling_price)}</p>
-              <p className="w-[10%] text-center">{item.product.tax}%</p>
-              <p className="w-[10%] text-center">{item.quantity}</p>
-              <p className="w-[10%] text-center">{formatCurrency(calculateTotalIncludingGST(Number(item.product.selling_price), Number(item.product.tax)) * item.quantity)}</p>
-            </div>
-          ))}
+          {product_list?.map((item: any, i: number) => {
+            return (
+              <div key={i} className="flex w-full mt-3">
+                <p className="w-[60%] my-2">{item.product ? item.product.name : item.name}</p>
 
-
+                <p className="w-[10%] text-center">{formatCurrency(item.product ? item.product.selling_price : item?.selling_price)}</p>
+                <p className="w-[10%] text-center">{item.product ? item.product.tax : item?.tax}%</p>
+                <p className="w-[10%] text-center">{item.quantity}</p>
+                <p className="w-[10%] text-center">
+                  {formatCurrency(calculateTotalIncludingGST(Number(item.product ? item.product.selling_price : item?.selling_price), Number(item.product ? item.product.tax : item?.tax)) * item.quantity)}
+                </p>
+              </div>
+            );
+          })}
         </CardBody>
         <Divider />
         <CardFooter>
           <div className="flex gap-2 justify-end w-full">
-            <Button size="sm" onPress={onProductFormOpen}>
+            <Button size="sm" onClick={productFormDisclosure.onOpen}>
               Add product(s)
             </Button>
-            <Button size="sm" onPress={onServiceFormOpen}>
+            <Button size="sm" onClick={serviceFormDisclosure.onOpen}>
               Add service
             </Button>
           </div>
           <div className="w-full">
-            <div className="flex justify-end ">
-              <p className="w-[100px]">
-                Items Subtotal:
-              </p>
-              <p className="w-[100px]">
-                {
-                  formatCurrency(amount_with_gst)
-                }
-              </p>
-            </div>
-            <div className="flex justify-end ">
-              <p className="w-[100px]">
-                Voucher(s):
-              </p>
-              <p className="w-[100px]">
-                {formatCurrency(services ? services.discount : 0)}
-              </p>
-            </div>
-            <div className="flex justify-end ">
-              <p className="w-[100px]">
-                Shipping:
-              </p>
-              <p className="w-[100px]">
-                {formatCurrency(services ? services.shipping_charges : 0)}
-              </p>
-            </div>
-            <div className="flex justify-end ">
-              <p className="w-[100px]">
-                Other charges:
-              </p>
-              <p className="w-[100px]">
-                {formatCurrency(services ? services.other_charge : 0)}
-              </p>
-            </div>
-            <div className="flex justify-end ">
-              <p className="w-[100px]">
-                Order Total:
-              </p>
+            {[
+              { label: 'Items Subtotal:', value: amount_with_gst },
+              { label: 'Voucher(s):', value: services?.discount || 0 },
+              { label: 'Shipping:', value: services?.shipping_charges || 0 },
+              { label: 'Other charges:', value: services?.other_charge || 0 },
+            ].map(({ label, value }, index) => (
+              <div key={index} className="flex justify-end">
+                <p className="w-[100px]">{label}</p>
+                <p className="w-[100px]">{formatCurrency(value)}</p>
+              </div>
+            ))}
+            <div className="flex justify-end">
+              <p className="w-[100px]">Order Total:</p>
               <p className="w-[100px]">
                 {formatCurrency(
                   (services?.shipping_charges || 0) +
                   (services?.other_charge || 0) -
                   (services?.discount || 0) +
-                  (amount_with_gst || 0)
+                  amount_with_gst
                 )}
               </p>
             </div>
           </div>
-
         </CardFooter>
       </Card>
 
       <Product_service
-        isOpen={isServiceFormOpen}
-        onClose={onServiceFormClose}
+        isOpen={serviceFormDisclosure.isOpen}
+        onClose={serviceFormDisclosure.onClose}
         set_services={set_services}
       />
-      <ProductForm isOpen={isProductFormOpen} onClose={onProductFormClose}
-        list={product_list} set_Poduct_list={set_Poduct_list}
+      <ProductForm
+        isOpen={productFormDisclosure.isOpen}
+        onClose={productFormDisclosure.onClose}
+        list={product_list}
+        set_Poduct_list={set_Poduct_list}
       />
     </div>
   );
@@ -154,13 +150,11 @@ const Order_product_form: React.FC<Order_product_form_props> = ({ services, set_
 
 
 
-
 const ProductForm: React.FC<popover> = ({ isOpen, onClose, list, set_Poduct_list }) => {
   const [filterValue, setFilterValue] = useState<string>("");
   const [debouncedFilterValue, setDebouncedFilterValue] = useState<string>(filterValue);
-  const { control, handleSubmit, setValue, formState: { errors } } = useForm<order_product_type_form>({});
 
-  // Fetching product data
+  const { control, handleSubmit, formState: { errors } } = useForm<order_product_type_form>();
   const { data: product_data } = useGetAllproductsQuery({
     is_active: "yes",
     is_delete: "no",
@@ -171,25 +165,22 @@ const ProductForm: React.FC<popover> = ({ isOpen, onClose, list, set_Poduct_list
   });
   const [getSingle, { isLoading }] = useGetSingleMutation();
 
-  // Debounce for filtering products
-  const handleDebouncedFilter = useMemo(
-    () => debounce((value) => setDebouncedFilterValue(value), 300),
-    []
-  );
+  // Debounce filter input
+  const debouncedHandleFilter = useMemo(() => debounce(setDebouncedFilterValue, 300), []);
 
   useEffect(() => {
-    handleDebouncedFilter(filterValue);
-  }, [filterValue, handleDebouncedFilter]);
+    debouncedHandleFilter(filterValue);
+  }, [filterValue, debouncedHandleFilter]);
 
-  // Filter the product data
-  const filter_product_data = useMemo(() => {
-    return (
-      product_data?.product?.map((item: any) => ({
-        label: item.name,
-        value: item._id,
-      })) || []
-    );
-  }, [product_data]);
+  // Map product data for dropdown
+  const filter_product_data = useMemo(
+    () => product_data?.product?.map((item: any) => ({
+      label: item.name,
+      value: item._id,
+    })) || [],
+    [product_data]
+  );
+
 
   const onSubmit: SubmitHandler<any> = useCallback(
     async (formData: any) => {
@@ -212,171 +203,141 @@ const ProductForm: React.FC<popover> = ({ isOpen, onClose, list, set_Poduct_list
         toast.error('Error fetching data:', error)
       }
     },
-    [getSingle]  // Dependency array for useCallback
+    [getSingle, set_Poduct_list]  // Dependency array for useCallback
   );
 
-  const removeHandler = (index: number) => {
-    const remove_data = list.filter((_: any, i: number) => i !== index); // Fixed the filter syntax
-    set_Poduct_list(remove_data); // Set the state with the filtered list
-  };
+  const removeProduct = useCallback(
+    (index: number) => {
+      set_Poduct_list((prev: any) => prev.filter((_: any, i: number) => i !== index));
+    },
+    [set_Poduct_list]
+  );
 
   return (
-    <Modal size={"4xl"} isOpen={isOpen} onClose={onClose}>
+    <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
       <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">Add products</ModalHeader>
-            <ModalBody>
-
-              <div className="flex gap-2">
-                <div className="w-[69%]">Product</div>
-                <div className="w-[29%]">Quantity</div>
+        <ModalHeader className="flex flex-col gap-1">Add products</ModalHeader>
+        <ModalBody>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="flex gap-2">
+              <div className="w-[69%]">
+                <Secondary_Autocomplete_field
+                  control={control}
+                  errors={errors}
+                  name="product"
+                  label_name="Search product"
+                  options={filter_product_data}
+                />
               </div>
-              <Divider />
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="flex gap-2">
-                  <div className="w-[69%]">
-                    <Secondary_Autocomplete_field
-                      control={control}
-                      errors={errors}
-                      name="product"
-                      label_name="Search product"
-                      options={filter_product_data}
-                    />
-                  </div>
+              <div className="w-[29%]">
+                <Input_field
+                  control={control}
+                  errors={errors}
+                  name="quantity"
+                  label="Quantity"
+                  type="number"
+                />
+              </div>
+            </div>
 
-                  <div className="w-[29%]">
-                    <Input_field
-                      control={control}
-                      errors={errors}
-                      name="quantity"
-                      label="Quantity"
-                      type="number"
-                    />
+            <div className="mt-10">
+              <div className="flex w-full">
+                <p className="w-[60%] my-2">Item</p>
+                <p className="w-[10%] my-2 text-center">Cost</p>
+                <p className="w-[10%] my-2 text-center">Qnty</p>
+                <p className="w-[10%] my-2 text-center">Total</p>
+                <p className="w-[10%] my-2 text-center">Remove</p>
+              </div>
+
+              {list.map((item: any, i: number) => (
+                <div key={i} className="flex w-full mt-3">
+                  <p className="w-[60%] my-2">{item.product ? item.product.name : item.name}</p>
+                  <p className="w-[10%] my-2 text-center">{formatCurrency(item.product ? item.product.selling_price : item.selling_price)}</p>
+                  <p className="w-[10%] my-2 text-center">{item?.quantity}</p>
+                  <p className="w-[10%] my-2 text-center">
+                    {formatCurrency(calculateTotalIncludingGST(Number(item.product ? item.product.selling_price : item.selling_price), Number(item.product ? item.product.tax : item.tax)) * item.quantity)}
+                  </p>
+                  <div className="w-[10%] my-2 justify-center flex">
+                    <CircleX onClick={() => removeProduct(i)} className="cursor-pointer text-red" size={20} />
                   </div>
                 </div>
-                <div className="mt-10">
-                  <div className="flex w-full">
-                    <p className="w-[60%] my-2">Item</p>
-                    <p className="w-[10%] my-2 text-center">Cost</p>
-                    <p className="w-[10%] my-2 text-center">Qnty</p>
-                    <p className="w-[10%]  my-2 text-center">Total</p>
-                    <p className="w-[10%] my-2 text-center">Remove</p>
-                  </div>
-                  {list && list.map((item: any, i: number) => (
-                    <div className="flex w-full mt-3">
-                      <p className="w-[60%] my-2">{item.product.name}</p>
-                      <p className="w-[10%] my-2 text-center">{item.product.selling_price}</p>
-                      <p className="w-[10%] my-2 text-center">{item.quantity}</p>
-                      <p className="w-[10%] my-2 text-center">{calculateTotalIncludingGST(Number(item.product.selling_price), Number(item.product.tax)) * item.quantity}</p>
-                      <div className="w-[10%]  my-2 justify-center flex "><CircleX onClick={() => removeHandler(i)} className="cursor-pointer text-red" size={20} /></div>
+              ))}
+            </div>
 
-                    </div>
-                  ))}
-                </div>
-                <ModalFooter className="mt-2">
-                  <Button color="danger"
-                    variant="light" onPress={onClose}>
-                    Close
-                  </Button>
-                  <Button className="bg-black text-white" type="submit">
-                    Add
-                  </Button>
-                </ModalFooter>
-              </form>
+            <ModalFooter className="mt-2">
+              <Button color="danger" variant="light" onClick={onClose}>Close</Button>
+              <Button className="bg-black text-white" type="submit">Add</Button>
+            </ModalFooter>
+          </form>
 
-              {isLoading && (
-                <div className="absolute z-10 inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-                  <CircularProgress />
-                </div>
-              )}
-            </ModalBody>
-          </>
-        )}
+          {isLoading && (
+            <div className="absolute z-10 inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+              <CircularProgress />
+            </div>
+          )}
+        </ModalBody>
       </ModalContent>
     </Modal>
   );
 };
 
-
-
 const Product_service: React.FC<popover> = ({ isOpen, set_services, onClose }) => {
+  const { control, handleSubmit, formState: { errors } } = useForm<other_sevice>();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<other_sevice>({});
-
-  const onSubmit = (formData: any) => {
-    set_services(formData)
-    onClose()
-  }
+  const onSubmit = useCallback(
+    (formData: any) => {
+      set_services(formData);
+      onClose();
+    },
+    [set_services, onClose]
+  );
 
   return (
-    <>
-      <Modal size={"4xl"} isOpen={isOpen} onClose={onClose}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Add service
-              </ModalHeader>
-              <ModalBody>
+    <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
+      <ModalContent>
+        <ModalHeader className="flex flex-col gap-1">Add service</ModalHeader>
+        <ModalBody>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="flex gap-2 my-2">
+              <div className="w-[32%]">
+                <Input_field
+                  control={control}
+                  errors={errors}
+                  name="shipping_charges"
+                  label="Shipping charge"
+                  type="number"
+                />
+              </div>
 
-                <Divider />
-                <form onSubmit={handleSubmit(onSubmit)}>
-                  <div className="flex gap-2 my-2" >
-                    <div className="w-[32%]">
-                      <Input_field
-                        control={control}
-                        errors={errors}
-                        name="shipping_charges"
-                        label="Shipping charge"
-                        type="number"
+              <div className="w-[32%]">
+                <Input_field
+                  control={control}
+                  errors={errors}
+                  name="discount"
+                  label="Discount amount"
+                  type="number"
+                />
+              </div>
 
-                      />
-                    </div>
+              <div className="w-[32%]">
+                <Input_field
+                  control={control}
+                  errors={errors}
+                  name="other_charge"
+                  label="Other Charges"
+                  type="number"
+                />
+              </div>
+            </div>
 
-                    <div className="w-[32%]">
-                      <Input_field
-                        control={control}
-                        errors={errors}
-                        name="discount"
-                        label="Discount amount"
-                        type="number"
-
-                      />
-                    </div>
-                    <div className="w-[32%]">
-                      <Input_field
-                        control={control}
-                        errors={errors}
-                        name="other_charge"
-                        label="Other Charges"
-                        type="number"
-                      />
-                    </div>
-                  </div>
-                  <Divider />
-                  <ModalFooter className="mt-2">
-
-                    <Button color="danger"
-                      variant="light" onPress={onClose}>
-                      Close
-                    </Button>
-                    <Button className="bg-black text-white" type="submit">
-                      Add
-                    </Button>
-                  </ModalFooter>
-                </form>
-              </ModalBody>
-
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+            <ModalFooter className="mt-2">
+              <Button color="danger" variant="light" onClick={onClose}>Close</Button>
+              <Button className="bg-black text-white" type="submit">Add</Button>
+            </ModalFooter>
+          </form>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 };
 

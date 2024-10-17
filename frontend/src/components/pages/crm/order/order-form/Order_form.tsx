@@ -22,6 +22,7 @@ import { useAddNewOrderMutation } from "@/state/orderApi";
 import { useUpdateMutation } from "@/state/categoriesApi";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import Server_image_card from "@/components/image_compress/Server_image_card";
 
 interface order_form_props {
   data_Loading: boolean;
@@ -178,6 +179,15 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
           pin_code: data.shipping_address?.pin_code || '',
           country: data.shipping_address?.country || '',
         },
+        images: {
+          path: data.images_id?.[0]?.path || "",
+        },
+        doket: {
+          path: data.doket_id?.[0]?.path || "",
+        },
+        invoice: {
+          path: data.invoice_id?.[0]?.path || "",
+        },
 
       };
     }
@@ -193,7 +203,11 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
 
       // Set product list from order details
       set_Poduct_list(data.order_details?.product_details || []); // Use default empty array if not defined
-
+      set_services({
+        shipping_charges: data?.shipping_charges ?? 0,
+        discount: data?.discount ?? 0,
+        other_charge: data?.other_charge ?? 0
+      });
       if (isValidVendorData(memoizedVendorData)) {
         // Recursive function to handle nested objects
         const setNestedValues = (data: any, parentKey: string = '') => {
@@ -207,7 +221,7 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
                 setNestedValues(value, fullKey);
               } else {
                 // Set value for top-level keys and nested keys
-                console.log(`Setting value for ${fullKey}:`, value);
+                // console.log(`Setting value for ${fullKey}:`, value);
                 setValue(fullKey as keyof order_type_form, value); // Remove explicit cast to string for type safety
               }
             }
@@ -253,7 +267,7 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
                             control={control}
                             errors={errors}
                             name="order_date"
-                            label=""
+                            label="Date"
                           />
                         </div>
                         <div className="w-full my-[6px]">
@@ -419,6 +433,7 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
           </div>
         </div>
         <div className="w-[30%]">
+          
           <Form_sidebar
             invoice_files={invoice_files}
             set_invoice_Files={set_invoice_Files}
@@ -426,6 +441,7 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
             set_doket_Files={set_doket_Files}
             Image_files={Image_files}
             set_Image_Files={set_Image_Files}
+            data={data}
           />
         </div>
       </div>

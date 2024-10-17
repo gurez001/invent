@@ -12,11 +12,11 @@ class OrderDetailsRepository {
     data.map((item: any, i: number) => {
       updated_data.push({
         product_id: item.product._id,
-        product_name: item.product.name,
-        product_selling_price: item.product.selling_price,
-        product_primary_unit: item.product.primary_unit,
-        product_tax: item.product.tax,
-        product_purchase_price: item.product.purchase_price,
+        name: item.product.name,
+        selling_price: item.product.selling_price,
+        primary_unit: item.product.primary_unit,
+        tax: item.product.tax,
+        purchase_price: item.product.purchase_price,
         quantity: toNumber(item.quantity),
       });
     });

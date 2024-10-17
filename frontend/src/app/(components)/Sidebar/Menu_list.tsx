@@ -28,7 +28,7 @@ const Menu_list: React.FC<MenuListProps> = ({ pages }) => {
   return pages.map((item, i) =>
     item.page_data ? (
       <Accordion
-        key={`${i}-${item.label}-menu`}
+        key={i}
         showDivider={false}
         className="p-2 flex flex-col gap-1 w-full max-w-[300px]"
         variant="shadow"
