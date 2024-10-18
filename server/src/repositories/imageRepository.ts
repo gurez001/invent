@@ -9,12 +9,15 @@ class ImageRepository {
     next: NextFunction
   ) {
     try {
+     
       // Create an array to hold image objects
       const images_arr: any[] = [];
 
       // Check if data is an array or an object
       if (Array.isArray(data)) {
         // Handle the case when data is an array
+     
+
         data.forEach((image: any, i: number) => {
           images_arr.push({
             fieldname: image.fieldname,
@@ -30,7 +33,8 @@ class ImageRepository {
         });
       } else if (typeof data === "object" && data !== null) {
         // Handle the case when data is an object
-        Object.entries(data).forEach(([key, value]) => {
+        Object.entries(data).forEach(([key, value], entryIndex) => {
+
           if (Array.isArray(value)) {
             value.forEach((image: any, i: number) => {
               images_arr.push({
@@ -40,7 +44,7 @@ class ImageRepository {
                 mimetype: image.mimetype,
                 destination: image.destination,
                 filename: image.filename,
-                path: image_uploader[i]?.url || "", // Use optional chaining to avoid errors
+                path: image_uploader[entryIndex]?.url || "", // Use optional chaining to avoid errors
                 size: image.size,
                 audit_log: user_id,
               });

@@ -8,7 +8,6 @@ export interface BaseAddress {
 }
 
 export interface order_type_form {
-  order_date: string;
   order_status: string;
   customer: string;
   dispatch_mod: string;
@@ -17,14 +16,13 @@ export interface order_type_form {
   payment_mode: string;
   status: string;
   name: string;
-  company: string;
+  company?: string;
   email: string;
   phone: string;
   gstin: string;
 }
 
 export interface order_type_list {
-  order_date: string;
   order_status: string;
   customer: string;
   dispatch_mod: string;

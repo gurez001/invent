@@ -11,7 +11,7 @@
     privateKey: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'), // Handle newlines in the private key
     clientEmail: process.env.GOOGLE_CLIENT_EMAIL,
   };
-
+ 
   // Initialize Firebase
   export const initFirebase = async () => {
     if (!admin.apps.length) {

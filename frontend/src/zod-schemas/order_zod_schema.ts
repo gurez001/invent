@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const order_type_form_schema = z.object({
-  order_date: z.string().nonempty("Order date is required"),
   order_status: z.string().nonempty("Order status is required"),
   customer: z.string().nonempty("Customer is required"),
   dispatch_mod: z.string().nonempty("Dispatch mode is required"),
@@ -17,7 +16,7 @@ export const order_type_form_schema = z.object({
   payment_mode: z.string().nonempty("Payment mode is required"),
   status: z.string().optional(),
   name: z.string().nonempty("Name is required"),
-  company: z.string().nonempty("Company is required"),
+  Company: z.string().nonempty("Company is required").optional(),
   email: z.string().email("Invalid email format"),
   phone: z.string().nonempty("Phone is required"),
   gstin: z.string().optional(),

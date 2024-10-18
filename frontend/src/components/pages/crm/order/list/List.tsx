@@ -110,9 +110,9 @@ const List: React.FC<list_props> = () => {
 
 
 
-  const response: Get_Response | undefined = data as Get_Response | undefined;
-  const orders: Get_Response = useMemo(() => {
-    const orders: product_type_list[] = response?.orders || [];
+  const response: any | undefined = data as any | undefined;
+  const orders: any = useMemo(() => {
+    const orders: any[] = response?.orders || [];
     const resultPerpage: number = response?.resultPerpage || 0;
     const data_counter: number = response?.data_counter || 0;
     return { orders, resultPerpage, data_counter };

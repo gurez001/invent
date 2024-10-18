@@ -25,10 +25,13 @@ import { useRouter } from "next/navigation";
 import Server_image_card from "@/components/image_compress/Server_image_card";
 
 interface order_form_props {
-  data_Loading: boolean;
-  data: any;
+  data_Loading?: boolean;
+  data?: any;
 }
-export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) => {
+export const Order_form: React.FC<order_form_props> = ({
+  data_Loading,
+  data,
+}) => {
   const router = useRouter();
   const [invoice_files, set_invoice_Files] = useState<File[]>([]);
   const [doket_files, set_doket_Files] = useState<File[]>([]);
@@ -36,6 +39,7 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
   const [filterValue, setFilterValue] = useState<string>("");
   const [product_list, set_Poduct_list] = useState<any>([]);
   const [services, set_services] = useState<any>();
+  
   const [debouncedFilterValue, setDebouncedFilterValue] =
     useState<string>(filterValue);
   const [addNewOrder, { isLoading, isSuccess, error }] =
@@ -154,13 +158,11 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
     }
   }, [error, isSuccess, update_error, update_success, router]);
 
-
-
   const memoizedVendorData = useMemo(() => {
     if (data && typeof data === "object" && !Array.isArray(data)) {
       return {
         name: data.name,
-        customer: data.customer,
+        customer: data.customer._id,
         dispatch_mod: data.dispatch_mod,
         invoice_no: data.invoice_no,
         payment_mode: data.payment_mode,
@@ -172,12 +174,12 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
         phone: data.phone,
         gstin: data.gstin,
         shipping_address: {
-          address_line_1: data.shipping_address?.address_line_1 || '',
-          address_line_2: data.shipping_address?.address_line_2 || '',
-          city: data.shipping_address?.city || '',
-          state: data.shipping_address?.state || '',
-          pin_code: data.shipping_address?.pin_code || '',
-          country: data.shipping_address?.country || '',
+          address_line_1: data.shipping_address?.address_line_1 || "",
+          address_line_2: data.shipping_address?.address_line_2 || "",
+          city: data.shipping_address?.city || "",
+          state: data.shipping_address?.state || "",
+          pin_code: data.shipping_address?.pin_code || "",
+          country: data.shipping_address?.country || "",
         },
         images: {
           path: data.images_id?.[0]?.path || "",
@@ -188,7 +190,6 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
         invoice: {
           path: data.invoice_id?.[0]?.path || "",
         },
-
       };
     }
     return {} as Partial<order_type_form>; // Use Partial<vendr_form> to allow for missing keys
@@ -206,11 +207,11 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
       set_services({
         shipping_charges: data?.shipping_charges ?? 0,
         discount: data?.discount ?? 0,
-        other_charge: data?.other_charge ?? 0
+        other_charge: data?.other_charge ?? 0,
       });
       if (isValidVendorData(memoizedVendorData)) {
         // Recursive function to handle nested objects
-        const setNestedValues = (data: any, parentKey: string = '') => {
+        const setNestedValues = (data: any, parentKey: string = "") => {
           Object.keys(data).forEach((key) => {
             const value = data[key];
             const fullKey = parentKey ? `${parentKey}.${key}` : key; // Build the full key
@@ -239,10 +240,6 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
     }
   }, [memoizedVendorData, setValue, data, set_Poduct_list]);
 
-
-
-
-
   return (
     <>
       <div className="flex gap-2">
@@ -262,14 +259,6 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
                   <div className="bg-white">
                     <div className="flex flex-wrap gap-2">
                       <div className="w-[48.5%]">
-                        <div className="w-full my-[6px]">
-                          <DatePickerField
-                            control={control}
-                            errors={errors}
-                            name="order_date"
-                            label="Date"
-                          />
-                        </div>
                         <div className="w-full my-[6px]">
                           <Select_field
                             control={control}
@@ -433,7 +422,6 @@ export const Order_form: React.FC<order_form_props> = ({ data_Loading, data }) =
           </div>
         </div>
         <div className="w-[30%]">
-          
           <Form_sidebar
             invoice_files={invoice_files}
             set_invoice_Files={set_invoice_Files}

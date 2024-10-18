@@ -18,13 +18,13 @@ class OrderService {
       product_details,
       next
     );
-
     // Flatten the files object into a single array
     let allFiles = [
       ...(files.invoice || []),
       ...(files.doket || []),
       ...(files.image || []),
     ];
+    
 
     // Check if there are files to upload
     if (allFiles.length === 0) {
@@ -40,7 +40,8 @@ class OrderService {
         new ErrorHandler("Something went wrong with the upload.", 500)
       );
     }
-
+    // console.log(image_uploader)
+   
     // Check if uploads were successful
     if (!image_uploader || image_uploader.length === 0) {
       return next(
@@ -57,7 +58,7 @@ class OrderService {
       user_id,
       next
     );
-
+    console.log(image_data)
     if (!image_data) {
       return next(
         new ErrorHandler(

@@ -25,7 +25,6 @@ class OrderRepository {
         return next(new ErrorHandler("Invalid services JSON format", 400));
       }
     }
-
     // Extract image ids into merged object
     const merged = image_data.reduce((acc: any, { fieldname, _id }: any) => {
       if (["image", "doket", "invoice"].includes(fieldname)) {
@@ -42,9 +41,9 @@ class OrderRepository {
 
     // Build updated_data object
     const updated_data = {
-      order_no: order_number,
+      order_no: order_number + 1,
       order_id: `ord_${data.uuid}_${rendom_id}`,
-      order_date: data.order_date,
+      order_date:new Date(),
       order_status: data.order_status,
       customer: data.customer,
       dispatch_mod: data.dispatch_mod,
@@ -88,6 +87,7 @@ class OrderRepository {
 
       // Save the order
       const newOrder = new Order_model(updated_data);
+
       return await newOrder.save();
     } catch (error: any) {
       console.log(error);

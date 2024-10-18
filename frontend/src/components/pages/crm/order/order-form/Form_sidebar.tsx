@@ -31,10 +31,10 @@ export const Form_sidebar: React.FC<sidebar_props> = ({
     doket: [] as { img: string; name: string }[],
     image: [] as { img: string; name: string }[],
   });
+
   const [field_visible, set_field_visible] = useState([false, false, false]);
   const [item_visible, set_item_visible] = useState([false, false, false]);
 
-  const router = useRouter();
 
   const handleDrop = useCallback(
     (acceptedFiles: File[], type: string) => {

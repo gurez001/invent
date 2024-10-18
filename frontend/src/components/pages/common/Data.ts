@@ -12,9 +12,15 @@ export const order_status_arr = [
   { label: "Draft", value: "Draft" },
 ];
 export const dispatch_mod_arr = [
+  { label: "Self", value: "Self" },
   { label: "Glow road", value: "Glow road" },
-  { label: "meesho", value: "meesho" },
-  { label: "flipkart", value: "flipkart" },
+  { label: "Meesho", value: "Meesho" },
+  { label: "Flipkart", value: "Flipkart" },
+  { label: "Amazon", value: "Amazon" },
+  { label: "Ecom Express", value: "Ecom Express" },
+  { label: "Ekart Logistics", value: "Ekart Logistics" },
+  { label: "XpressBees", value: "XpressBees" },
+  { label: "DTDC", value: "DTDC" },
 ];
 export const Payment_mode_arr = [
   { label: "COD", value: "cod" },
