@@ -45,7 +45,7 @@ const Order_product_form: React.FC<Order_product_form_props> = ({ services, set_
       let sellingPrice = 0;
       let tax = 0;
       let quantity = 1; // Default to 1 if no quantity is found
-  
+
       // Check if the item has a product field (structure with quantity)
       if (item.product) {
         sellingPrice = Number(item.product?.selling_price) || 0; // Extract from product field
@@ -57,15 +57,15 @@ const Order_product_form: React.FC<Order_product_form_props> = ({ services, set_
         tax = Number(item.tax) || 0; // Extract directly from item
         quantity = item.quantity; // Use the quantity from the item
       }
-  
+
       // Calculate total price with GST
       const totalPrice = calculateTotalIncludingGST(sellingPrice, tax) * quantity;
-  
+
       // Add the total price to the accumulator
       return accumulator + totalPrice;
     }, 0);
   }, [product_list]);
-  
+
 
   return (
     <div>
@@ -187,13 +187,30 @@ const ProductForm: React.FC<popover> = ({ isOpen, onClose, list, set_Poduct_list
       try {
         const { product, quantity } = formData;  // Extract 'product' (or any other field) from form data
         const result = await getSingle(product);  // Pass the product or id to the mutation
+        console.log(quantity)
         if (result?.data) {
           const data: any = result.data;
           const porduct: any = data?.product;
-          set_Poduct_list((prev: any) => [
-            ...prev,
-            { product: porduct, quantity: quantity }  // Correct spelling and ensure quantity is defined
-          ]);
+          set_Poduct_list((prev: any) => {
+            const existingProductIndex = prev.findIndex(
+              (p: any) => p.product._id === porduct._id
+            );
+
+
+            if (existingProductIndex >= 0) {
+              // If the product exists, update its quantity
+              const updatedList = [...prev];
+              updatedList[existingProductIndex].quantity  + quantity;  // Add new quantity to the existing quantity
+              return updatedList;
+            } else {
+              // If the product doesn't exist, add it to the list
+              return [
+                ...prev,
+                { product: porduct, quantity: quantity }  // Add new product with quantity
+              ];
+            }
+
+          });
         } else {
           const data: any = result.error;
           const error: any = data.data.message;
