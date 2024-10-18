@@ -4,6 +4,7 @@ import { useGetSingleMutation } from '@/state/orderApi';
 import { order_type_form, Post_Response } from '@/types/order_type';
 import React, { useEffect, memo, useMemo } from 'react';
 import { Order_form } from '../order-form/Order_form';
+import { CircularProgress } from '@nextui-org/react';
 
 interface UpdateOrderProps {
     id: string;
@@ -29,8 +30,13 @@ const UpdateOrder: React.FC<UpdateOrderProps> = memo(({ id }) => {
 
     return (
         <div>
-            <Order_form data_Loading={isLoading} data={order} />
-
+            {isLoading ? (
+                <div className="absolute z-10 inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+                    <CircularProgress />
+                </div>
+            ) :
+                <Order_form data={order} edit={true} />
+            }
         </div>
     );
 });

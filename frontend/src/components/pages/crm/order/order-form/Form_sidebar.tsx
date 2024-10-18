@@ -4,7 +4,6 @@ import Server_image_card from "@/components/image_compress/Server_image_card";
 import React, { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import Image_card from "@/components/image_compress/Image_card";
-import { useRouter } from "next/navigation";
 import { Button, Card, CardBody, Divider } from "@nextui-org/react";
 
 interface sidebar_props {
@@ -68,7 +67,8 @@ export const Form_sidebar: React.FC<sidebar_props> = ({
   };
 
   const View_file_handler = (item: any) => {
-    window.open(item.img, "_blank");
+    item.img ?
+      window.open(item.img, "_blank") : window.open(item.path, "_blank")
   };
 
   useEffect(() => {
@@ -120,9 +120,14 @@ export const Form_sidebar: React.FC<sidebar_props> = ({
               {item_visible[index] ? (
                 <div className="flex w-full flex-wrap gap-2">
                   {data?.[dataKey]?.map((item: any, i: number) => (
-                    <div className="w-full" key={i}>
-                      <Server_image_card src={item.path} alt={item.originalname} width={200} height={200} />
-                    </div>
+                    <>
+                      <div className="w-full" key={i}>
+                        <Server_image_card src={item.path} alt={item.originalname} width={200} height={200} />
+                      </div>
+                      <Button className="bg-black mt-2 text-white" onClick={() => View_file_handler(item)}>
+                        View
+                      </Button>
+                    </>
                   ))}
                 </div>
               ) : (
