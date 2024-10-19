@@ -24,7 +24,6 @@ class OrderService {
       ...(files.doket || []),
       ...(files.image || []),
     ];
-    
 
     // Check if there are files to upload
     if (allFiles.length === 0) {
@@ -40,8 +39,7 @@ class OrderService {
         new ErrorHandler("Something went wrong with the upload.", 500)
       );
     }
-    // console.log(image_uploader)
-   
+
     // Check if uploads were successful
     if (!image_uploader || image_uploader.length === 0) {
       return next(
@@ -58,7 +56,7 @@ class OrderService {
       user_id,
       next
     );
-    console.log(image_data)
+
     if (!image_data) {
       return next(
         new ErrorHandler(
@@ -76,49 +74,69 @@ class OrderService {
       next
     );
   }
-  // async update(data: any, files: any, user_id: string, next: NextFunction) {
-  //   const id_exist = await this.productRepository.find_by_id(data.id, next);
-  //   if (!id_exist) {
-  //     return next(new ErrorHandler("Product ID does not exist", 400));
-  //   }
-  //   const existing_name = await this.productRepository.findByName(data.name);
-  //   if (existing_name) {
-  //     if (existing_name && existing_name.name !== id_exist.name) {
-  //       return next(
-  //         new ErrorHandler("Product with this Name already exists", 400)
-  //       );
-  //     }
-  //   }
-  //   let image_uploader;
-  //   let image_data;
-  //   if (files.length > 0) {
-  //     image_uploader = await imageUploader.uploadImage(files, next);
-  //     if (!image_uploader) {
-  //       return next(
-  //         new ErrorHandler(
-  //           "Something wrong image is not uploaded to the server",
-  //           404
-  //         )
-  //       );
-  //     }
-  //     image_data = await add_image.createImage(
-  //       files,
-  //       image_uploader,
-  //       user_id,
-  //       next
-  //     );
-  //     if (!image_data) {
-  //       return next(
-  //         new ErrorHandler(
-  //           "Something wrong image is not added into database",
-  //           404
-  //         )
-  //       );
-  //     }
-  //   }
-  //   // await FileManager.deleteFiles(files);
-  //   return await this.productRepository.update(data, image_data, user_id,next);
-  // }
+  async update(data: any, files: any, user_id: string, next: NextFunction) {
+    const product_details = JSON.parse(data.products_details);
+
+    const order_details_data = await orderDetailsRepository.create(
+      product_details,
+      next
+    );
+
+    // Flatten the files object into a single array
+    let allFiles = [
+      ...(files.invoice || []),
+      ...(files.doket || []),
+      ...(files.image || []),
+    ];
+
+    // Check if there are files to upload
+    let image_uploader;
+    let image_data;
+    if (allFiles.length > 0) {
+      // Use a single upload call for all files
+      try {
+        image_uploader = await imageUploader.uploadImage(allFiles, next);
+      } catch (error) {
+        return next(
+          new ErrorHandler("Something went wrong with the upload.", 500)
+        );
+      }
+
+      // Check if uploads were successful
+      if (!image_uploader || image_uploader.length === 0) {
+        return next(
+          new ErrorHandler(
+            "Something went wrong; images are not uploaded to the server",
+            404
+          )
+        );
+      }
+
+      image_data = await add_image.createImage(
+        files,
+        image_uploader,
+        user_id,
+        next
+      );
+
+      if (!image_data) {
+        return next(
+          new ErrorHandler(
+            "Something wrong image is not added into database",
+            404
+          )
+        );
+      }
+    }
+    // await FileManager.deleteFiles(files);
+    return await this.orderRepository.update(
+      data,
+      image_data,
+      user_id,
+      order_details_data,
+      next
+    );
+  }
   async all(query: any) {
     return await this.orderRepository.all(query);
   }

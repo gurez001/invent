@@ -8,26 +8,25 @@ class OrderDetailsRepository {
   async create(data: any, next: NextFunction) {
     const toNumber = (value: any) => (isNaN(Number(value)) ? 0 : Number(value));
 
-    const updated_data: any[] = [];
-    data.map((item: any, i: number) => {
-      updated_data.push({
-        product_id: item.product._id,
-        name: item.product.name,
-        selling_price: item.product.selling_price,
-        primary_unit: item.product.primary_unit,
-        tax: item.product.tax,
-        purchase_price: item.product.purchase_price,
-        quantity: toNumber(item.quantity),
-      });
-    });
+    const updated_data: any[] = data.map((item: any) => {
+      // Check if item.product exists, otherwise default to an empty object
+      const product = item.product || item; // fallback to item itself if product is not defined
 
-    
+      return {
+        product_id: product._id ? product._id : product.product_id,
+        name: product.name || "",
+        selling_price: product.selling_price || 0,
+        primary_unit: product.primary_unit || "",
+        tax: product.tax || "0",
+        purchase_price: product.purchase_price || 0,
+        quantity: toNumber(item.quantity),
+      };
+    });
 
     try {
       const newOrderDetails = new Order_details_model({
         product_details: updated_data, // Wrap in `product_details`
       });
-
       return await newOrderDetails.save();
     } catch (error: any) {
       return next(new ErrorHandler(error, 404));

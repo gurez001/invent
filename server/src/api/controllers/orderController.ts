@@ -18,7 +18,7 @@ class OrderController {
         user,
         next
       );
-      console.log(result);
+     
       if (result) {
         return res.status(201).json({
           success: true,
@@ -26,26 +26,26 @@ class OrderController {
       }
     }
   );
-  // update = AsyncHandler.handle(
-  //   async (req: Request, res: Response, next: NextFunction) => {
-  //     const user: string = (req as any).user._id;
-  //     const files = req.files;
-  //     if (!user) {
-  //       return next(new ErrorHandler("User not authenticated", 401));
-  //     }
-  //     const product = await this.productService.update(
-  //       req.body,
-  //       files,
-  //       user,
-  //       next
-  //     );
-  //     if (product) {
-  //       return res.status(201).json({
-  //         success: true,
-  //       });
-  //     }
-  //   }
-  // );
+  update = AsyncHandler.handle(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const user: string = (req as any).user._id;
+      const files = req.files;
+      if (!user) {
+        return next(new ErrorHandler("User not authenticated", 401));
+      }
+      const result = await this.orderService.update(
+        req.body,
+        files,
+        user,
+        next
+      );
+      // if (product) {
+      return res.status(201).json({
+        success: true,
+      });
+      // }
+    }
+  );
   all = AsyncHandler.handle(
     async (req: Request, res: Response, next: NextFunction) => {
       const query = req.query;

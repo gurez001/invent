@@ -111,6 +111,7 @@ export const Order_form: React.FC<order_form_props> = ({
         const invoice = invoice_files.length > 0 ? invoice_files : invoice_url;
         const updated_data = {
           ...form_data,
+          id: data?._id,
           product: product_list,
           services: services,
           invoice: invoice,
@@ -137,7 +138,7 @@ export const Order_form: React.FC<order_form_props> = ({
         setOperationSuccess(true);
       }
     },
-    [addNewOrder, update, data, invoice_files, edit, doket_files, Image_files]
+    [addNewOrder, update, data, invoice_files,product_list,services, edit, doket_files, Image_files]
   );
 
 

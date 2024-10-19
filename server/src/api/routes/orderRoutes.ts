@@ -17,13 +17,17 @@ const orderRoutes = (orderController: OrderController) => {
     authorizeRoles("admin", "employee"),
     orderController.add_new.bind(orderController)
   );
-  // router.post(
-  //   "/update",
-  //   upload.array("images", 10),
-  //   isAuthenticatedUser,
-  // authorizeRoles("admin", "employee"),
-  //   productController.update.bind(productController)
-  // );
+  router.post(
+    "/update",
+    upload.fields([
+      { name: "image", maxCount: 10 }, // Field "images" with up to 10 files
+      { name: "invoice", maxCount: 5 }, // Field "invoices" with up to 5 files
+      { name: "doket", maxCount: 3 }, // Field "documents" with up to 3 files
+    ]),
+    isAuthenticatedUser,
+    authorizeRoles("admin", "employee"),
+    orderController.update.bind(orderController)
+  );
   router.get(
     "/all-orders",
     isAuthenticatedUser,

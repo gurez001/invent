@@ -38,8 +38,6 @@ interface Order_product_form_props {
 const Order_product_form: React.FC<Order_product_form_props> = ({ services, set_services, product_list, set_Poduct_list }) => {
   const productFormDisclosure = useDisclosure();
   const serviceFormDisclosure = useDisclosure();
-  console.log(product_list)
-  // Memoize total amount with GST to avoid recalculations on each render
   const amount_with_gst = useMemo(() => {
     return product_list.reduce((accumulator: number, item: any) => {
       let sellingPrice = 0;
@@ -193,14 +191,14 @@ const ProductForm: React.FC<popover> = ({ isOpen, onClose, list, set_Poduct_list
           const porduct: any = data?.product;
           set_Poduct_list((prev: any) => {
             const existingProductIndex = prev.findIndex(
-              (p: any) => p.product._id === porduct._id
+              (p: any) => p.product?._id === porduct?._id
             );
 
 
             if (existingProductIndex >= 0) {
               // If the product exists, update its quantity
               const updatedList = [...prev];
-              updatedList[existingProductIndex].quantity  + quantity;  // Add new quantity to the existing quantity
+              updatedList[existingProductIndex].quantity  = quantity;  // Add new quantity to the existing quantity
               return updatedList;
             } else {
               // If the product doesn't exist, add it to the list

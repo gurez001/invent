@@ -15,7 +15,6 @@ class OrderRepository {
     order_details: any,
     next: NextFunction
   ) {
-    console.log(data)
     const rendom_id = generateRandomId();
     // Check if data.services is defined and a valid JSON string
     let service_data: any = {};
@@ -33,7 +32,7 @@ class OrderRepository {
       }
       return acc;
     }, {});
-    const parse_shipping = JSON.parse(data.shipping_address)
+    const parse_shipping = JSON.parse(data.shipping_address);
     const shipping_data = { ...parse_shipping, audit_log: user_id };
     const [shipping_a] = await Promise.all([
       AddressModel.create(shipping_data),
@@ -44,7 +43,7 @@ class OrderRepository {
     const updated_data = {
       order_no: order_number + 1,
       order_id: `ord_${data.uuid}_${rendom_id}`,
-      order_date:new Date(),
+      order_date: new Date(),
       order_status: data.order_status,
       customer: data.customer,
       dispatch_mod: data.dispatch_mod,
@@ -97,62 +96,106 @@ class OrderRepository {
     }
   }
 
-  // async update(
-  //   data: any,
-  //   image_data: any,
-  //   user_id: string,
-  //   next: NextFunction
-  // ) {
-  //   const toNumber = (value: any) => (isNaN(Number(value)) ? 0 : Number(value));
+  async update(
+    data: any,
+    image_data: any,
+    user_id: string,
+    order_details: any,
+    next: NextFunction
+  ) {
+    const rendom_id = generateRandomId();
+    let service_data: any = {};
 
-  //   const image_ids =
-  //     Array.isArray(image_data) && image_data.length > 0
-  //       ? image_data.map((item: any) => item._id)
-  //       : [];
+    if (data.services && data.services !== "undefined") {
+      try {
+        service_data = JSON.parse(data.services);
+      } catch (error) {
+        return next(new ErrorHandler("Invalid services JSON format", 400));
+      }
+    }
 
-  //   const updated_data: any = {
-  //     name: data.name,
-  //     status: data.status,
-  //     selling_price: toNumber(data.selling_price),
-  //     tax: data.tax,
-  //     primary_unit: data.primary_unit,
-  //     sku: data.sku,
-  //     hsn: data.hsn,
-  //     purchase_price: toNumber(data.purchase_price),
-  //     total_quantity: toNumber(data.total_quantity),
-  //     barcode: data.barcode,
-  //     weight: toNumber(data.weight),
-  //     depth: toNumber(data.depth),
-  //     width: toNumber(data.width),
-  //     height: toNumber(data.height),
-  //     images_id: image_ids.length > 0 ? image_ids : data.images && data.images,
-  //     audit_log: user_id,
-  //   };
-  //   if (data.categorie && mongoose.Types.ObjectId.isValid(data.categorie)) {
-  //     updated_data.categorie = data.categorie;
-  //   }
-  //   try {
-  //     const updated_custome_data = await Product_model.findByIdAndUpdate(
-  //       data.id,
-  //       updated_data,
-  //       {
-  //         new: true,
-  //         runValidators: true,
-  //         useFindAndModify: false,
-  //       }
-  //     );
-  //     if (!updated_custome_data) {
-  //       return next(new ErrorHandler("Product not found", 404));
-  //     }
-  //     return updated_custome_data
-  //   } catch (error: any) {
-  //     return next(new ErrorHandler(error, 404));
-  //   }
-  // }
-  // async findByName(name: any) {
-  //   const customer = await Product_model.findOne({ name: name });
-  //   return customer;
-  // }
+    // Use reduce to create merged object from image_data
+    const merged = (image_data || []).reduce(
+      (acc: any, { fieldname, _id }: any) => {
+        if (["image", "doket", "invoice"].includes(fieldname)) {
+          acc[`${fieldname}_id`] = _id;
+        }
+        return acc;
+      },
+      {}
+    );
+
+    const parse_shipping = JSON.parse(data.shipping_address);
+    const shipping_data = { ...parse_shipping, audit_log: user_id };
+
+    const [shipping_a] = await Promise.all([
+      AddressModel.create(shipping_data),
+    ]);
+    const order_number = await Order_model.countDocuments();
+
+    // Build updated_data object
+    const updated_data = {
+      order_no: order_number + 1,
+      order_id: `ord_${data.uuid}_${rendom_id}`,
+      order_date: new Date(),
+      order_status: data.order_status,
+      customer: data.customer,
+      dispatch_mod: data.dispatch_mod,
+      invoice_no: data.invoice_no,
+      payment_mode: data.payment_mode,
+      name: data.name,
+      shipping_charges: service_data.shipping_charges || 0,
+      discount: service_data.discount || 0,
+      other_charge: service_data.other_charge || 0,
+      order_details: order_details._id,
+      shipping_address: shipping_a._id,
+      company: data.company,
+      email: data.email,
+      notes: data.notes,
+      phone: data.phone,
+      gstin: data.gstin,
+      audit_log: user_id,
+      invoice_id: merged.invoice_id || data.invoice,
+      doket_id: merged.doket_id || data.doket,
+      image_id: merged.image_id || data.image,
+    };
+
+    try {
+      // Update product quantities in the Product model
+      const productUpdates = order_details.product_details.map(
+        async ({ product_id, quantity }: any) => {
+          return Product_model.findOneAndUpdate(
+            { _id: product_id },
+            { $inc: { total_quantity: -quantity } }, // Decrease total_quantity
+            { new: true } // Return the updated product
+          );
+        }
+      );
+
+      // Await all updates
+      await Promise.all(productUpdates);
+
+      
+      const updated_order_data = await Order_model.findByIdAndUpdate(data.id, updated_data, {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+      });
+      
+      console.log(updated_order_data);
+      if (!updated_order_data) {
+        throw new Error("Customer not found");
+      }
+    } catch (error: any) {
+      console.log(error);
+      return next(new ErrorHandler(error.message || "An error occurred", 404));
+    }
+  }
+
+  async findByName(name: any) {
+    const customer = await Product_model.findOne({ name: name });
+    return customer;
+  }
   async all(query: any) {
     const resultPerPage = Number(query.rowsPerPage);
     const apiFeatures = new ApiFeatures(Order_model.find(), query);
