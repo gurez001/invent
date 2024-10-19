@@ -7,6 +7,7 @@ export interface IOrder extends Document {
   dispatch_mod?: string;
   email?: string;
   gstin?: string;
+  notes?: string;
   order_date: Date;
   order_status: string;
   invoice_no: string;
@@ -69,6 +70,10 @@ const orderSchema: Schema<IOrder> = new mongoose.Schema(
       default: null,
     },
     payment_mode: {
+      type: String,
+      default: null,
+    },
+    notes: {
       type: String,
       default: null,
     },

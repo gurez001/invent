@@ -10,6 +10,7 @@ export interface BaseAddress {
 export interface order_type_form {
   order_status: string;
   customer: string;
+  notes: string;
   dispatch_mod: string;
   invoice_no: string;
   shipping_address: BaseAddress;
@@ -17,7 +18,7 @@ export interface order_type_form {
   status: string;
   name: string;
   company?: string;
-  email: string;
+  email?: string;
   phone: string;
   gstin: string;
 }

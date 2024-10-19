@@ -2,9 +2,10 @@
 
 import { useGetSingleMutation } from '@/state/orderApi';
 import { order_type_form, Post_Response } from '@/types/order_type';
-import React, { useEffect, memo, useMemo } from 'react';
+import React, { useEffect, memo, useMemo, useCallback } from 'react';
 import { Order_form } from '../order-form/Order_form';
 import { CircularProgress } from '@nextui-org/react';
+import toast from 'react-hot-toast';
 
 interface UpdateOrderProps {
     id: string;
@@ -13,18 +14,35 @@ interface UpdateOrderProps {
 const UpdateOrder: React.FC<UpdateOrderProps> = memo(({ id }) => {
     const [getSingle, { data, isLoading, error }] = useGetSingleMutation();
 
-    useEffect(() => {
+    // Fetch data when `id` changes
+    const fetchOrder = useCallback(() => {
         if (id) {
-            getSingle(id); // Fetch the data for the given order ID
+            getSingle(id);
         }
-    }, [id]); // Only re-run the effect when `id` changes
+    }, [id, getSingle]);
 
-    if (error) return <p>Error: {error instanceof Error ? error.message : 'Something went wrong'}</p>;
+    useEffect(() => {
+        fetchOrder(); // Invoke the callback to fetch the order
+    }, [fetchOrder]);
 
-    // Ensure type safety by checking if `data` is of the expected type `Post_Response`
-    const response: Post_Response | undefined = data as Post_Response | undefined;
+    // Extract the response and order data with memoization to prevent recalculations
+    const order = useMemo(() => {
+        const response: Post_Response | undefined = data as Post_Response | undefined;
+        return response?.order;
+    }, [data]);
 
-    const order = response?.order; // Access the `order` field from the response if it exists
+    useEffect(() => {
+        // Handle error messages
+        if (error) {
+            let errorMessage = "An unexpected error occurred."; // Default message
+            // Check if 'error' contains the expected 'data' structure with a message
+            const apiError = error as { data?: { message?: string } };
+            if (apiError?.data?.message) {
+                errorMessage = apiError.data.message;
+            }
+            toast.error(errorMessage);
+        }
+    }, [error]);
 
 
 
@@ -34,9 +52,9 @@ const UpdateOrder: React.FC<UpdateOrderProps> = memo(({ id }) => {
                 <div className="absolute z-10 inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
                     <CircularProgress />
                 </div>
-            ) :
+            ) : (
                 <Order_form data={order} edit={true} />
-            }
+            )}
         </div>
     );
 });

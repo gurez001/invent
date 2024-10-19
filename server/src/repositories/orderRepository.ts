@@ -15,6 +15,7 @@ class OrderRepository {
     order_details: any,
     next: NextFunction
   ) {
+    console.log(data)
     const rendom_id = generateRandomId();
     // Check if data.services is defined and a valid JSON string
     let service_data: any = {};
@@ -57,6 +58,7 @@ class OrderRepository {
       shipping_address: shipping_a._id,
       company: data.company,
       email: data.email,
+      notes: data.notes,
       phone: data.phone,
       gstin: data.gstin,
       audit_log: user_id,
