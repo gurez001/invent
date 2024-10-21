@@ -4,7 +4,7 @@ import { ScrollShadow, Select, SelectItem } from "@nextui-org/react";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsSidebarCollapsed, setWorkspace } from "@/state";
 import Menu_list from "./Menu_list";
-import { LucideIcon, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { navItems } from "./config";
 
@@ -25,7 +25,7 @@ const Sidebar: React.FC = () => {
     dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
   };
 
-  const sidebarClassNames = `fixed flex flex-col dark:bg-[#1f1228] ${isSidebarCollapsed ? "w-0 md:w-16" : "w-72 md:w-64"
+  const sidebarClassNames = `fixed flex flex-col dark:bg-[#1f1228] ${isSidebarCollapsed ? "w-[65px]" : "w-72 md:w-64"
     } bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
 
   // Update handleWorkSpace to handle string values
@@ -71,11 +71,11 @@ const Sidebar: React.FC = () => {
             </SelectItem>
           ))}
         </Select>
-        <ScrollShadow orientation="horizontal" className="max-h-[440px]">
+        <ScrollShadow hideScrollBar={true} orientation="horizontal" className="max-h-[440px]">
           {navItems
             .filter((item) => item.key === Workspace)
             .map((item) => (
-              <Menu_list key={item.key} pages={item.pages} />
+              <Menu_list key={item.key} pages={item.pages} isSidebarCollapsed={isSidebarCollapsed} />
             ))}
         </ScrollShadow>
       </div>
