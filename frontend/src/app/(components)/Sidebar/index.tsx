@@ -25,7 +25,7 @@ const Sidebar: React.FC = () => {
     dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
   };
 
-  const sidebarClassNames = `fixed flex flex-col dark:bg-[#1f1228] ${isSidebarCollapsed ? "w-[65px]" : "w-72 md:w-64"
+  const sidebarClassNames = `fixed flex flex-col dark:bg-[#1f1228] ${isSidebarCollapsed ? "w-[0px] lg:w-[65px]" : "w-72 md:w-64"
     } bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
 
   // Update handleWorkSpace to handle string values
@@ -71,7 +71,7 @@ const Sidebar: React.FC = () => {
             </SelectItem>
           ))}
         </Select>
-        <ScrollShadow hideScrollBar={true} orientation="horizontal" className="max-h-[440px]">
+        <ScrollShadow isEnabled={false} hideScrollBar={true} orientation="horizontal" className="max-h-[440px]">
           {navItems
             .filter((item) => item.key === Workspace)
             .map((item) => (
