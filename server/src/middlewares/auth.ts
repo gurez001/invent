@@ -5,18 +5,15 @@ import ErrorHandler from "../utils/ErrorHandler";
 import { IUser } from "../models/userModel"; // Adjust this if necessary
 
 interface CustomRequest extends Request {
-    user?: IUser; // Use the IUser interface to match the user model
-  }
-  
-  
+  user?: IUser; // Use the IUser interface to match the user model
+}
+
 export const isAuthenticatedUser = async (
   req: Request, // Use the extended Request type
   res: Response,
   next: NextFunction
 ) => {
-  const s_token: string | undefined = req.headers.authorization;
-  const token: string | undefined = s_token && s_token.split(" ")[1];
-
+  const token: string | undefined = req.cookies.token;
   if (!token) {
     return next(new ErrorHandler("Please log in first", 400));
   }
@@ -31,7 +28,7 @@ export const isAuthenticatedUser = async (
       return next(new ErrorHandler("User not found", 404));
     }
 
-    (req as any).user = user; 
+    (req as any).user = user;
     next();
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
@@ -43,17 +40,17 @@ export const isAuthenticatedUser = async (
 };
 
 export const authorizeRoles = (...roles: string[]) => {
-    return (req: CustomRequest, res: Response, next: NextFunction) => {
-      // Ensure req.user is defined and has a role property
-      if (!req.user || !roles.includes(req.user.role)) {
-        return next(
-          new ErrorHandler(
-            `Role: ${req.user?.role} is not allowed to access this resource`,
-            403
-          )
-        );
-      }
-  
-      next();
-    };
+  return (req: CustomRequest, res: Response, next: NextFunction) => {
+    // Ensure req.user is defined and has a role property
+    if (!req.user || !roles.includes(req.user.role)) {
+      return next(
+        new ErrorHandler(
+          `Role: ${req.user?.role} is not allowed to access this resource`,
+          403
+        )
+      );
+    }
+
+    next();
   };
+};

@@ -7,6 +7,7 @@ const userRoutes = (userController: UserController) => {
 
   router.post("/register", userController.register.bind(userController));
   router.get("/profile",isAuthenticatedUser, userController.profile.bind(userController));
+  router.post("/logout",isAuthenticatedUser, userController.logout.bind(userController));
   router.post("/login", userController.login.bind(userController));
   router.get("/", userController.getAllUsers.bind(userController));
   router.get("/:id", userController.getUserById.bind(userController));

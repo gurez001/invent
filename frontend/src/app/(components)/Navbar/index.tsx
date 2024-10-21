@@ -1,11 +1,10 @@
 "use client";
-
+import React from "react";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsDarkMode, setIsSidebarCollapsed } from "@/state";
-import { Bell, Menu, Moon, Settings, Sun } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
+import { Bell, Menu, Moon, Sun } from "lucide-react";
+import { useSelector } from "react-redux";
+import { UserDropDown } from "./UserDropDown";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
@@ -33,7 +32,7 @@ const Navbar = () => {
           <Menu className="w-4 h-4" />
         </button>
 
-        <div className="relative">
+        <div className="hidden md:block relative">
           <input
             type="search"
             placeholder="Start type to search groups & products"
@@ -48,7 +47,7 @@ const Navbar = () => {
 
       {/* RIGHT SIDE */}
       <div className="flex justify-between items-center gap-5">
-        <div className="hidden md:flex justify-between items-center gap-5">
+        <div className="flex justify-between items-center gap-5">
           <div>
             <button onClick={toggleDarkMode}>
               {isDarkMode ? (
@@ -65,20 +64,10 @@ const Navbar = () => {
             </span>
           </div>
           <hr className="w-0 h-7 border border-solid border-l border-gray-300 mx-3" />
-          <div className="flex items-center gap-3 cursor-pointer">
-            {/* <Image
-              // src="https://s3-inventorymanagement.s3.us-east-2.amazonaws.com/profile.jpg"
-              alt="Profile"
-              width={50}
-              height={50}
-              className="rounded-full h-full object-cover"
-            /> */}
-            <span className="font-semibold">Ed Roh</span>
+          <div className="flex items-center gap-3 cursor-pointer border px-2 py-[4px] bg-black rounded-full">
+            <UserDropDown />
           </div>
         </div>
-        <Link href="/settings">
-          <Settings className="cursor-pointer text-gray-500" size={24} />
-        </Link>
       </div>
     </div>
   );

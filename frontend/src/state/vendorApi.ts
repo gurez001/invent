@@ -1,30 +1,17 @@
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 import { Vendor_Data, vendr_form, vendr_list } from "@/types/Vendor_type";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import Cookies from "universal-cookie";
 export interface Vendors {
   name: string;
   phone: string;
   email: string;
 }
 
-const getTokenFromCookies = () => {
-  const cookies = new Cookies();
-  const token = cookies.get("auth_token");
-  return token; // Replace 'token' with your cookie name
-};
-
 export const vendorApi = createApi({
   reducerPath: "vendorApi",
   baseQuery: fetchBaseQuery({
     baseUrl: apiUrl,
-    prepareHeaders: (headers) => {
-      const token = getTokenFromCookies(); // Get token from cookies
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`); // Set the Authorization header
-      }
-      return headers;
-    },
+    credentials: "include",
   }),
 
   tagTypes: ["Vendor"],

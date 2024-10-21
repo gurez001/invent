@@ -9,13 +9,7 @@ export const productApi = createApi({
   reducerPath: "productApi",
   baseQuery: fetchBaseQuery({
     baseUrl: apiUrl,
-    prepareHeaders: (headers) => {
-      const token = cookiesManager.get("auth_token"); // Get token from cookies
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`); // Set the Authorization header
-      }
-      return headers;
-    },
+    credentials: "include",
   }),
   tagTypes: ["Products"],
   endpoints: (builder) => ({

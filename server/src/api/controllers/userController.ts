@@ -6,7 +6,21 @@ import sendToken from "../../utils/jwtToken";
 
 class UserController {
   constructor(private userService: UserService) {}
-
+  logout = AsyncHandler.handle(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const option: any = {
+        expires: new Date(),
+        path: "/",
+        secure: true, // accessible through HTTP
+        httpOnly: true, // only server can access the cookie
+        sameSite: "none", // enforcement type
+        partitioned: false,
+      };
+      res.status(200).cookie("token", null, option).json({
+        success: true,
+      });
+    }
+  );
   register = AsyncHandler.handle(
     async (req: Request, res: Response, next: NextFunction) => {
       const user = await this.userService.registerUser(req.body, next);

@@ -2,16 +2,15 @@
 import { FbIcon } from '@/components/common/svg-icons/fb_icon'
 import { GoogleIcon } from '@/components/common/svg-icons/google_icon'
 import { useLoginUserMutation } from '@/state/usersApi'
-import type { Login, User_Data } from '@/types/auth_type'
+import type { Login } from '@/types/auth_type'
 import { login_schema } from '@/zod-schemas/auth_zod_schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Input } from '@nextui-org/react'
-import { toast, ToastBar } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import Cookies from "universal-cookie";
 import { useRouter } from 'next/navigation'
 import { useDispatch } from 'react-redux'
 import { setUser } from '@/state/store/userSlice'
@@ -22,7 +21,7 @@ const Login = () => {
     const toggleVisibility = () => setIsVisible(!isVisible);
     const router = useRouter();
     const { control, handleSubmit, formState: { errors } } = useForm<Login>({ resolver: zodResolver(login_schema) })
-    const [loginUser, { data, error, isSuccess, isLoading }] = useLoginUserMutation();
+    const [loginUser, { error, isSuccess, isLoading }] = useLoginUserMutation();
     const onSubmit = async (data: Login) => {
         const userData: any = await loginUser(data).unwrap();
         if (userData && userData.user) {
@@ -35,16 +34,7 @@ const Login = () => {
             toast.error(errorMessage); // Show the error toast
         }
         if (isSuccess) {
-            const token: string = data.token;
-            if (token) {
-                const cookies = new Cookies(null, { path: "/" });
-                const options = {
-                    path: "/", // cookie path
-                };
-
-                cookies.set("auth_token", token, options);
-            }
-            router.push('/dashboard');
+            router.push('/crm');
             toast.success('Welcome'); // Show the error toast
         }
     }, [error, isSuccess])

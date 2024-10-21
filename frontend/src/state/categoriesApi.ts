@@ -1,4 +1,3 @@
-import cookiesManager from "@/lib/service/cookies-axis/Cookies";
 import { categorie_form, categorie_list } from "@/types/categorie_type";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"; // Ensure /react is imported
 
@@ -8,13 +7,7 @@ export const categorieApi = createApi({
   reducerPath: "categorieApi",
   baseQuery: fetchBaseQuery({
     baseUrl: apiUrl,
-    prepareHeaders: (headers) => {
-      const token = cookiesManager.get("auth_token"); // Get token from cookies
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`); // Set the Authorization header
-      }
-      return headers;
-    },
+    credentials: "include",
   }),
   tagTypes: ["Categorie"],
   endpoints: (builder) => ({
