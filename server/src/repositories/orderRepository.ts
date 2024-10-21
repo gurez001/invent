@@ -26,7 +26,7 @@ class OrderRepository {
       }
     }
     // Extract image ids into merged object
-    const merged = image_data.reduce((acc: any, { fieldname, _id }: any) => {
+    const merged =(image_data || []).reduce((acc: any, { fieldname, _id }: any) => {
       if (["image", "doket", "invoice"].includes(fieldname)) {
         acc[`${fieldname}_id`] = _id;
       }
@@ -40,11 +40,12 @@ class OrderRepository {
     const order_number = await Order_model.countDocuments();
 
     // Build updated_data object
-    const updated_data = {
+    const updated_data:any = {
       order_no: order_number + 1,
       order_id: `ord_${data.uuid}_${rendom_id}`,
       order_date: new Date(),
       order_status: data.order_status,
+      tax_status: data.tax_status,
       customer: data.customer,
       dispatch_mod: data.dispatch_mod,
       invoice_no: data.invoice_no,
@@ -61,7 +62,6 @@ class OrderRepository {
       phone: data.phone,
       gstin: data.gstin,
       audit_log: user_id,
-      ...merged, // Spread merged image fields
     };
 
     // Validate and apply only if IDs are valid
@@ -70,6 +70,15 @@ class OrderRepository {
         delete updated_data[field]; // Remove invalid IDs
       }
     });
+    const validMergedFields = Object.keys(merged).filter(
+      (field) => merged[field] && mongoose.Types.ObjectId.isValid(merged[field])
+    );
+
+    if (validMergedFields.length > 0) {
+      validMergedFields.forEach((field) => {
+        updated_data[field] = merged[field];
+      });
+    }
 
     try {
       // Update product quantities in the Product model
@@ -137,10 +146,10 @@ class OrderRepository {
     const updated_data = {
       order_no: order_number + 1,
       order_id: `ord_${data.uuid}_${rendom_id}`,
-      order_date: new Date(),
       order_status: data.order_status,
       customer: data.customer,
       dispatch_mod: data.dispatch_mod,
+      tax_status: data.tax_status,
       invoice_no: data.invoice_no,
       payment_mode: data.payment_mode,
       name: data.name,
@@ -175,13 +184,16 @@ class OrderRepository {
       // Await all updates
       await Promise.all(productUpdates);
 
-      
-      const updated_order_data = await Order_model.findByIdAndUpdate(data.id, updated_data, {
-        new: true,
-        runValidators: true,
-        useFindAndModify: false,
-      });
-      
+      const updated_order_data = await Order_model.findByIdAndUpdate(
+        data.id,
+        updated_data,
+        {
+          new: true,
+          runValidators: true,
+          useFindAndModify: false,
+        }
+      );
+
       console.log(updated_order_data);
       if (!updated_order_data) {
         throw new Error("Customer not found");

@@ -18,8 +18,9 @@ export interface MenuListProps {
 }
 export const navItems: MenuListProps[] = [
   {
-    key: "CRM",
+    key: "crm",
     pages: [
+
       {
         title: "Purchases",
         label: "Purchases",
@@ -82,10 +83,43 @@ export const navItems: MenuListProps[] = [
             href: paths.crm.order.form,
             icon: "ShoppingBag",
           },
-          
-        ],
-      },
 
+        ],
+      }, {
+        title: "Expense",
+        label: "expense",
+        icon: 'ReceiptIndianRupee',
+        href: paths.crm.expense,
+      },
+      {
+        title: "Users",
+        label: "Users",
+        icon: 'CircleUser',
+        href: paths.crm.users,
+      },
+    ],
+  },
+  {
+    key: "dashboard",
+    pages: [
+      {
+        title: "Products",
+        label: "Products",
+        icon: 'Layout',
+        href: paths.dashboard.products,
+      },
+      {
+        title: "Inventory",
+        label: "Inventory",
+        icon: 'Layout',
+        href: paths.dashboard.inventory,
+      },
+      {
+        title: "Users",
+        label: "Users",
+        icon: 'CircleUser',
+        href: paths.dashboard.users,
+      },
     ],
   },
 ];

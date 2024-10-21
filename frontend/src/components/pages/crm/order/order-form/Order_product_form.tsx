@@ -25,6 +25,7 @@ import toast from "react-hot-toast";
 import { calculateTotalIncludingGST } from "@/lib/service/calculations";
 import { CircleX } from "lucide-react";
 import { formatCurrency } from "@/lib/service/currencyUtils";
+import { show_per_Page } from "@/components/pages/common/Data";
 interface popover {
   isOpen: boolean;
   onClose: () => void;
@@ -158,7 +159,7 @@ const ProductForm: React.FC<popover> = ({ isOpen, onClose, list, set_Poduct_list
     is_delete: "no",
     keyword: debouncedFilterValue,
     status: "active",
-    rowsPerPage: 10,
+    rowsPerPage: show_per_Page,
     page: 1,
   });
   const [getSingle, { isLoading }] = useGetSingleMutation();

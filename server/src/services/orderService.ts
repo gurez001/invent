@@ -25,45 +25,43 @@ class OrderService {
       ...(files.image || []),
     ];
 
-    // Check if there are files to upload
-    if (allFiles.length === 0) {
-      return next(new ErrorHandler("No files to upload.", 400));
-    }
-
-    // Use a single upload call for all files
     let image_uploader;
-    try {
-      image_uploader = await imageUploader.uploadImage(allFiles, next);
-    } catch (error) {
-      return next(
-        new ErrorHandler("Something went wrong with the upload.", 500)
-      );
-    }
+    let image_data;
+    if (allFiles.length > 0) {
+      // Use a single upload call for all files
+      try {
+        image_uploader = await imageUploader.uploadImage(allFiles, next);
+      } catch (error) {
+        return next(
+          new ErrorHandler("Something went wrong with the upload.", 500)
+        );
+      }
 
-    // Check if uploads were successful
-    if (!image_uploader || image_uploader.length === 0) {
-      return next(
-        new ErrorHandler(
-          "Something went wrong; images are not uploaded to the server",
-          404
-        )
-      );
-    }
+      // Check if uploads were successful
+      if (!image_uploader || image_uploader.length === 0) {
+        return next(
+          new ErrorHandler(
+            "Something went wrong; images are not uploaded to the server",
+            404
+          )
+        );
+      }
 
-    const image_data = await add_image.createImage(
-      files,
-      image_uploader,
-      user_id,
-      next
-    );
-
-    if (!image_data) {
-      return next(
-        new ErrorHandler(
-          "Something wrong image is not added into database",
-          404
-        )
+      image_data = await add_image.createImage(
+        files,
+        image_uploader,
+        user_id,
+        next
       );
+
+      if (!image_data) {
+        return next(
+          new ErrorHandler(
+            "Something wrong image is not added into database",
+            404
+          )
+        );
+      }
     }
     // // await FileManager.deleteFiles(files);
     return await this.orderRepository.create(

@@ -15,6 +15,7 @@ export interface IOrder extends Document {
   status: string;
   company: string;
   phone: string;
+  tax_status?: string; // Optional field
   shipping_charges?: Number;
   discount?: Number;
   other_charge?: Number;
@@ -35,6 +36,11 @@ const orderSchema: Schema<IOrder> = new mongoose.Schema(
       type: Number,
     },
     order_id: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    tax_status: {
       type: String,
       trim: true,
       default: null,

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import List_table from "@/components/common/table/List_table";
 import debounce from "lodash.debounce";
 import React, { useEffect, useMemo, useState } from "react";
@@ -7,14 +7,13 @@ import { Trash2, Edit, RotateCcw, Eraser } from "lucide-react";
 import toast from "react-hot-toast";
 import { TimeAgo } from "@/lib/service/time/timeAgo";
 import { useActionMutation } from "@/state/productApi";
-import { Get_Response, product_type_list } from "@/types/Product_types";
+import { product_type_list } from "@/types/Product_types";
 import { useGetAllOrdersQuery } from "@/state/orderApi";
 import { statusColorMap } from "@/components/common/table/data";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-interface list_props {
-}
+interface list_props {}
 const INITIAL_VISIBLE_COLUMNS = [
   "order_no",
   "name",
@@ -40,17 +39,14 @@ const columns: any[] = [
   { name: "Actions", uid: "actions" }, // Added actions column
 ];
 
-
-
 const List: React.FC<list_props> = () => {
   const router = useRouter();
-  const [open, set_open] = useState<Boolean>(false);
   const [filterValue, setFilterValue] = useState<string>("");
   const [page_status, set_page_status] = useState<string>("yes");
   const [debouncedFilterValue, setDebouncedFilterValue] =
     useState<string>(filterValue);
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
   const [page, setPage] = useState<number>(1);
 
   //-------------use states for apis
@@ -107,8 +103,6 @@ const List: React.FC<list_props> = () => {
     }
   }, [delete_error, delete_success, toast, error]);
   // Fetch vendors only when debouncedFilterValue has a valid value
-
-
 
   const response: any | undefined = data as any | undefined;
   const orders: any = useMemo(() => {
@@ -178,18 +172,14 @@ const List: React.FC<list_props> = () => {
             <div className="relative flex justify-end gap-2">
               <Tooltip
                 content={
-                  orders.is_active === "yes"
-                    ? "Edit order"
-                    : "Recover order"
+                  orders.is_active === "yes" ? "Edit order" : "Recover order"
                 }
               >
                 <span className="text-sm text-default-400 cursor-pointer active:opacity-50">
                   {orders && orders.is_delete === "no" ? (
                     orders.is_active === "yes" ? (
                       <Link href={`/crm/orders/form/${orders._id}`}>
-                        <Edit
-                          size={20}
-                        />
+                        <Edit size={20} />
                       </Link>
                     ) : orders.is_active === "no" ? (
                       <RotateCcw
@@ -210,9 +200,7 @@ const List: React.FC<list_props> = () => {
 
               <Tooltip
                 content={
-                  orders.is_active === "yes"
-                    ? "Delete order"
-                    : "Erase order"
+                  orders.is_active === "yes" ? "Delete order" : "Erase order"
                 }
               >
                 <span className="text-sm text-red-600 cursor-pointer active:opacity-50">
@@ -246,7 +234,11 @@ const List: React.FC<list_props> = () => {
     },
     []
   );
-
+  const funedirect = () => {
+    if (router) {
+      router.push("/crm/orders");
+    }
+  };
   return (
     <div>
       <List_table<product_type_list>
@@ -262,7 +254,7 @@ const List: React.FC<list_props> = () => {
         setPage={setPage}
         filterValue={filterValue}
         setFilterValue={setFilterValue}
-        form_open={set_open}
+        form_open={funedirect}
         set_page_status={set_page_status}
         visiable_columns={INITIAL_VISIBLE_COLUMNS}
         renderCell={renderCell}

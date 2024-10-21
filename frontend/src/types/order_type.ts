@@ -9,6 +9,7 @@ export interface BaseAddress {
 
 export interface order_type_form {
   order_status: string;
+  tax_status: string;
   customer: string;
   notes: string;
   dispatch_mod: string;

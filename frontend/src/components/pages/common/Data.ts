@@ -1,6 +1,11 @@
+export const show_per_Page = 10000; 
 export const status_arr = [
   { label: "Active", value: "active" },
   { label: "Inactive", value: "inactive" },
+];
+export const tax_status = [
+  { label: "With gst", value: "with gst" },
+  { label: "Without gst", value: "without gst" },
 ];
 export const order_status_arr = [
   { label: "Pending Payment", value: "pending payment" },

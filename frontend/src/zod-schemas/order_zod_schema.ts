@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const order_type_form_schema = z.object({
   order_status: z.string().nonempty("Order status is required"),
+  tax_status: z.string().nonempty("Tax status status is required").nullable(),
   customer: z.string().nonempty("Customer is required"),
   dispatch_mod: z.string().nonempty("Dispatch mode is required"),
   invoice_no: z.string().optional(),

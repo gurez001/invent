@@ -8,6 +8,7 @@ import {
   dispatch_mod_arr,
   order_status_arr,
   Payment_mode_arr,
+  tax_status,
 } from "../../../common/Data";
 import Select_field from "@/components/common/fields/Select_field";
 import { order_type_form } from "@/types/order_type";
@@ -179,6 +180,7 @@ export const Order_form: React.FC<order_form_props> = ({
     } else if (update_success && operationSuccess) {
       toast.success("Order updated successfully");
       setOperationSuccess(false);
+      router.push('/crm/orders')
     }
   }, [error, isSuccess, update_error, update_success, router, operationSuccess, setOperationSuccess]);
 
@@ -198,6 +200,7 @@ export const Order_form: React.FC<order_form_props> = ({
         phone: data.phone,
         notes: data.notes,
         gstin: data.gstin,
+        tax_status: data.tax_status,
         shipping_address: {
           address_line_1: data.shipping_address?.address_line_1 || "",
           address_line_2: data.shipping_address?.address_line_2 || "",
@@ -354,6 +357,15 @@ export const Order_form: React.FC<order_form_props> = ({
                           errors={errors}
                           name="invoice_no"
                           label="Invoice no"
+                        />
+                      </div>
+                      <div className="w-full my-[6px]">
+                        <Select_field
+                          control={control}
+                          errors={errors}
+                          name="tax_status"
+                          label="Tax status"
+                          options={tax_status}
                         />
                       </div>
                       <div>

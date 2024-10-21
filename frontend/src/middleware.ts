@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // List of routes that are protected
-const protectedRoutes = ["/dashboard","/crm"];
+const protectedRoutes = ["/dashboard", "/crm"];
 const authRoutes = ["/auth"];
 
 // Middleware function
@@ -57,8 +57,8 @@ export async function middleware(req: NextRequest) {
   if (authRoutes.some((route) => req.nextUrl.pathname.startsWith(route))) {
     // If the token exists and not already on the sign-in page, redirect to the dashboard
     if (token) {
-      console.log("Token found, redirecting to dashboard");
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+      console.log("Token found, redirecting to crm");
+      return NextResponse.redirect(new URL("/crm", req.url));
     }
   }
 
@@ -68,5 +68,5 @@ export async function middleware(req: NextRequest) {
 
 // Config to define which routes to run the middleware on
 export const config = {
-  matcher: ["/dashboard/:path*", "/auth/:path*","/crm/:path*"], // Include auth routes for matching
+  matcher: ["/dashboard/:path*", "/auth/:path*", "/crm/:path*"], // Include auth routes for matching
 };

@@ -1,74 +1,22 @@
 "use client";
-import { Button, Select, SelectItem } from "@nextui-org/react";
+import React from "react";
+import { ScrollShadow, Select, SelectItem } from "@nextui-org/react";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
-import { setIsSidebarCollapsed } from "@/state";
+import { setIsSidebarCollapsed, setWorkspace } from "@/state";
 import Menu_list from "./Menu_list";
-import {
-  Archive,
-  CircleDollarSign,
-  Clipboard,
-  Layout,
-  LucideIcon,
-  Menu,
-  SlidersHorizontal,
-  User,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import { LucideIcon, Menu } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { navItems } from "./config";
-export const animals = [
-  { key: "CRM", label: "CRM" },
-  { key: "CRM2", label: "CRM2" },
+
+export const workspce_selector = [
+  { key: "crm", label: "CRM" },
+  { key: "dashboard", label: "Dashboard" },
 ];
-
-interface SidebarLinkProps {
-  href: string;
-  icon: LucideIcon;
-  label: string;
-  isCollapsed: boolean;
-}
-
-const SidebarLink = ({
-  href,
-  icon: Icon,
-  label,
-  isCollapsed,
-}: SidebarLinkProps) => {
-  const pathname = usePathname();
-
-  const isActive =
-    pathname === href || (pathname === "/" && href === "/dashboard");
-
-  return (
-    <Link href={href}>
-      <div
-        className={`cursor-pointer flex items-center ${
-          isCollapsed ? "justify-center py-4" : "justify-start px-8 py-4"
-        }
-        hover:text-blue-500 hover:bg-blue-100 gap-3 transition-colors ${
-          isActive ? "bg-blue-200 text-white" : ""
-        }
-      }`}
-      >
-        <Icon className="w-6 h-6 !text-gray-700" />
-
-        <span
-          className={`${
-            isCollapsed ? "hidden" : "block"
-          } font-medium text-gray-700`}
-        >
-          {label}
-        </span>
-      </div>
-    </Link>
-  );
-};
 
 const Sidebar: React.FC = () => {
   const dispatch = useAppDispatch();
-  const [option, setOption] = useState<string>("CRM");
+  const router = useRouter();
+  const Workspace = useAppSelector((state) => state.global.Workspace);
   const isSidebarCollapsed = useAppSelector(
     (state) => state.global.isSidebarCollapsed
   );
@@ -77,29 +25,25 @@ const Sidebar: React.FC = () => {
     dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
   };
 
-  const sidebarClassNames = `fixed flex flex-col dark:bg-[#1f1228] ${
-    isSidebarCollapsed ? "w-0 md:w-16" : "w-72 md:w-64"
-  } bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
+  const sidebarClassNames = `fixed flex flex-col dark:bg-[#1f1228] ${isSidebarCollapsed ? "w-0 md:w-16" : "w-72 md:w-64"
+    } bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
+
+  // Update handleWorkSpace to handle string values
+  const handleWorkSpace = (value: string) => {
+    router.push(`/${value}`);
+    dispatch(setWorkspace(value));
+  };
 
   return (
     <div className={sidebarClassNames}>
       {/* TOP LOGO */}
       <div
-        className={`flex gap-3 justify-between md:justify-normal items-center pt-8 ${
-          isSidebarCollapsed ? "px-5" : "px-8"
-        }`}
+        className={`flex gap-3 justify-between md:justify-normal items-center pt-8 ${isSidebarCollapsed ? "px-5" : "px-8"
+          }`}
       >
-        {/* <Image
-          // src="https://s3-inventorymanagement.s3.us-east-2.amazonaws.com/logo.png"
-          alt="edstock-logo"
-          width={27}
-          height={27}
-          className="rounded w-8"
-        /> */}
         <h1
-          className={`${
-            isSidebarCollapsed ? "hidden" : "block"
-          } font-extrabold text-2xl`}
+          className={`${isSidebarCollapsed ? "hidden" : "block"
+            } font-extrabold text-2xl`}
         >
           EDSTOCK
         </h1>
@@ -117,64 +61,30 @@ const Sidebar: React.FC = () => {
         <Select
           isRequired
           label="Workspace"
-          // placeholder="Select an animal"
-          onChange={(e) => setOption(e.target.value)}
-          defaultSelectedKeys={["CRM"]}
+          onChange={(e) => handleWorkSpace(e.target.value)} // Extract value from event
+          defaultSelectedKeys={[Workspace]}
           className="max-w-xs text-lg p-4"
         >
-          {animals.map((animal) => (
-            <SelectItem key={animal.key} value={animal.key}>
-              {animal.label}
+          {workspce_selector.map((item) => (
+            <SelectItem key={item.key} value={item.key}>
+              {item.label}
             </SelectItem>
           ))}
         </Select>
-        {navItems
-          .filter((item) => item.key === option)
-          .map((item) => (
-            <Menu_list key={item.key} pages={item.pages}/>
-          ))}
-
-        <SidebarLink
-          href="/dashboard"
-          icon={Layout}
-          label="Dashboard"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/inventory"
-          icon={Archive}
-          label="Inventory"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/products"
-          icon={Clipboard}
-          label="Products"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/users"
-          icon={User}
-          label="Users"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/settings"
-          icon={SlidersHorizontal}
-          label="Settings"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/expenses"
-          icon={CircleDollarSign}
-          label="Expenses"
-          isCollapsed={isSidebarCollapsed}
-        />
+        <ScrollShadow orientation="horizontal" className="max-h-[440px]">
+          {navItems
+            .filter((item) => item.key === Workspace)
+            .map((item) => (
+              <Menu_list key={item.key} pages={item.pages} />
+            ))}
+        </ScrollShadow>
       </div>
 
       {/* FOOTER */}
       <div className={`${isSidebarCollapsed ? "hidden" : "block"} mb-10`}>
-        <p className="text-center text-xs text-gray-500">&copy; 2024 Edstock</p>
+        <p className="text-center text-xs text-gray-500 pt-4">
+          &copy; 2024 Edstock
+        </p>
       </div>
     </div>
   );
