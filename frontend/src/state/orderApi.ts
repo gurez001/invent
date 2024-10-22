@@ -1,3 +1,4 @@
+import cookiesManager from "@/lib/service/cookies-axis/Cookies";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"; // Ensure /react is imported
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -6,6 +7,13 @@ export const orderApi = createApi({
   reducerPath: "orderApi",
   baseQuery: fetchBaseQuery({
     baseUrl: apiUrl,
+    prepareHeaders: (headers) => {
+      const token = cookiesManager.get("token"); // Get token from cookies
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`); // Set the Authorization header
+      }
+      return headers;
+    },
     credentials: "include",
   }),
   tagTypes: ["Order"],

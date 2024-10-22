@@ -26,12 +26,15 @@ class OrderRepository {
       }
     }
     // Extract image ids into merged object
-    const merged =(image_data || []).reduce((acc: any, { fieldname, _id }: any) => {
-      if (["image", "doket", "invoice"].includes(fieldname)) {
-        acc[`${fieldname}_id`] = _id;
-      }
-      return acc;
-    }, {});
+    const merged = (image_data || []).reduce(
+      (acc: any, { fieldname, _id }: any) => {
+        if (["image", "doket", "invoice"].includes(fieldname)) {
+          acc[`${fieldname}_id`] = _id;
+        }
+        return acc;
+      },
+      {}
+    );
     const parse_shipping = JSON.parse(data.shipping_address);
     const shipping_data = { ...parse_shipping, audit_log: user_id };
     const [shipping_a] = await Promise.all([
@@ -40,7 +43,7 @@ class OrderRepository {
     const order_number = await Order_model.countDocuments();
 
     // Build updated_data object
-    const updated_data:any = {
+    const updated_data: any = {
       order_no: order_number + 1,
       order_id: `ord_${data.uuid}_${rendom_id}`,
       order_date: new Date(),
@@ -81,19 +84,13 @@ class OrderRepository {
     }
 
     try {
-      // Update product quantities in the Product model
-      const productUpdates = order_details.product_details.map(
-        async ({ product_id, quantity }: any) => {
-          return Product_model.findOneAndUpdate(
-            { _id: product_id },
-            { $inc: { total_quantity: -quantity } }, // Decrease total_quantity
-            { new: true } // Return the updated product
-          );
-        }
+      await updateOrderStatus(
+        "create",
+        data.order_status,
+        "mome",
+        order_details,
+        user_id
       );
-
-      // Await all updates
-      await Promise.all(productUpdates);
 
       // Save the order
       const newOrder = new Order_model(updated_data);
@@ -112,7 +109,6 @@ class OrderRepository {
     order_details: any,
     next: NextFunction
   ) {
-    const rendom_id = generateRandomId();
     let service_data: any = {};
 
     if (data.services && data.services !== "undefined") {
@@ -140,12 +136,9 @@ class OrderRepository {
     const [shipping_a] = await Promise.all([
       AddressModel.create(shipping_data),
     ]);
-    const order_number = await Order_model.countDocuments();
 
     // Build updated_data object
     const updated_data = {
-      order_no: order_number + 1,
-      order_id: `ord_${data.uuid}_${rendom_id}`,
       order_status: data.order_status,
       customer: data.customer,
       dispatch_mod: data.dispatch_mod,
@@ -170,19 +163,16 @@ class OrderRepository {
     };
 
     try {
-      // Update product quantities in the Product model
-      const productUpdates = order_details.product_details.map(
-        async ({ product_id, quantity }: any) => {
-          return Product_model.findOneAndUpdate(
-            { _id: product_id },
-            { $inc: { total_quantity: -quantity } }, // Decrease total_quantity
-            { new: true } // Return the updated product
-          );
-        }
-      );
-
-      // Await all updates
-      await Promise.all(productUpdates);
+      const before_order_status = await Order_model.findOne({ _id: data.id });
+      if (before_order_status) {
+        await updateOrderStatus(
+          "update",
+          data.order_status,
+          before_order_status.order_status,
+          order_details,
+          user_id
+        );
+      }
 
       const updated_order_data = await Order_model.findByIdAndUpdate(
         data.id,
@@ -194,7 +184,6 @@ class OrderRepository {
         }
       );
 
-      console.log(updated_order_data);
       if (!updated_order_data) {
         throw new Error("Customer not found");
       }
@@ -307,3 +296,164 @@ class OrderRepository {
   }
 }
 export default OrderRepository;
+
+async function updateOrderStatus(
+  type: string,
+  status: string,
+  order_status: string,
+  order_details: any,
+  user_id: string
+) {
+  switch (status) {
+    case "processing":
+      await processOrder(order_status, order_details, user_id);
+      break;
+    // case "delivered":
+    //   await handleDelivered(order_status, order_details, user_id);
+    //   break;
+    case "canceled":
+      await handleCanceled(type, status, order_status, order_details, user_id);
+      break;
+    case "refund":
+      await handleRefund(type, status, order_status, order_details, user_id);
+      break;
+    case "return":
+      await handleReturn(type, status, order_status, order_details, user_id);
+      break;
+    case "hold":
+      await handleHold(order_status, order_details, user_id);
+      break;
+    default:
+      return;
+  }
+}
+
+// Function to process the order
+async function processOrder(
+  order_status: string,
+  order_details: any,
+  user_id: string
+) {
+  if (order_status === "processing") return;
+  const productUpdates = order_details.product_details.map(
+    async ({ product_id, quantity }: any) => {
+      return Product_model.findOneAndUpdate(
+        { _id: product_id },
+        { $inc: { total_quantity: -quantity } }, // Decrease total_quantity
+        { new: true }
+      );
+    }
+  );
+  await Promise.all(productUpdates);
+  console.log(`Order is being processed by user ${user_id}`);
+}
+
+// Function for handling delivered orders
+async function handleDelivered(
+  order_status: string,
+  order_details: any,
+  user_id: string
+) {
+  // You can add custom logic for a delivered order
+  console.log(`Order delivered by user ${user_id}`);
+}
+
+// Function for handling canceled orders
+async function handleCanceled(
+  type: string,
+  status: string,
+  order_status: string,
+  order_details: any,
+  user_id: string
+) {
+  if (
+    type === "create" ||
+    order_status === "canceled" ||
+    order_status === "returned" ||
+    order_status === "refund"
+  ) {
+    return;
+  }
+
+  const productUpdates = order_details.product_details.map(
+    async ({ product_id, quantity }: any) => {
+      return Product_model.findOneAndUpdate(
+        { _id: product_id },
+        { $inc: { total_quantity: quantity } }, // Restore total_quantity
+        { new: true }
+      );
+    }
+  );
+  await Promise.all(productUpdates);
+  console.log(`Order canceled by user ${user_id}`);
+}
+
+// Function for handling refunds
+async function handleRefund(
+  type: string,
+  status: string,
+  order_status: string,
+  order_details: any,
+  user_id: string
+) {
+  if (
+    type === "create" ||
+    order_status === "refund" ||
+    order_status === "canceled" ||
+    order_status === "returned" 
+  ) {
+    return;
+  }
+
+  const productUpdates = order_details.product_details.map(
+    async ({ product_id, quantity }: any) => {
+      return Product_model.findOneAndUpdate(
+        { _id: product_id },
+        { $inc: { total_quantity: quantity } }, // Restore total_quantity
+        { new: true }
+      );
+    }
+  );
+  await Promise.all(productUpdates);
+  console.log(`Order canceled by user ${user_id}`);
+}
+
+// Function for handling returns
+async function handleReturn(
+  type: string,
+  status: string,
+  order_status: string,
+  order_details: any,
+  user_id: string
+) {
+  if (
+    type === "create" ||
+    order_status === "refund" ||
+    order_status === "canceled" ||
+    order_status === "returned"
+  ) {
+    return;
+  }
+
+  const productUpdates = order_details.product_details.map(
+    async ({ product_id, quantity }: any) => {
+      return Product_model.findOneAndUpdate(
+        { _id: product_id },
+        { $inc: { total_quantity: quantity } }, // Restore total_quantity
+        { new: true }
+      );
+    }
+  );
+  await Promise.all(productUpdates);
+  console.log(`Order returned by user ${user_id}`);
+}
+
+// Function for handling hold orders
+async function handleHold(
+  order_status: string,
+  order_details: any,
+  user_id: string
+) {
+  // Simply hold the order and prevent further changes
+  console.log(`Order placed on hold by user ${user_id}`);
+}

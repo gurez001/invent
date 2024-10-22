@@ -13,7 +13,9 @@ export const isAuthenticatedUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  const token: string | undefined = req.cookies.token;
+  const s_token: string | undefined = req.headers.authorization;
+  
+  const token: string | undefined = s_token && s_token.split(" ")[1];
   if (!token) {
     return next(new ErrorHandler("Please log in first", 400));
   }

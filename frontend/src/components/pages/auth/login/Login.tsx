@@ -14,6 +14,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import { useDispatch } from 'react-redux'
 import { setUser } from '@/state/store/userSlice'
+import cookiesManager from '@/lib/service/cookies-axis/Cookies'
 
 const Login = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -26,7 +27,10 @@ const Login = () => {
         const userData: any = await loginUser(data).unwrap();
         if (userData && userData.user) {
             dispatch(setUser({ user: userData.user, token: userData.token }));
+            const token = cookiesManager.add('token',userData.token)
+            console.log(token)
         }
+
     }
     useEffect(() => {
         if (error) {

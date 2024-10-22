@@ -8,19 +8,19 @@ export const tax_status = [
   { label: "Without gst", value: "without gst" },
 ];
 export const order_status_arr = [
-  { label: "Pending Payment", value: "pending payment" },
   { label: "Processing", value: "processing" },
-  { label: "On hold", value: "on-hold" },
-  { label: "Completed", value: "completed" },
-  { label: "Cancelled", value: "cancelled" },
-  { label: "Refunded", value: "refunded" },
-  { label: "Draft", value: "Draft" },
+  { label: "Delivered", value: "delivered" },
+  { label: "Canceled", value: "canceled" },
+  { label: "Refund", value: "refund" },
+  { label: "Return", value: "return" },
+  { label: "Hold", value: "hold" },
 ];
 export const dispatch_mod_arr = [
   { label: "Self", value: "Self" },
   { label: "Glow road", value: "Glow road" },
   { label: "Meesho", value: "Meesho" },
   { label: "Flipkart", value: "Flipkart" },
+  { label: "Delhivery", value: "Delhivery" },
   { label: "Amazon", value: "Amazon" },
   { label: "Ecom Express", value: "Ecom Express" },
   { label: "Ekart Logistics", value: "Ekart Logistics" },

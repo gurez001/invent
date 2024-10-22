@@ -1,3 +1,4 @@
+import cookiesManager from "@/lib/service/cookies-axis/Cookies";
 import { Login, Sign_up, User_Data } from "@/types/auth_type";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { AnyARecord } from "dns";
@@ -7,6 +8,13 @@ export const usersApi = createApi({
   reducerPath: "usersApi",
   baseQuery: fetchBaseQuery({
     baseUrl: apiUrl,
+    prepareHeaders: (headers) => {
+      const token = cookiesManager.get("token"); // Get token from cookies
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`); // Set the Authorization header
+      }
+      return headers;
+    },
     credentials: "include",
   }),
   tagTypes: ["Users"],
