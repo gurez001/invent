@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Popover_component from "@/components/Popover_component/Popover_component";
-import { Button } from "@nextui-org/react";
+import { Button, CircularProgress } from "@nextui-org/react";
 import Product_form from "./Product_form";
 import {
   useAddNewProductMutation,
@@ -27,7 +27,7 @@ const Product = () => {
   const [addNewProduct, { error, isLoading, isSuccess }] =
     useAddNewProductMutation();
 
-  const [getSingle, { data }] = useGetSingleMutation();
+  const [getSingle, { data, isLoading: single_data_loading }] = useGetSingleMutation();
 
   const [
     update,
@@ -75,7 +75,7 @@ const Product = () => {
       }
       setFiles([])
     },
-    [addNewProduct, update, edit, product, files,setFiles]
+    [addNewProduct, update, edit, product, files, setFiles]
   );
 
   const edit_handler = useCallback(
@@ -145,15 +145,23 @@ const Product = () => {
           open={isOpen}
           set_open={setIsOpen}
           components={
-            <Product_form
-              files={files}
-              setFiles={setFiles}
-              isLoading={isLoading || update_loading}
-              edit={edit}
-              set_open={setIsOpen}
-              data={product}
-              onsubmit={onSubmit}
-            />
+            <>
+              <Product_form
+                files={files}
+                setFiles={setFiles}
+                isLoading={isLoading || update_loading}
+                edit={edit}
+                set_open={setIsOpen}
+                data={product}
+                onsubmit={onSubmit}
+              />
+              {single_data_loading && (
+                <div className="absolute z-10 inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+                  <CircularProgress />
+                </div>
+              )}
+
+            </>
           }
         />
       )}

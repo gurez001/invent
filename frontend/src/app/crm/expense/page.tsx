@@ -1,8 +1,9 @@
+import Expenses from '@/components/pages/crm/expenses/Expenses'
 import React from 'react'
 
 const page = () => {
   return (
-    <div>page</div>
+    <Expenses />
   )
 }
 

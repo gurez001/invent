@@ -1,12 +1,11 @@
 import cookiesManager from "@/lib/service/cookies-axis/Cookies";
-import { product_type_form } from "@/types/Product_types";
-import { purchase_product_list_props } from "@/types/Purchase_type";
+import { Expences_List_Props, expenses_form } from "@/types/expense_type";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"; // Ensure /react is imported
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-export const productApi = createApi({
-  reducerPath: "productApi",
+export const expencesApi = createApi({
+  reducerPath: "expencesApi",
   baseQuery: fetchBaseQuery({
     baseUrl: apiUrl,
     prepareHeaders: (headers) => {
@@ -18,9 +17,9 @@ export const productApi = createApi({
     },
     credentials: "include",
   }),
-  tagTypes: ["Products"],
+  tagTypes: ["Expences"],
   endpoints: (builder) => ({
-    addNewProduct: builder.mutation<any, product_type_form>({
+    addNew: builder.mutation<any, expenses_form>({
       query: (data) => {
         const formData = new FormData();
         for (let [key, value] of Object.entries(data)) {
@@ -29,59 +28,57 @@ export const productApi = createApi({
             value.forEach((file: any) => formData.append("images", file));
           } else {
             formData.append(key, value === undefined ? "" : value);
-
             // For all other fields, just append key-value pairs
           }
         }
 
         return {
-          url: "/product/add",
+          url: "/expense/add",
           method: "POST",
           body: formData, // Use formData as body
         };
       },
-      invalidatesTags: [{ type: "Products", id: "LIST" }],
+      invalidatesTags: [{ type: "Expences", id: "LIST" }],
     }),
-    update: builder.mutation<any, product_type_form>({
+    update: builder.mutation<void, expenses_form>({
       query: (data) => {
-        console.log(data);
         const formData = new FormData();
         for (let [key, value] of Object.entries(data)) {
-          if (key === "images" && Array.isArray(value)) {
-            // console.log(value)
-            // Assuming 'images' is an array of files, append each file separately
-            value.forEach((file: any) => formData.append("images", file));
-          } else {
-            formData.append(key, value === undefined ? "" : value);
+            if (key === "images" && Array.isArray(value)) {
+              // Assuming 'images' is an array of files, append each file separately
+              value.forEach((file: any) => formData.append("images", file));
+            } else {
+              formData.append(key, value === undefined ? "" : value);
+              // For all other fields, just append key-value pairs
+            }
           }
-        }
         return {
-          url: "/product/update",
+          url: "/expense/update",
           method: "POST",
           body: formData,
         };
       },
-      invalidatesTags: [{ type: "Products", id: "LIST" }],
+      invalidatesTags: [{ type: "Expences", id: "LIST" }],
     }),
     action: builder.mutation({
       query: (data) => {
         return {
-          url: `/product/remove/${data.id}`,
+          url: `/expense/remove/${data.id}`,
           method: "POST",
           body: data,
         };
       },
-      invalidatesTags: [{ type: "Products", id: "LIST" }],
+      invalidatesTags: [{ type: "Expences", id: "LIST" }],
     }),
-    getSingle: builder.mutation<purchase_product_list_props, string>({
+    getSingle: builder.mutation<Expences_List_Props, string>({
       query: (id: string) => ({
-        url: `/product/data/${id}`,
+        url: `/expense/data/${id}`,
         method: "GET",
       }),
-      invalidatesTags: [{ type: "Products", id: "LIST" }],
+      invalidatesTags: [{ type: "Expences", id: "LIST" }],
     }),
 
-    getAllproducts: builder.query<
+    getAll: builder.query<
       any,
       {
         is_delete?: string;
@@ -93,11 +90,7 @@ export const productApi = createApi({
       } | void
     >({
       query: (filters) => {
-        // Initialize the query params object with the default value for isActive
-        const params: Record<string, string | number | boolean> = {
-          // is_active: filters.is_active, // Default to true
-        };
-        // Add filters to the query parameters if they are present
+        const params: Record<string, string | number | boolean> = {};
         if (filters) {
           if (filters.is_active && filters.is_active !== "final") {
             params.is_active = filters.is_active;
@@ -121,21 +114,16 @@ export const productApi = createApi({
         }
 
         return {
-          url: "/product/all-products",
+          url: "/expense/all-expense",
           params, // Use the dynamically constructed params
           method: "GET",
         };
       },
-      providesTags: [{ type: "Products", id: "LIST" }],
+      providesTags: [{ type: "Expences", id: "LIST" }],
     }),
   }),
 });
 
 // Correct hook name generated by createApi
-export const {
-  useAddNewProductMutation,
-  useGetAllproductsQuery,
-  useUpdateMutation,
-  useGetSingleMutation,
-  useActionMutation,
-} = productApi;
+export const { useAddNewMutation, useGetAllQuery,useUpdateMutation, useActionMutation,useGetSingleMutation } =
+  expencesApi;

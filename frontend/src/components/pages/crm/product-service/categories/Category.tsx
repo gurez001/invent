@@ -15,6 +15,7 @@ import {
 import toast from "react-hot-toast";
 import { generate32BitUUID } from "@/lib/service/generate32BitUUID";
 import Categorie_list from "./Categorie_list";
+import { CircularProgress } from "@nextui-org/react";
 
 const Category = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -23,7 +24,7 @@ const Category = () => {
   const [operationSuccess, setOperationSuccess] = useState<boolean>(false); // New state for operation success
   const [addNewCategorie, { error, isLoading, isSuccess }] =
     useAddNewCategorieMutation();
-  const [getSingle, { data }] = useGetSingleMutation();
+  const [getSingle, { data, isLoading: single_data_loading }] = useGetSingleMutation();
 
   const [
     update,
@@ -140,15 +141,22 @@ const Category = () => {
           open={isOpen}
           set_open={setIsOpen}
           components={
-            <Categotie_form
-              files={files}
-              setFiles={setFiles}
-              isLoading={isLoading || update_loading}
-              edit={edit}
-              set_open={setIsOpen}
-              data={categorie}
-              onsubmit={onSubmit}
-            />
+            <>
+              <Categotie_form
+                files={files}
+                setFiles={setFiles}
+                isLoading={isLoading || update_loading}
+                edit={edit}
+                set_open={setIsOpen}
+                data={categorie}
+                onsubmit={onSubmit}
+              />
+              {single_data_loading && (
+                <div className="absolute z-10 inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+                  <CircularProgress />
+                </div>
+              )}
+            </>
           }
         />
       )}

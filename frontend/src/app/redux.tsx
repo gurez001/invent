@@ -30,6 +30,7 @@ import { customerApi } from "@/state/customerApi";
 import { categorieApi } from "@/state/categoriesApi";
 import { productApi } from "@/state/productApi";
 import { orderApi } from "@/state/orderApi";
+import { expencesApi } from "@/state/expenseApi";
 
 /* REDUX PERSISTENCE */
 const createNoopStorage = () => {
@@ -66,6 +67,7 @@ const rootReducer = combineReducers({
   [categorieApi.reducerPath]: categorieApi.reducer,
   [productApi.reducerPath]: productApi.reducer,
   [orderApi.reducerPath]: orderApi.reducer,
+  [expencesApi.reducerPath]: expencesApi.reducer,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
@@ -76,7 +78,7 @@ export const makeStore = () => {
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         immutableCheck: false, // Disable ImmutableStateInvariantMiddleware
-        serializableCheck: false, // Optionally disable serializableCheck if it's also causing performance issues
+        // serializableCheck: false, // Optionally disable serializableCheck if it's also causing performance issues
         // serializableCheck: {
         //   ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         // },
@@ -87,7 +89,8 @@ export const makeStore = () => {
         .concat(customerApi.middleware)
         .concat(categorieApi.middleware)
         .concat(productApi.middleware)
-        .concat(orderApi.middleware),
+        .concat(orderApi.middleware)
+        .concat(expencesApi.middleware),
   });
 };
 

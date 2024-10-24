@@ -15,6 +15,7 @@ import {
   customer_list,
   Post_CustomerResponse,
 } from "@/types/Customer_type";
+import { CircularProgress } from "@nextui-org/react";
 
 const Vendor: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -31,7 +32,7 @@ const Vendor: React.FC = () => {
       isLoading: update_loading,
     },
   ] = useUpdate_customerMutation();
-  const [getSingleCustomer, { data }] = useGetSingleCustomerMutation();
+  const [getSingleCustomer, { data, isLoading: single_data_loading }] = useGetSingleCustomerMutation();
 
   const response: Post_CustomerResponse | undefined = data as
     | Post_CustomerResponse
@@ -133,14 +134,22 @@ const Vendor: React.FC = () => {
           open={isOpen}
           set_open={setIsOpen}
           components={
-            <Customer_from
-              isLoading={isLoading || update_loading}
-              edit={edit}
-              open={isOpen}
-              set_open={setIsOpen}
-              data={customer}
-              onSubmit={onSubmit}
-            />
+            <>
+              <Customer_from
+                isLoading={isLoading || update_loading}
+                edit={edit}
+                open={isOpen}
+                set_open={setIsOpen}
+                data={customer}
+                onSubmit={onSubmit}
+              />
+              {single_data_loading && (
+                <div className="absolute z-10 inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+                  <CircularProgress />
+                </div>
+              )}
+
+            </>
           }
         />
       )}

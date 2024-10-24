@@ -15,6 +15,7 @@ import {
 } from "@/state/vendorApi";
 import { generate32BitUUID } from "@/lib/service/generate32BitUUID";
 import toast from "react-hot-toast";
+import { CircularProgress } from "@nextui-org/react";
 
 const Vendor: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -24,7 +25,7 @@ const Vendor: React.FC = () => {
   const [addNew_vendor, { error, isSuccess, isLoading }] =
     useAddNew_vendorMutation();
   const [update_vendor, { error: update_error, isSuccess: update_success, isLoading: update_loading }] = useUpdate_vendorMutation();
-  const [getSingeVendor, { data }] = useGetSingeVendorMutation();
+  const [getSingeVendor, { data,isLoading:single_data_loading }] = useGetSingeVendorMutation();
 
   const response: Post_VendorResponse | undefined = data as
     | Post_VendorResponse
@@ -116,6 +117,7 @@ const Vendor: React.FC = () => {
           open={isOpen}
           set_open={setIsOpen}
           components={
+            <>
             <Vendor_from
               isLoading={isLoading || update_loading}
               edit={edit}
@@ -124,6 +126,13 @@ const Vendor: React.FC = () => {
               vendor_data={vendor}
               onSubmit={onSubmit}
             />
+            {single_data_loading && (
+              <div className="absolute z-10 inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+                <CircularProgress />
+              </div>
+            )}
+            
+            </>
           }
         />
       )}

@@ -11,6 +11,8 @@ import ProductService from "../services/productService";
 import ProductRepository from "../repositories/productRepository";
 import OrderService from "../services/orderService";
 import OrderRepository from "../repositories/orderRepository";
+import ExpenseRepository from "../repositories/expenseRepository";
+import ExpenseService from "../services/expenseServiec";
 
 const servicesLoader = (repositories: {
   userRepository: UserRepository;
@@ -19,6 +21,7 @@ const servicesLoader = (repositories: {
   categorieRepository: CategorieRepository;
   productRepository: ProductRepository;
   orderRepository: OrderRepository;
+  expenseRepository: ExpenseRepository;
 }) => {
   const userService = new UserService(repositories.userRepository);
   const vendorService = new VendorService(repositories.vendorRepository);
@@ -27,7 +30,8 @@ const servicesLoader = (repositories: {
     repositories.categorieRepository
   );
   const productService = new ProductService(repositories.productRepository);
-  const orderService= new OrderService(repositories.orderRepository);
+  const orderService = new OrderService(repositories.orderRepository);
+  const expenseService = new ExpenseService(repositories.expenseRepository);
 
   return {
     userService,
@@ -35,7 +39,8 @@ const servicesLoader = (repositories: {
     customerService,
     categorieService,
     productService,
-    orderService
+    orderService,
+    expenseService,
   };
 };
 

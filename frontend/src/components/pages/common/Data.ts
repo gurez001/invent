@@ -1,4 +1,4 @@
-export const show_per_Page = 10000; 
+export const show_per_Page = 10000;
 export const status_arr = [
   { label: "Active", value: "active" },
   { label: "Inactive", value: "inactive" },
@@ -6,6 +6,24 @@ export const status_arr = [
 export const tax_status = [
   { label: "With gst", value: "with gst" },
   { label: "Without gst", value: "without gst" },
+];
+export const expance_categorie = [
+  { label: "travel", value: "Travel" },
+  { label: "office supplies", value: "Office Supplies" },
+  { label: "utilities", value: "Utilities" },
+  { label: "salaries and wages", value: "Salaries and Wages" },
+  { label: "marketing and advertising", value: "Marketing and Advertising" },
+  { label: "rent and lease", value: "Rent and Lease" },
+  { label: "maintenance and repairs", value: "Maintenance and Repairs" },
+  { label: "professional services", value: "Professional Services" },
+  {
+    label: "inventory and cost of goods sold",
+    value: "Inventory and Cost of Goods Sold",
+  },
+  {
+    label: "inventory and cost of goods sold",
+    value: "Inventory and Cost of Goods Sold",
+  },
 ];
 export const order_status_arr = [
   { label: "Processing", value: "processing" },
@@ -16,24 +34,29 @@ export const order_status_arr = [
   { label: "Hold", value: "hold" },
 ];
 export const dispatch_mod_arr = [
-  { label: "Self", value: "Self" },
-  { label: "Glow road", value: "Glow road" },
-  { label: "Meesho", value: "Meesho" },
-  { label: "Flipkart", value: "Flipkart" },
-  { label: "Delhivery", value: "Delhivery" },
-  { label: "Amazon", value: "Amazon" },
-  { label: "Ecom Express", value: "Ecom Express" },
-  { label: "Ekart Logistics", value: "Ekart Logistics" },
-  { label: "XpressBees", value: "XpressBees" },
+  { label: "Self", value: "self" },
+  { label: "Glow road", value: "glow_road" },
+  { label: "Meesho", value: "meesho" },
+  { label: "Flipkart", value: "flipkart" },
+  { label: "Delhivery", value: "delhivery" },
+  { label: "Amazon", value: "amazon" },
+  { label: "Ecom Express", value: "ecom_express" },
+  { label: "Ekart Logistics", value: "ekart_logistics" },
+  { label: "XpressBees", value: "xpressBees" },
   { label: "DTDC", value: "DTDC" },
 ];
 export const Payment_mode_arr = [
-  { label: "COD", value: "cod" },
-  { label: "Phonepe", value: "phonepe" },
-  { label: "Card", value: "card" },
-  { label: "Paytm", value: "paytm" },
-  { label: "G-pay", value: "g-pay" },
-  { label: "Other", value: "other" },
+  { label: "cash", value: "Cash" },
+  { label: "cod", value: "COD" },
+  { label: "phonepe", value: "Phonepe" },
+  { label: "card", value: "card" },
+  { label: "paytm", value: "Paytm" },
+  { label: "g-pay", value: "G-pay" },
+  { label: "other", value: "Other" },
+];
+export const Payment_status_arr = [
+  { label: "Paid", value: "paid" },
+  { label: "Unpaid", value: "unpaid" },
 ];
 export const gst_arr = [
   {
