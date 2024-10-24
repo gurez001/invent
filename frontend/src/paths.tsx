@@ -40,7 +40,7 @@ export const paths: Paths = {
     expense: "/crm/expense",
     customer: "/crm/customer",
     vendor: "/crm/vendor",
-    users: "/users",
+    users: "/crm/users",
   },
   dashboard: {
     products: "/products",

@@ -50,8 +50,21 @@ class UserController {
   );
 
   getAllUsers = AsyncHandler.handle(async (req: Request, res: Response) => {
-    const users = await this.userService.getAllUsers();
-    res.status(200).json({ users });
+    const query = req.query;
+
+    const resultPerpage = Number(query.rowsPerPage);
+
+    const result = await this.userService.getAllUsers(query);
+    const data_counter = await this.userService.data_counter(query);
+    console.log(result)
+    if (result) {
+      return res.status(201).json({
+        success: true,
+        result,
+        resultPerpage,
+        data_counter,
+      });
+    }
   });
 
   getUserById = AsyncHandler.handle(async (req: Request, res: Response) => {

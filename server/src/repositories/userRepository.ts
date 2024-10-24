@@ -1,4 +1,5 @@
 import User from "../models/userModel";
+import ApiFeatures from "../utils/apiFeatuers";
 import { generateRandomId } from "../utils/generateRandomId";
 
 class UserRepository {
@@ -23,8 +24,33 @@ class UserRepository {
     return await User.findById(id);
   }
 
-  async getAllUsers() {
-    return await User.find().select("-password"); // Exclude password
+  async getAllUsers(query: any) {
+    const resultPerPage = Number(query.rowsPerPage);
+    const apiFeatures = new ApiFeatures(User.find(), query);
+    apiFeatures.search().filter().sort().pagination(resultPerPage);
+
+    const result = await apiFeatures
+      .getQuery() // Use the public getter
+      .populate([
+        {
+          path: "audit_log",
+          model: "User",
+        },
+        {
+          path: "images_id",
+          model: "Images",
+        },
+      ])
+      .sort({ updated_at: -1 })
+      .exec();
+
+    return result;
+  }
+  async data_counter(query: any) {
+    const apiFeatures = new ApiFeatures(User.find(), query);
+    apiFeatures.search().filter();
+    const result = await apiFeatures.exec();
+    return result.length;
   }
 
   async updateUser(id: string, updateData: any) {

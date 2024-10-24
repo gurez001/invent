@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document, Model, Schema, Types } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 
@@ -11,8 +11,11 @@ export interface IUser extends Document {
   password: string;
   role: string;
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  status: string;
+  images_id: Types.ObjectId;
+  audit_log: Types.ObjectId;
+  is_active?: string; // Optional field
+  is_delete?: string; // Optional field
   getJWT_token: () => Promise<string>;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
@@ -58,6 +61,28 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: false, // Active by default
+    },
+    images_id: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Images",
+      },
+    ],
+    status: {
+      type: String,
+      default: "active",
+    },
+    audit_log: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    is_active: {
+      type: String,
+      default: "yes",
+    },
+    is_delete: {
+      type: String,
+      default: "no",
     },
   },
   {

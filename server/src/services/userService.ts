@@ -38,10 +38,12 @@ class UserService {
     return user;
   }
 
-  async getAllUsers() {
-    return await this.userRepository.getAllUsers();
+  async getAllUsers(query: any) {
+    return await this.userRepository.getAllUsers(query);
   }
-
+  async data_counter(query: any) {
+    return await this.userRepository.data_counter(query);
+  }
   async getUserById(id: string) {
     const user = await this.userRepository.findUserById(id);
     if (!user) {
