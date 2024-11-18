@@ -7,7 +7,7 @@ import UserRepository from "../../repositories/crm/userRepository";
 import VendorRepository from "../../repositories/crm/vendorRepository";
 import CategorieRepository from "../../repositories/crm/categorieRepository";
 
-export const repositoriesLoader = () => {
+ const repositoriesLoader = () => {
   const userRepository = new UserRepository();
   const vendorRepository = new VendorRepository();
   const customerRepository = new CustomerRepository();
@@ -27,3 +27,4 @@ export const repositoriesLoader = () => {
     purchaseRepository,
   };
 };
+export default repositoriesLoader;

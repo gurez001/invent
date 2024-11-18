@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import admin from "firebase-admin";
 
 // Load environment variables
 dotenv.config();
@@ -44,17 +43,3 @@ thardConnection.on("connected", () => {
 thardConnection.on("error", (err: any) => {
   console.error("Error connecting to THARD DB:", err);
 });
-
-// Firebase initialization
-const serviceAccount = "../serviceAccountKey.json";
-
-export const initFirebase = async () => {
-  if (!admin.apps.length) {
-    // Only initialize if there are no existing apps
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    });
-  }
-  return admin.storage().bucket(); // Return the bucket reference
-};

@@ -1,5 +1,4 @@
 import multer from "multer";
-import { Request } from "express"; // Import Request type from express
 
 // Define the storage configuration
 const storage = multer.memoryStorage(); // Change to memory storage

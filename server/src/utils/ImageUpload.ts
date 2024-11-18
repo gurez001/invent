@@ -1,6 +1,6 @@
 import { NextFunction } from "express";
 import ErrorHandler from "./ErrorHandler"; // Ensure this is correct
-import { initFirebase } from "../firebase";
+import { initFirebase_1 } from "../firebase";
 import { generateRandomId } from "./generateRandomId";
 
 export class ImageUploader {
@@ -17,7 +17,7 @@ export class ImageUploader {
 
       // Generate a unique filename
       const uniqueFilename = `${Date.now()}-${file.originalname}`;
-      const bucket = await initFirebase();
+      const bucket = await initFirebase_1();
       const blob = bucket.file(uniqueFilename); // Use the unique filename
 
       const blobStream = blob.createWriteStream({

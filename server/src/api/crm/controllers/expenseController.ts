@@ -47,7 +47,7 @@ class ExpenseController {
   all = AsyncHandler.handle(
     async (req: Request, res: Response, next: NextFunction) => {
       const query = req.query;
-
+   
       const resultPerpage = Number(query.rowsPerPage);
 
       const result = await this.expenseService.all(query);
