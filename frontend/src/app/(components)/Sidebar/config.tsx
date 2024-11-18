@@ -120,10 +120,58 @@ export const navItems: MenuListProps[] = [
     key: "karnalwebtech",
     pages: [
       {
-        title: "Post",
-        label: "Post",
+        title: "Posts",
+        label: "Posts",
         icon: 'CirclePlus',
-        href: paths.karnalwebtech.post,
+        href: '',
+        page_data: [
+          {
+            key: "Post",
+            title: "Post",
+            href: paths.karnalwebtech.post,
+            icon: "CirclePlus",
+          },
+          {
+            key: "post-categorie",
+            title: "Categorie",
+            href: paths.karnalwebtech.post_categorie,
+            icon: "Component",
+          },
+          
+          {
+            key: "post-tag",
+            title: "Tag",
+            href: paths.karnalwebtech.post_tag,
+            icon: "Tag",
+          },
+        ],
+      },
+      {
+        title: "portfolios",
+        label: "Portfolios",
+        icon: 'BriefcaseBusiness',
+        href: '',
+        page_data: [
+          {
+            key: "Portfolio",
+            title: "Portfolio",
+            href: paths.karnalwebtech.portfolio,
+            icon: "BriefcaseBusiness",
+          },
+          {
+            key: "portfolio-categorie",
+            title: "Categorie",
+            href: paths.karnalwebtech.portfolio_categorie,
+            icon: "Component",
+          },
+          
+          {
+            key: "portfolio-tag",
+            title: "Tag",
+            href: paths.karnalwebtech.portfolio_tag,
+            icon: "Tag",
+          },
+        ],
       }
     ]
   },

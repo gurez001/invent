@@ -7,17 +7,16 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { postSchema } from "@/zod-schemas/karnal-web-tech/post_zod_schema";
 
-export default function AddNewPost() {
-  const { imageitemData,files, handleDrop } = useImageDrop();
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    []
-  );
+export default function AddNewPostTag() {
+  const { imageitemData, files, handleDrop } = useImageDrop();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [keywords, setKeywords] = useState<string[]>([]);
   const {
     control,
     handleSubmit,
     formState: { errors },
-    setValue, watch
+    setValue,
+    watch,
   } = useForm<any>({
     resolver: zodResolver(postSchema),
     defaultValues: {
@@ -27,10 +26,9 @@ export default function AddNewPost() {
   });
   // 2. Define the submit handler
   const onSubmit: SubmitHandler<any> = (data) => {
-    console.log("Form Data: ", data, keywords, selectedCategories,files);
+    console.log("Form Data: ", data, keywords, selectedCategories, files);
     // Perform any action with the form data here
   };
-
 
   return (
     <>
@@ -39,14 +37,15 @@ export default function AddNewPost() {
           control={control} // react form
           errors={errors} // react form
           setValue={setValue} // react form
-          watch={watch}// react form
+          watch={watch} // react form
           imageitemData={imageitemData}
           handleDrop={handleDrop}
           setKeywords={setKeywords}
           keywords={keywords}
           selectedCategories={selectedCategories}
           setSelectedCategories={setSelectedCategories}
-          pageTitle={"Post"}
+          isVisiableCategory={false} // optinoal
+          pageTitle={"Tag"}
         />
       </form>
     </>
