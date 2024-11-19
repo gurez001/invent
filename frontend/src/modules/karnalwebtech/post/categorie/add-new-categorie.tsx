@@ -6,11 +6,14 @@ import { useImageDrop } from "@/hooks/handleMediaDrop";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { postSchema } from "@/zod-schemas/karnal-web-tech/post_zod_schema";
+import { useAddNewCategorieMutation } from "@/state/karnal-web-tech/categorieApi";
 
 export default function AddNewPostCategorie() {
   const { imageitemData, files, handleDrop } = useImageDrop();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [keywords, setKeywords] = useState<string[]>([]);
+  const [addNewCategorie, { error, isLoading, isSuccess }] =
+    useAddNewCategorieMutation();
   const {
     control,
     handleSubmit,
@@ -25,7 +28,11 @@ export default function AddNewPostCategorie() {
     },
   });
   // 2. Define the submit handler
-  const onSubmit: SubmitHandler<any> = (data) => {
+  const onSubmit: SubmitHandler<any> = async (data) => {
+    const updateddData = {
+      ...data, keywords, images:files
+    }
+    await addNewCategorie(updateddData);
     console.log("Form Data: ", data, keywords, selectedCategories, files);
     // Perform any action with the form data here
   };

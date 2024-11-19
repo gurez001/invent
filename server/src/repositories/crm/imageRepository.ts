@@ -1,22 +1,21 @@
 import { NextFunction } from "express";
-import ImageModel from "../../models/primary/imageModel";
+import { getImageModel } from "../../utils/models-handler/image-model-handler";
 
 class ImageRepository {
   async createImage(
     data: any,
     image_uploader: any,
     user_id: string,
-    next: NextFunction
+    next: NextFunction,
+    image_key:string ="crm"
   ) {
     try {
-     
       // Create an array to hold image objects
       const images_arr: any[] = [];
-      const counter = await ImageModel.countDocuments();
+      const counter = await getImageModel(image_key).countDocuments();
       // Check if data is an array or an object
       if (Array.isArray(data)) {
         // Handle the case when data is an array
-     
 
         data.forEach((image: any, i: number) => {
           images_arr.push({
@@ -35,7 +34,6 @@ class ImageRepository {
       } else if (typeof data === "object" && data !== null) {
         // Handle the case when data is an object
         Object.entries(data).forEach(([key, value], entryIndex) => {
-
           if (Array.isArray(value)) {
             value.forEach((image: any, i: number) => {
               images_arr.push({
@@ -59,7 +57,7 @@ class ImageRepository {
 
       // Insert multiple images into the database if images_arr is populated
       if (images_arr.length > 0) {
-        const createdImages = await ImageModel.insertMany(images_arr); // Insert the accumulated images array
+        const createdImages = await getImageModel(image_key).insertMany(images_arr); // Insert the accumulated images array
         return createdImages; // Return saved images
       } else {
         return next(new Error("No images to insert.")); // Handle the case with no images

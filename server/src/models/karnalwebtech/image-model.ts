@@ -1,60 +1,95 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document, Model, Types, Schema } from "mongoose";
 import { thardConnection } from "../../loaders/config";
-
-export interface IImage extends Document {
+// Define the IKarnalimages interface to match the image data structure
+export interface IKarnalImages extends Document {
   _no: number;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  fieldname: string;
   filename: string;
-  original_filename: string;
-  file_size: number;
-  width: number;
-  height: number;
-  format: string;
-  color_space: string;
-  is_public: boolean;
-  folder: string;
-  seo: mongoose.Types.ObjectId;
-  url: string;
-  secure_url: string;
-  cloud_id: string;
-  asset_id: string;
-  signature: string;
-  original_extension: string;
-  user_id: mongoose.Types.ObjectId;
-  is_active: boolean;
-  is_deleted: boolean;
+  path: string;
+  size: number;
+  altText: string;
+  title: string;
+  caption: string;
+  audit_log: Types.ObjectId;
+  seo: Types.ObjectId;
+  status: boolean;
+  is_active?: boolean; // Optional field
+  is_delete?: boolean;
 }
 
-const ImageSchema: Schema = new Schema(
+// Define the image schema
+const imageSchema: Schema<IKarnalImages> = new mongoose.Schema(
   {
-    _no: { type: Number, required: true, unique: true },
-    filename: { type: String, required: true },
-    original_filename: { type: String, required: true },
-    file_size: { type: Number, required: true },
-    width: { type: Number, required: true },
-    height: { type: Number, required: true },
-    format: { type: String, required: true },
-    color_space: { type: String },
-    is_public: { type: Boolean, default: true },
-    folder: { type: String },
-    url: { type: String, required: true },
-    secure_url: { type: String, required: true },
-    cloud_id: { type: String, required: true, unique: true },
-    asset_id: { type: String, required: true, unique: true },
-    signature: { type: String, required: true },
-    original_extension: { type: String, required: true },
+    _no: {
+      type: Number,
+      default:0,
+    },
+    originalname: {
+      type: String,
+      default: null,
+    },
+    encoding: {
+      type: String,
+      default: null,
+    },
+    filename: {
+      type: String,
+      default: null,
+    },
+    fieldname: {
+      type: String,
+      default: null,
+    },
+    path: {
+      type: String,
+      default: null,
+    },
+    size: {
+      type: Number,
+      default: null,
+    },
+    altText: {
+      type: String,
+      default: null,
+    },
+    title: {
+      type: String,
+      default: null,
+    },
+    caption: {
+      type: String,
+      default: null,
+    },
     seo: { type: Schema.Types.ObjectId, ref: "Karnal_web_seo" },
-    user_id: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    is_active: { type: Boolean, default: true },
-    is_deleted: { type: Boolean, default: false },
+    status: {
+      type: Boolean,
+      default: true,
+    },
+    audit_log: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    is_active: {
+      type: Boolean,
+      default: true,
+    },
+    is_delete: {
+      type: Boolean,
+      default:false,
+    },
   },
   {
-    timestamps: true,
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
   }
 );
 
-const ImageModel: Model<IImage> = thardConnection.model<IImage>(
-  "Karnal_web_Image",
-  ImageSchema
+// Create and export the Image model
+const KarnalwebtechImageModel: Model<IKarnalImages> = thardConnection.model<IKarnalImages>(
+  "Karnal_Images",
+  imageSchema
 );
 
-export default ImageModel;
+export default KarnalwebtechImageModel;

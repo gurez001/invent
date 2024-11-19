@@ -1,11 +1,11 @@
 import { NextFunction } from "express";
 import ErrorHandler from "./ErrorHandler"; // Ensure this is correct
-import { initFirebase_1 } from "../firebase";
+import { getFirebaseInstance } from "../firebase";
 import { generateRandomId } from "./generateRandomId";
 
 export class ImageUploader {
   // Function to handle image uploads
-  async uploadImage(files: any, next: NextFunction) {
+  async uploadImage(files: any, next: NextFunction,firebase_key:string="crm") {
     if (!files || !Array.isArray(files) || files.length === 0) {
       return next(new ErrorHandler("No files uploaded.", 400));
     }
@@ -17,7 +17,7 @@ export class ImageUploader {
 
       // Generate a unique filename
       const uniqueFilename = `${Date.now()}-${file.originalname}`;
-      const bucket = await initFirebase_1();
+      const bucket = await getFirebaseInstance(firebase_key);
       const blob = bucket.file(uniqueFilename); // Use the unique filename
 
       const blobStream = blob.createWriteStream({

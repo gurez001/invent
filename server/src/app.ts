@@ -25,6 +25,7 @@ app.use(
   })
 );
 //-----loaders
+//------------------ crm
 import crm_repositoriesLoader from "./loaders/crm/repositoriesLoader";
 import crm_servicesLoader from "./loaders/crm/servicesLoader";
 import crm_controllersLoader from "./loaders/crm/controllersLoader";
@@ -35,6 +36,19 @@ const crm_services = crm_servicesLoader(crm_repositories);
 // Initialize Controllers
 const crm_controllers = crm_controllersLoader(crm_services);
 crm_routesLoader(app, crm_controllers);
+
+//--------------------- karnalweb tech
+import karnal_repositoriesLoader from "./loaders/karnalwebtech/repositoriesLoader";
+import karnal_servicesLoader from "./loaders/karnalwebtech/servicesLoader";
+import karnal_controllersLoader from "./loaders/karnalwebtech/controllersLoader";
+import karnal_routesLoader from "./app-routes/karnal-web-tech-loader";
+const karnal_repositories = karnal_repositoriesLoader();
+const karnal_services = karnal_servicesLoader(karnal_repositories);
+
+// Initialize Controllers
+const karnal_controllers = karnal_controllersLoader(karnal_services);
+karnal_routesLoader(app, karnal_controllers);
+
 
 app.use(errorMiddleware);
 

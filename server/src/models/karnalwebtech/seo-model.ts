@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 import { thardConnection } from "../../loaders/config";
-
+import slugify from "slugify";
 export interface ISeo extends Document {
   title: string;
   meta_description: string;
@@ -14,6 +14,8 @@ export interface ISeo extends Document {
   twitter_image?: string;
   canonical_url?: string;
   robots?: string;
+  generateSlug: () => string;
+  generateMetaDescription: () => string;
 }
 
 const SeoSchema = new Schema<ISeo>(
@@ -29,6 +31,7 @@ const SeoSchema = new Schema<ISeo>(
     twitter_description: { type: String },
     twitter_image: { type: String },
     canonical_url: { type: String },
+
     robots: { type: String, default: "index, follow" }, // Default to allow indexing and following
   },
   {
@@ -36,6 +39,29 @@ const SeoSchema = new Schema<ISeo>(
   }
 );
 
-const SeoModel = thardConnection.model<ISeo>("Karnal_web_seo", SeoSchema);
+SeoSchema.methods.generateSlug = function (): string {
+  return slugify(this.canonical_url, {
+    lower: true,
+    strict: true,
+    replacement: "-",
+  });
+};
+// Method to generate meta description from content
+SeoSchema.methods.generateMetaDescription = function (): string {
+  return this.content ? this.content.substring(0, 160) : "";
+};
+SeoSchema.pre<ISeo>("save", function (next) {
+  if (!this.canonical_url) {
+    this.canonical_url = this.generateSlug();
+  }
+  if (!this.meta_description) {
+    this.meta_description = this.generateMetaDescription();
+  }
+  next();
+});
+const Karnal_SeoModel = thardConnection.model<ISeo>(
+  "Karnal_web_seo",
+  SeoSchema
+);
 
-export default SeoModel;
+export default Karnal_SeoModel;
