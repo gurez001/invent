@@ -2,7 +2,9 @@ import app from "./app";
 import cluster from "cluster";
 import os from "os";
 import dotent from "dotenv";
+import { connectRedis } from "./loaders/redis";
 dotent.config();
+connectRedis();
 const numCPUs = os.cpus().length;
 // if (cluster.isMaster) {
 //   console.log(`Master ${process.pid} is running`);
