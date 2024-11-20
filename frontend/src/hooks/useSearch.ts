@@ -1,21 +1,28 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react'
 
-const useSearch = (initialValue: string = "", setPage: (value: number) => void) => {
-  const [filterValue, setFilterValue] = useState(initialValue);
+type SearchableItem = {
+  id: number | string
+  [key: string]: any
+}
 
-  const onSearchChange = useCallback((value?: string) => {
-    if (value) {
-      setFilterValue(value);
-      setPage(1); // Reset page when search value changes
-    } else {
-      setFilterValue("");
-    }
-  }, [setPage]);
+export function useSearch<T extends SearchableItem>(
+  items: T[],
+  searchKeys: (keyof T)[],
+  initialSearchTerm: string = ''
+) {
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm)
+
+  const filteredItems = useMemo(() => {
+    return items?.filter((item) =>
+      searchKeys.some((key) =>
+        item[key].toString().toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    )
+  }, [items, searchKeys, searchTerm])
 
   return {
-    filterValue,
-    onSearchChange,
-  };
-};
-
-export default useSearch;
+    searchTerm,
+    setSearchTerm,
+    filteredItems,
+  }
+}

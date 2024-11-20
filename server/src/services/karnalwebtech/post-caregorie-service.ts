@@ -63,6 +63,12 @@ class CategorieService {
   async findByUrl(url: string) {
     return await this.categorieRepository.findByUrl(url);
   }
+  async all(query: any) {
+    return await this.categorieRepository.all(query);
+  }
+  async data_counter(query: any) {
+    return await this.categorieRepository.data_counter(query);
+  }
 }
 
 export default CategorieService;

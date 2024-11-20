@@ -1,4 +1,6 @@
 import PostCategorieModel from "../../models/karnalwebtech/post-categorie";
+import User from "../../models/primary/userModel";
+import ApiFeatures from "../../utils/apiFeatuers";
 import { generateRandomId } from "../../utils/generateRandomId";
 
 class CategorieRepository {
@@ -28,7 +30,7 @@ class CategorieRepository {
         cat_id: this.generateCategoryId(uuid, randomId),
         title,
         content,
-        status:status,
+        status: status,
         slug: metaCanonicalUrl,
         feature_image: imageIds[0],
         seo: seo?._id,
@@ -44,8 +46,41 @@ class CategorieRepository {
     }
   }
   async findByUrl(url: string) {
-      const newCategory = await PostCategorieModel.findOne({ slug: url });
-      return newCategory;
+    const newCategory = await PostCategorieModel.findOne({ slug: url });
+    return newCategory;
+  }
+  async all(query: any) {
+    const resultPerPage = Number(query.rowsPerPage);
+    const apiFeatures = new ApiFeatures(PostCategorieModel.find(), query);
+    apiFeatures.search().filter().sort().pagination(resultPerPage);
+
+    const result = await apiFeatures
+      .getQuery() // Use the public getter
+      .populate([
+        {
+          path: "audit_log",
+          model: User,
+        },
+        {
+          path: "feature_image",
+          model: "Karnal_Images",
+        },
+        {
+          path: "seo",
+          model: "Karnal_web_seo",
+        },
+      ])
+      .sort({ updated_at: -1 })
+      .exec();
+
+    return result;
+  }
+
+  async data_counter(query: any) {
+    const apiFeatures = new ApiFeatures(PostCategorieModel.find(), query);
+    apiFeatures.search().filter();
+    const result = await apiFeatures.exec();
+    return result.length;
   }
 }
 
