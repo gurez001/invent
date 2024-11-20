@@ -2,28 +2,44 @@ import cookieParser from "cookie-parser";
 import express from "express";
 const app = express();
 import cors from "cors";
+import helmet from "helmet";
+import csurf from "csurf";
+import rateLimit from "express-rate-limit";
 import errorMiddleware from "./middlewares/error";
 // Middleware to parse JSON bodies
 app.use(express.json());
 // Middleware to parse URL-encoded bodies (form submissions)
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.disable("x-powered-by");
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per window
+});
+app.use(helmet());
+// export const csrfProtection = csurf({ cookie: true });
+// app.use(csrfProtection);
+app.use(limiter);
 app.use(
   cors({
     origin: ["http://localhost:3000", "https://inventory-7773.vercel.app"], // Allow only your frontend to access the API
     methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed methods
     exposedHeaders: "Set-Cookie",
     allowedHeaders: [
-      "Access-Control-Allow-Origin",
       "Content-Type",
       "Authorization",
       "cookies",
+      "X-CSRF-Token",
     ],
     credentials: true, // Allow sending cookies and other credentials
     optionsSuccessStatus: 200,
     preflightContinue: false,
   })
 );
+app.get("/api/csrf-token", (req, res) => {
+  // console.log('call')
+  res.status(200).cookie("XSRF-TOKEN", req.csrfToken()).json({ success: true,token:req.csrfToken() }); // Optional, for other use cases
+});
 //-----loaders
 //------------------ crm
 import crm_repositoriesLoader from "./loaders/crm/repositoriesLoader";
@@ -49,7 +65,7 @@ const karnal_services = karnal_servicesLoader(karnal_repositories);
 const karnal_controllers = karnal_controllersLoader(karnal_services);
 karnal_routesLoader(app, karnal_controllers);
 
-
+//--------------- allmiddleware
 app.use(errorMiddleware);
 
 export default app;

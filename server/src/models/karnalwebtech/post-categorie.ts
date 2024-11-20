@@ -9,7 +9,7 @@ export interface IPost extends Document {
   slug: string;
   content?: string;
   post_id: string;
-  status: boolean;
+  status: string;
   audit_log: mongoose.Types.ObjectId;
   feature_image: mongoose.Types.ObjectId;
   seo: mongoose.Types.ObjectId;
@@ -29,7 +29,7 @@ const PostSchema: Schema = new Schema(
     content: { type: String, default: "" },
     feature_image: { type: Schema.Types.ObjectId, ref: "Karnal_web_Image" },
     seo: { type: Schema.Types.ObjectId, ref: "Karnal_web_seo" },
-    status: { type: Boolean, default: true },
+    status: { type: String, default: "Draft" },
     is_active: { type: Boolean, default: true },
     is_delete: { type: Boolean, default: false },
     audit_log: {

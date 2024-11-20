@@ -28,6 +28,7 @@ class CategorieRepository {
         cat_id: this.generateCategoryId(uuid, randomId),
         title,
         content,
+        status:status,
         slug: metaCanonicalUrl,
         feature_image: imageIds[0],
         seo: seo?._id,

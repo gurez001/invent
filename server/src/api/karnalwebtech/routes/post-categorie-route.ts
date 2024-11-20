@@ -8,7 +8,7 @@ const categorieRoutes = (postCategorieConroller: CategorieController) => {
   router.post(
     "/add",
     upload.array("images", 10),
-    isAuthenticatedUser,
+    isAuthenticatedUser,  
     authorizeRoles("admin", "employee"),
     postCategorieConroller.create.bind(postCategorieConroller)
   );
