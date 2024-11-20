@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PostFromCard from "@/components/post/post-form-card";
 import { useImageDrop } from "@/hooks/handleMediaDrop";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { postSchema } from "@/zod-schemas/karnal-web-tech/post_zod_schema";
 import { useAddNewCategorieMutation } from "@/state/karnal-web-tech/categorieApi";
+import toast from "react-hot-toast";
+import { generate32BitUUID } from "../../../../lib/service/generate32BitUUID";
 
 export default function AddNewPostCategorie() {
   const { imageitemData, files, handleDrop } = useImageDrop();
@@ -27,15 +29,44 @@ export default function AddNewPostCategorie() {
       content: "",
     },
   });
+
   // 2. Define the submit handler
-  const onSubmit: SubmitHandler<any> = async (data) => {
+  const onSubmit: SubmitHandler<any> = async (data, e: any) => {
+    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
+    const action = submitter.innerText;
     const updateddData = {
-      ...data, keywords, images:files
+      ...data, keywords, uuid: generate32BitUUID(), status: action, images: files
     }
+
     await addNewCategorie(updateddData);
-    console.log("Form Data: ", data, keywords, selectedCategories, files);
     // Perform any action with the form data here
   };
+
+
+  useEffect(() => {
+    // Handle error messages
+    if (error) {
+      let errorMessage = "An unexpected error occurred."; // Default message
+
+      // Check if 'error' is defined and has the expected structure
+      if (error && "data" in error) {
+        errorMessage =
+          (error as { data?: { message?: string } }).data?.message ||
+          errorMessage;
+      }
+
+      toast.error(errorMessage);
+      return; // Exit early if there's an error
+    }
+    // Handle success messages
+    if (isSuccess) {
+      toast.success("Customer added successfully");
+    }
+
+  }, [
+    error,
+    isSuccess,
+  ]);
 
   return (
     <>
@@ -53,6 +84,7 @@ export default function AddNewPostCategorie() {
           setSelectedCategories={setSelectedCategories}
           isVisiableCategory={false} // optinoal
           pageTitle={"Categorie"}
+          isLoading={isLoading}
         />
       </form>
     </>

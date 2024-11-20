@@ -21,6 +21,7 @@ export const karnal_CategorieApi = createApi({
   endpoints: (builder) => ({
     addNewCategorie: builder.mutation<any, any>({
       query: (data) => {
+       
         const formData = new FormData();
         for (let [key, value] of Object.entries(data)) {
           if (key === "images" && Array.isArray(value)) {
@@ -35,6 +36,9 @@ export const karnal_CategorieApi = createApi({
         return {
           url: "v2/categorie/add",
           method: "POST",
+          headers: {
+            'X-CSRF-Token': cookiesManager.get('XSRF-TOKEN'),
+        },
           body: formData, // Use formData as body
         };
       },

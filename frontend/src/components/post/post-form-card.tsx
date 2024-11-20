@@ -24,7 +24,8 @@ interface PostFromCardProps {
   selectedCategories: any;
   setSelectedCategories: any;
   isVisiableCategory?: boolean;
-  pageTitle:string
+  pageTitle: string;
+  isLoading: boolean;
 }
 export default function PostFromCard({
   imageitemData,
@@ -38,7 +39,8 @@ export default function PostFromCard({
   selectedCategories,
   setSelectedCategories,
   isVisiableCategory = true,
-  pageTitle
+  pageTitle,
+  isLoading = false
 }: PostFromCardProps) {
   const [postType, setPostType] = useState<string>(pageTitle);
 
@@ -138,25 +140,36 @@ export default function PostFromCard({
             </div>
           </div>
 
-          <FooterActions />
+          <FooterActions isLoading={isLoading} />
         </CardContent>
       </Card>
     </div>
   );
 }
 
-function FooterActions() {
+interface FooterActionsProps {
+  isLoading: boolean;
+}
+function FooterActions({ isLoading }: FooterActionsProps) {
   return (
     <div className="flex justify-between mt-6 pt-6 border-t border-zinc-800">
       <Button variant="ghost" className="text-zinc-400">
         Discard
       </Button>
-      <div className="space-x-2">
-        <Button variant="outline" className="bg-transparent border-zinc-700">
-          Save draft
-        </Button>
-        <Button type="submit" className="bg-orange-600 hover:bg-orange-700">
-          Post
+      <div className="space-x-2 flex">
+       
+        <Button
+          type="submit"
+          className="bg-orange-600 w-[100px] relative hover:bg-orange-700 relative"
+          disabled={isLoading}  // Disable the button if loading
+        >
+          {isLoading ? (
+            <span className="absolute  flex justify-center items-center">
+              <div className="spinner-border animate-spin border-4 border-t-4 border-white w-5 h-5 rounded-full"></div> {/* This spinner can be replaced with your loading indicator */}
+            </span>
+          ) : (
+            'Post'
+          )}
         </Button>
       </div>
     </div>

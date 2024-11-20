@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export interface Product {
   productId: string;
@@ -57,10 +58,14 @@ export interface User {
 }
 
 export const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
+  baseQuery: fetchBaseQuery({ baseUrl: apiUrl }),
   reducerPath: "api",
-  tagTypes: ["DashboardMetrics", "Products", "Users", "Expenses"],
+  tagTypes: ["DashboardMetrics", "csrf", "Products", "Users", "Expenses"],
   endpoints: (build) => ({
+    fetchCsrfToken: build.query<any, any>({
+      query: () => "/csrf-token",
+      providesTags: ["csrf"],
+    }),
     getDashboardMetrics: build.query<DashboardMetrics, void>({
       query: () => "/dashboard",
       providesTags: ["DashboardMetrics"],
@@ -92,6 +97,7 @@ export const api = createApi({
 });
 
 export const {
+  useFetchCsrfTokenQuery,useLazyFetchCsrfTokenQuery ,
   useGetDashboardMetricsQuery,
   useGetProductsQuery,
   useCreateProductMutation,
