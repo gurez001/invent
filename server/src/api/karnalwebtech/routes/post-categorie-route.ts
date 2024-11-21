@@ -14,8 +14,8 @@ const categorieRoutes = (postCategorieConroller: CategorieController) => {
   );
   router.get(
     "/",
-    isAuthenticatedUser,
-    authorizeRoles("admin", "employee"),
+    // isAuthenticatedUser,
+    // authorizeRoles("admin", "employee"),
     postCategorieConroller.all.bind(postCategorieConroller)
   );
   return router;

@@ -11,7 +11,10 @@ import toast from "react-hot-toast";
 import { generate32BitUUID } from "../../../../lib/service/generate32BitUUID";
 import { useRouter } from "next/navigation";
 
-export default function AddNewPostCategorie() {
+interface UpdatePostCategorieProps{
+    id:string;
+}
+export default function UpdatePostCategorie({id}:UpdatePostCategorieProps) {
   const { imageitemData, files, handleDrop } = useImageDrop();
   const router = useRouter();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);

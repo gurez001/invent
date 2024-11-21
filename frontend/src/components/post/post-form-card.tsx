@@ -11,6 +11,8 @@ import Drag_input_field from "@/components/image_compress/Drag_input_field";
 import Image_card from "@/components/image_compress/Image_card";
 import Seo_form from "@/components/common/seo/seo";
 import { useState } from "react";
+import SelectFields from "../common/fields-shadcn/select-field";
+import { useRouter } from "next/navigation";
 
 interface PostFromCardProps {
   imageitemData?: { img: string; name: string }[]; // Corrected to match the useState structure
@@ -26,6 +28,7 @@ interface PostFromCardProps {
   isVisiableCategory?: boolean;
   pageTitle: string;
   isLoading: boolean;
+  discard_link: string;
 }
 export default function PostFromCard({
   imageitemData,
@@ -40,7 +43,8 @@ export default function PostFromCard({
   setSelectedCategories,
   isVisiableCategory = true,
   pageTitle,
-  isLoading = false
+  isLoading = false,
+  discard_link
 }: PostFromCardProps) {
   const [postType, setPostType] = useState<string>(pageTitle);
 
@@ -53,7 +57,20 @@ export default function PostFromCard({
     // // setFiles(newImages);
     // setItemData(imageData);
   };
-
+  const drop_down_selector = [
+    {
+      key: 'published',
+      value: 'Published',
+    },
+    {
+      key: 'draft',
+      value: 'Draft'
+    },
+    {
+      key: 'review',
+      value: 'Review'
+    }
+  ]
   return (
     <div className="min-h-screen text-white p-4">
       <Card className="mx-auto bg-black border-zinc-800">
@@ -111,6 +128,20 @@ export default function PostFromCard({
 
             {/* Right Panel: Sharing Options */}
             <div className="w-full lg:w-[30%]">
+              <div className="mb-4">
+                <h3 className="text-gray-200 text-lg">
+
+                  Add Post Status
+                </h3>
+                <SelectFields
+                  control={control}
+                  errors={errors}
+                  name={"status"}
+                  placeholder="Seleect status"  // Default placeholder
+                  drop_down_selector={drop_down_selector}
+                  class_style={"text-gray-200"}
+                />
+              </div>
               {isVisiableCategory && (
                 <ScrollArea className="h-[200px] w-full rounded-md border p-4">
                   <CategorySelector
@@ -140,7 +171,7 @@ export default function PostFromCard({
             </div>
           </div>
 
-          <FooterActions isLoading={isLoading} />
+          <FooterActions isLoading={isLoading} discard_link={discard_link} />
         </CardContent>
       </Card>
     </div>
@@ -149,15 +180,17 @@ export default function PostFromCard({
 
 interface FooterActionsProps {
   isLoading: boolean;
+  discard_link: any;
 }
-function FooterActions({ isLoading }: FooterActionsProps) {
+function FooterActions({ isLoading, discard_link }: FooterActionsProps) {
+  const router = useRouter()
   return (
     <div className="flex justify-between mt-6 pt-6 border-t border-zinc-800">
-      <Button variant="ghost" className="text-zinc-400">
+      <p onClick={() => router.push(discard_link)} className="rounded text-black bg-gray-300 cursor-pointer px-[15px] m-0 py-[3px] pt-[7px]">
         Discard
-      </Button>
+      </p>
       <div className="space-x-2 flex">
-       
+
         <Button
           type="submit"
           className="bg-orange-600 w-[100px] relative hover:bg-orange-700 relative"

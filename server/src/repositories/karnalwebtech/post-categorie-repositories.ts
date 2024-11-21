@@ -20,7 +20,7 @@ class CategorieRepository {
       const randomId = generateRandomId();
       const { title, content, uuid, status, metaCanonicalUrl } = data;
       const imageIds = image_data.map((item: any) => item._id);
-
+      console.log(data)
       // Get next category number (optimized)
       const categoryNumber = await this.getNextCategoryNumber();
 
