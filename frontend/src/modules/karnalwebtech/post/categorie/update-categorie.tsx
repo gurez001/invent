@@ -15,6 +15,7 @@ interface UpdatePostCategorieProps{
     id:string;
 }
 export default function UpdatePostCategorie({id}:UpdatePostCategorieProps) {
+    console.log(id)
   const { imageitemData, files, handleDrop } = useImageDrop();
   const router = useRouter();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
