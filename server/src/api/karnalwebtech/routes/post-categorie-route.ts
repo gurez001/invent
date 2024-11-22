@@ -8,15 +8,28 @@ const categorieRoutes = (postCategorieConroller: CategorieController) => {
   router.post(
     "/add",
     upload.array("images", 10),
-    isAuthenticatedUser,  
+    isAuthenticatedUser,
     authorizeRoles("admin", "employee"),
     postCategorieConroller.create.bind(postCategorieConroller)
   );
   router.get(
     "/",
-    // isAuthenticatedUser,
-    // authorizeRoles("admin", "employee"),
+    isAuthenticatedUser,
+    authorizeRoles("admin", "employee"),
     postCategorieConroller.all.bind(postCategorieConroller)
+  );
+  router.get(
+    "/data/:id",
+    isAuthenticatedUser,
+    authorizeRoles("admin", "employee"),
+    postCategorieConroller.get_single_data.bind(postCategorieConroller)
+  );
+  router.put(
+    "/update",
+    upload.array("images", 10),
+    isAuthenticatedUser,
+    authorizeRoles("admin", "employee"),
+    postCategorieConroller.update.bind(postCategorieConroller)
   );
   return router;
 };

@@ -9,6 +9,7 @@ interface ImageItem {
 export const useImageDrop = (limit: number = 1) => {
     const [imageitemData, setImageItemData] = useState<ImageItem[]>([]);
     const [files, setFiles] = useState<File[]>([]);
+    const [fileData, setFileData] = useState<File[]>([]);
 
     // Cleanup object URLs on component unmount or when image data changes
     useEffect(() => {
@@ -39,6 +40,6 @@ export const useImageDrop = (limit: number = 1) => {
 
     return {
         imageitemData,
-        handleDrop, files
+        handleDrop, files, fileData, setFileData
     };
 };

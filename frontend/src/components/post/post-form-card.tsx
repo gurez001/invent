@@ -13,6 +13,7 @@ import Seo_form from "@/components/common/seo/seo";
 import { useState } from "react";
 import SelectFields from "../common/fields-shadcn/select-field";
 import { useRouter } from "next/navigation";
+import Server_image_card from "../image_compress/Server_image_card";
 
 interface PostFromCardProps {
   imageitemData?: { img: string; name: string }[]; // Corrected to match the useState structure
@@ -27,8 +28,9 @@ interface PostFromCardProps {
   setSelectedCategories: any;
   isVisiableCategory?: boolean;
   pageTitle: string;
-  isLoading: boolean;
+  isLoading?: boolean;
   discard_link: string;
+  image_files?: any;
 }
 export default function PostFromCard({
   imageitemData,
@@ -44,7 +46,7 @@ export default function PostFromCard({
   isVisiableCategory = true,
   pageTitle,
   isLoading = false,
-  discard_link
+  discard_link, image_files
 }: PostFromCardProps) {
   const [postType, setPostType] = useState<string>(pageTitle);
 
@@ -137,7 +139,7 @@ export default function PostFromCard({
                   control={control}
                   errors={errors}
                   name={"status"}
-                  placeholder="Seleect status"  // Default placeholder
+                  placeholder="Select status"  // Default placeholder
                   drop_down_selector={drop_down_selector}
                   class_style={"text-gray-200"}
                 />
@@ -156,7 +158,7 @@ export default function PostFromCard({
                 <div className="text-gray-200 my-2 bg-black w-full rounded-md border p-4">
                   <h3 className="text-xl">Feature Image</h3>
                   <div className="flex w-full flex-wrap my-2 gap-2">
-                    {imageitemData.map((item, index) => (
+                    {imageitemData.length > 0 ? imageitemData.map((item, index) => (
                       <div key={index} className="w-[100%]">
                         <Image_card
                           item={item}
@@ -164,7 +166,17 @@ export default function PostFromCard({
                           onDelete={handleDelete}
                         />
                       </div>
-                    ))}
+                    )) :
+
+                      <div className="w-[100%]">
+                        <Server_image_card
+                          src={image_files?.path}
+                          alt={image_files?.originalname}
+                          width={200}
+                          height={200}
+                        />
+                      </div>
+                    }
                   </div>
                 </div>
               ) : null}

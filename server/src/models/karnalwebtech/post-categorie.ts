@@ -8,7 +8,7 @@ export interface IPost extends Document {
   title: string;
   slug: string;
   content?: string;
-  post_id: string;
+  cat_id: string;
   status: string;
   audit_log: mongoose.Types.ObjectId;
   feature_image: mongoose.Types.ObjectId;
@@ -23,7 +23,7 @@ export interface IPost extends Document {
 const PostSchema: Schema = new Schema(
   {
     _no: { type: Number, default: 0 },
-    post_id: { type: String, default: "" },
+    cat_id: { type: String, default: "" },
     title: { type: String, default: "" },
     slug: { type: String, default: "" },
     content: { type: String, default: "" },

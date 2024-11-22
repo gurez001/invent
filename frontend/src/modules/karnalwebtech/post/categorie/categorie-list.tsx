@@ -45,11 +45,12 @@ const CategorieList: React.FC<Customer_list_props> = ({
     rowsPerPage: Number(rowsPerPage),
     page: page,
   });
+  const { data:api_data } = data || {}; 
   const { searchTerm,
     setSearchTerm,
     statusFilter,
     setStatusFilter,
-    filteredItems, } = useTableFilters(data?.result, [searchField])
+    filteredItems, } = useTableFilters(api_data?.result, [searchField])
 
   const table_header: string[] = ["Title", "	Author", "Date", "Status", "Action"]
   const categorie_dropdown: any[] = []
@@ -73,12 +74,12 @@ const CategorieList: React.FC<Customer_list_props> = ({
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(post._id)}
+                  onClick={() => navigator.clipboard.writeText(post.cat_id)}
                 >
                   Copy ID
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={()=>router.push(`/karnalwebtech/post/categorie/${post._id}`)}>Edit Categorie</DropdownMenuItem>
+                <DropdownMenuItem onClick={()=>router.push(`/karnalwebtech/post/categorie/${post.cat_id}`)}>Edit Categorie</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -87,10 +88,11 @@ const CategorieList: React.FC<Customer_list_props> = ({
       ))
     )
   }
+  console.log(api_data)
   return (
     <Shadcn_table
       table_header={table_header}
-      tabelBody={data?.result}
+      tabelBody={api_data?.result}
       tabel_body={tabel_body}
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}
@@ -103,7 +105,7 @@ const CategorieList: React.FC<Customer_list_props> = ({
       setRowsPerPage={setRowsPerPage}
       currentPage={page}
       setCurrentPage={setPage}
-      data_length={data?.data_counter}
+      data_length={api_data?.dataCounter}
       isLoading={isLoading} />
   );
 };

@@ -34,7 +34,6 @@ export default function AddNewPostCategorie() {
 
   // 2. Define the submit handler
   const onSubmit: SubmitHandler<any> = async (data, e: any) => {
-    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
     const updateddData = {
       ...data, keywords, uuid: generate32BitUUID(), images: files
     }
