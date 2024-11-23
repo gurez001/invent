@@ -1,10 +1,3 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import React from "react";
 import {
   Control,
@@ -13,17 +6,23 @@ import {
   FieldValues,
   Path,
 } from "react-hook-form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-// Dropdown option type
 type DropdownOption = { key: string; value: string };
 
 interface SelectFieldProps<T extends FieldValues> {
   control: Control<T>;
   errors: FieldErrors<T>;
   name: Path<T>;
-  label?: string; // Optional field label
-  placeholder?: string; // Custom placeholder
-  drop_down_selector: DropdownOption[]; // Dropdown options
+  label?: string;
+  placeholder?: string;
+  drop_down_selector: DropdownOption[];
   class_style?: string;
 }
 
@@ -32,7 +31,7 @@ const SelectFields = <T extends FieldValues>({
   errors,
   name,
   label,
-  placeholder = "Select category", // Default placeholder
+  placeholder = "Select category",
   drop_down_selector,
   class_style,
 }: SelectFieldProps<T>) => {
@@ -50,26 +49,29 @@ const SelectFields = <T extends FieldValues>({
   } else {
     errorMessage = (errors[name] as { message?: string })?.message;
   }
-
   return (
-    <Controller
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <Select onValueChange={field.onChange} defaultValue={field.value || ""} value={field.value || ""}>
-          <SelectTrigger className={`w-full ${class_style}`}>
-            <SelectValue placeholder={placeholder} />
-          </SelectTrigger>
-          <SelectContent>
-            {drop_down_selector.map((option) => (
-              <SelectItem key={option.key} value={option.key}>
-                {option.value}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
-    />
+    <div className="w-full">
+      {label && <label className="block mb-2 text-sm font-medium">{label}</label>}
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <Select onValueChange={field.onChange} value={field.value || ""}>
+            <SelectTrigger className={`w-full ${class_style || ""}`}>
+              <SelectValue placeholder={placeholder} />
+            </SelectTrigger>
+            <SelectContent>
+              {drop_down_selector.map((option) => (
+                <SelectItem key={option.key} value={option.key}>
+                  {option.value}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      />
+      {errorMessage && <p className="text-red-500 text-sm mt-2">{errorMessage}</p>}
+    </div>
   );
 };
 

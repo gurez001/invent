@@ -52,7 +52,6 @@ export default function AddNewPostCategorie() {
         keywords={keywords}
         selectedCategories={[]}
         setSelectedCategories={() => { }}
-        isVisiableCategory={false}
         pageTitle="Categorie"
         isLoading={isLoading}
         discard_link="/karnalwebtech/post/categorie"

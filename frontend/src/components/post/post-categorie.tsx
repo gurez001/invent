@@ -4,31 +4,22 @@ import * as React from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
-type Category = {
-  id: string;
-  name: string;
-};
-
-const categories: Category[] = [
-  { id: "1", name: "Electronics" },
-  { id: "2", name: "Books" },
-  { id: "3", name: "Clothing" },
-  { id: "4", name: "Home & Garden" },
-  { id: "5", name: "Toys & Games" },
-];
 interface categorie_props {
   class_cat: string;
-  selectedCategories:any;
-  setSelectedCategories:any;
+  selectedCategories: any;
+  setSelectedCategories: any;
+  categorieList: any;
+
 }
-export default function CategorySelector({ class_cat,setSelectedCategories,selectedCategories }: categorie_props) {
+export default function CategorySelector({ categorieList, class_cat, setSelectedCategories, selectedCategories }: categorie_props) {
 
 
   const handleCategoryChange = (categoryId: string) => {
-    setSelectedCategories((prev:any) =>
+    setSelectedCategories((prev: any) =>
       prev.includes(categoryId)
-        ? prev.filter((id:any) => id !== categoryId)
+        ? prev.filter((id: any) => id !== categoryId)
         : [...prev, categoryId]
     );
   };
@@ -45,22 +36,22 @@ export default function CategorySelector({ class_cat,setSelectedCategories,selec
         <h2 className={`text-lg font-semibold ${class_cat}`}>
           Select Categories
         </h2>
-        {categories.map((category) => (
-          <div key={category.id} className="flex items-center space-x-2">
+        {categorieList?.length > 0 ? categorieList?.map((category: any) => (
+          <div key={category?._id} className="flex items-center space-x-2">
             <Checkbox
               id={category.id}
               className="bg-gray-600 text-white border"
-              checked={selectedCategories.includes(category.id)}
-              onCheckedChange={() => handleCategoryChange(category.id)}
+              checked={selectedCategories.includes(category?._id)}
+              onCheckedChange={() => handleCategoryChange(category?._id)}
             />
             <Label
-              htmlFor={category.id}
+              htmlFor={category?._id}
               className={`${class_cat} text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70`}
             >
-              {category.name}
+              {category?.title}
             </Label>
           </div>
-        ))}
+        )) : <div className="h-[100px] flex items-center justify-center"><Loader2 className="h-12 w-12 animate-spin text-gray-300" /></div>}
       </div>
       {selectedCategories.length > 0 && (
         <div className="mt-4">

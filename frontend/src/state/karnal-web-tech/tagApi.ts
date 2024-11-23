@@ -34,7 +34,7 @@ export const karnal_TagApi = createApi({
         return {
           url: "v2/tag/add",
           method: "POST",
-        
+
           body: formData, // Use formData as body
         };
       },
@@ -79,12 +79,9 @@ export const karnal_TagApi = createApi({
     getAllTag: builder.query<
       any,
       {
-        is_delete?: string;
-        keyword?: string;
-        status?: string;
+        type?: string;
         rowsPerPage?: number;
         page?: number;
-        is_active?: string;
       } | void
     >({
       query: (filters) => {
@@ -94,6 +91,9 @@ export const karnal_TagApi = createApi({
         };
         // Add filters to the query parameters if they are present
         if (filters) {
+          if (filters.type) {
+            params.type = filters.type; // Convert number to string
+          }
           if (filters.rowsPerPage) {
             params.rowsPerPage = filters.rowsPerPage; // Convert number to string
           }

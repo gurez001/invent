@@ -1,18 +1,36 @@
 "use client";
-
 import { useState } from "react";
 import PostFromCard from "@/components/post/post-form-card";
 import { useImageDrop } from "@/hooks/handleMediaDrop";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { postSchema } from "@/zod-schemas/karnal-web-tech/post_zod_schema";
+import { useGetAllcategorieQuery } from "@/state/karnal-web-tech/categorieApi";
+import { useGetAllTagQuery } from "@/state/karnal-web-tech/tagApi";
 
 export default function AddNewPost() {
-  const { imageitemData,files, handleDrop } = useImageDrop();
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     []
   );
+  const [selectedTag, setSelectedTags] = useState<string[]>(
+    []
+  );
   const [keywords, setKeywords] = useState<string[]>([]);
+  //----------------- use hookes
+  const { imageitemData, files, handleDrop } = useImageDrop();
+  const { data: categorie_data, error: categorie_error } = useGetAllcategorieQuery({
+    rowsPerPage: 1000,
+    page: 1,
+    type: "post",
+  });
+  const { data: tag_data, error: tag_Error } = useGetAllTagQuery({
+    rowsPerPage: 1000,
+    page: 1,
+    type: "post",
+  });
+  const { data: categorieApiData } = categorie_data || {};
+  const { data: tagApiData } = tag_data || {};
+ 
   const {
     control,
     handleSubmit,
@@ -27,7 +45,7 @@ export default function AddNewPost() {
   });
   // 2. Define the submit handler
   const onSubmit: SubmitHandler<any> = (data) => {
-    console.log("Form Data: ", data, keywords, selectedCategories,files);
+    console.log("Form Data: ", data, keywords, selectedCategories, files, selectedTag);
     // Perform any action with the form data here
   };
 
@@ -44,9 +62,16 @@ export default function AddNewPost() {
           handleDrop={handleDrop}
           setKeywords={setKeywords}
           keywords={keywords}
+          isVisiableCategory={true}
+          isVisiableTag={true}
           selectedCategories={selectedCategories}
           setSelectedCategories={setSelectedCategories}
           pageTitle={"Post"}
+          discard_link={"/karnalwebtech/post"}
+          categorieList={categorieApiData?.result}
+          selectedTag={selectedTag}
+          setSelectedTags={setSelectedTags}
+          tagList={tagApiData?.result}
         />
       </form>
     </>

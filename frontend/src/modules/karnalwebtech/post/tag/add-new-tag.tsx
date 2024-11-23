@@ -34,6 +34,7 @@ export default function AddNewPostTag() {
       keywords,
       uuid: generate32BitUUID(),
       images: files,
+      type: "post",
     };
     await addNewTag(updatedData);
   };
@@ -51,7 +52,6 @@ export default function AddNewPostTag() {
         keywords={keywords}
         selectedCategories={[]}
         setSelectedCategories={() => { }}
-        isVisiableCategory={false}
         pageTitle="Tag"
         isLoading={isLoading}
         discard_link="/karnalwebtech/post/tag"
