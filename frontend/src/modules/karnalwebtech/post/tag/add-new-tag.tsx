@@ -1,53 +1,61 @@
 "use client";
 
 import { useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import PostFromCard from "@/components/post/post-form-card";
 import { useImageDrop } from "@/hooks/handleMediaDrop";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { postSchema } from "@/zod-schemas/karnal-web-tech/post_zod_schema";
+import { generate32BitUUID } from "../../../../lib/service/generate32BitUUID";
+import { z } from "zod";
+import { useHandleNotifications } from "@/hooks/useHandleNotifications";
+import { useAddNewTagMutation } from "../../../../state/karnal-web-tech/tagApi";
 
 export default function AddNewPostTag() {
-  const { imageitemData, files, handleDrop } = useImageDrop();
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [keywords, setKeywords] = useState<string[]>([]);
+  // -------------  use hookes
+  const { imageitemData, files, handleDrop } = useImageDrop();
+  const [addNewTag, { error, isLoading, isSuccess }] = useAddNewTagMutation();
+  useHandleNotifications({ error: error, isSuccess, successMessage: "Tag added successfully!", redirectPath: "/karnalwebtech/post/tag" })
   const {
     control,
     handleSubmit,
     formState: { errors },
     setValue,
     watch,
-  } = useForm<any>({
+  } = useForm<z.infer<typeof postSchema>>({
     resolver: zodResolver(postSchema),
-    defaultValues: {
-      username: "",
-      content: "",
-    },
   });
-  // 2. Define the submit handler
-  const onSubmit: SubmitHandler<any> = (data) => {
-    console.log("Form Data: ", data, keywords, selectedCategories, files);
-    // Perform any action with the form data here
+
+  // Submit Handler
+  const onSubmit: SubmitHandler<z.infer<typeof postSchema>> = async (formData) => {
+    const updatedData = {
+      ...formData,
+      keywords,
+      uuid: generate32BitUUID(),
+      images: files,
+    };
+    await addNewTag(updatedData);
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit(onSubmit)} className="dark-custom">
-        <PostFromCard
-          control={control} // react form
-          errors={errors} // react form
-          setValue={setValue} // react form
-          watch={watch} // react form
-          imageitemData={imageitemData}
-          handleDrop={handleDrop}
-          setKeywords={setKeywords}
-          keywords={keywords}
-          selectedCategories={selectedCategories}
-          setSelectedCategories={setSelectedCategories}
-          isVisiableCategory={false} // optinoal
-          pageTitle={"Tag"}
-        />
-      </form>
-    </>
+    <form onSubmit={handleSubmit(onSubmit)} className="dark-custom">
+      <PostFromCard
+        control={control}
+        errors={errors}
+        setValue={setValue}
+        watch={watch}
+        imageitemData={imageitemData}
+        handleDrop={handleDrop}
+        setKeywords={setKeywords}
+        keywords={keywords}
+        selectedCategories={[]}
+        setSelectedCategories={() => { }}
+        isVisiableCategory={false}
+        pageTitle="Tag"
+        isLoading={isLoading}
+        discard_link="/karnalwebtech/post/tag"
+      />
+    </form>
   );
 }

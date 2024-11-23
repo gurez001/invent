@@ -34,6 +34,7 @@ export default function AddNewPostCategorie() {
       keywords,
       uuid: generate32BitUUID(),
       images: files,
+      type: "post",
     };
     await addNewCategorie(updatedData);
   };

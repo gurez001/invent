@@ -18,8 +18,7 @@ import { useRouter } from "next/navigation";
 import { useHandleNotifications } from "@/hooks/useHandleNotifications";
 
 interface Customer_list_props {
-  set_open: (value: boolean) => void;
-  edit_handler: (value: any) => void;
+
 }
 
 const CategorieList: React.FC<Customer_list_props> = () => {
