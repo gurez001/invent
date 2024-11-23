@@ -5,6 +5,7 @@ import dotent from "dotenv";
 import { connectRedis } from "./loaders/redis";
 dotent.config();
 connectRedis();
+const port = process.env.PORT || 9000
 const numCPUs = os.cpus().length;
 // if (cluster.isMaster) {
 //   console.log(`Master ${process.pid} is running`);
@@ -41,7 +42,7 @@ const numCPUs = os.cpus().length;
 //     });
 // }
 
-app.listen(process.env.PORT, (err?: Error) => {
+app.listen(port, (err?: Error) => {
   if (err) {
     console.log(err);
   }

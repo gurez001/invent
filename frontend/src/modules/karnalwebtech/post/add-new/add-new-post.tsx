@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { postSchema } from "@/zod-schemas/karnal-web-tech/post_zod_schema";
 import { useGetAllcategorieQuery } from "@/state/karnal-web-tech/categorieApi";
 import { useGetAllTagQuery } from "@/state/karnal-web-tech/tagApi";
+import { useAddNewPostMutation } from "@/state/karnal-web-tech/postApi";
+import { generate32BitUUID } from "@/lib/service/generate32BitUUID";
 
 export default function AddNewPost() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
@@ -28,6 +30,7 @@ export default function AddNewPost() {
     page: 1,
     type: "post",
   });
+  const [addNewPost]= useAddNewPostMutation();
   const { data: categorieApiData } = categorie_data || {};
   const { data: tagApiData } = tag_data || {};
  
@@ -44,8 +47,17 @@ export default function AddNewPost() {
     },
   });
   // 2. Define the submit handler
-  const onSubmit: SubmitHandler<any> = (data) => {
-    console.log("Form Data: ", data, keywords, selectedCategories, files, selectedTag);
+  const onSubmit: SubmitHandler<any> =async (data) => {
+    const updated_data = {
+      ...data,
+      keywords,
+      uuid: generate32BitUUID(),
+      images: files,
+      tags:selectedTag,
+      categorie:selectedCategories,
+    }
+    await addNewPost(updated_data)
+    // console.log("Form Data: ", data, keywords, selectedCategories, files, selectedTag);
     // Perform any action with the form data here
   };
 

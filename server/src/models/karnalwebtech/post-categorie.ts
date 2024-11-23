@@ -59,7 +59,7 @@ PostSchema.pre<IPost>("save", function (next) {
 
 // Create and export the model
 const PostCategorieModel: Model<IPost> = thardConnection.model<IPost>(
-  "karnal_Post_categorie",
+  "Karnal_categorie",
   PostSchema
 );
 
