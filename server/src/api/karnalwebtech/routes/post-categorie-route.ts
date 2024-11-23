@@ -24,6 +24,12 @@ const categorieRoutes = (postCategorieConroller: CategorieController) => {
     authorizeRoles("admin", "employee"),
     postCategorieConroller.get_single_data.bind(postCategorieConroller)
   );
+  router.delete(
+    "/data/:id",
+    isAuthenticatedUser,
+    authorizeRoles("admin", "employee"),
+    postCategorieConroller.removeItem.bind(postCategorieConroller)
+  );
   router.put(
     "/update",
     upload.array("images", 10),

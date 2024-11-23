@@ -1,117 +1,97 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import PostFromCard from "@/components/post/post-form-card";
-import { useImageDrop } from "@/hooks/handleMediaDrop";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useRouter } from "next/navigation";
+import PostFromCard from "@/components/post/post-form-card";
+import LoadingPage from "@/components/common/loading-page";
 import { postSchema } from "@/zod-schemas/karnal-web-tech/post_zod_schema";
+import { useImageDrop } from "@/hooks/handleMediaDrop";
 import {
-  useAddNewCategorieMutation,
   useGetSingleQuery,
   useUpdateMutation,
 } from "@/state/karnal-web-tech/categorieApi";
-import toast from "react-hot-toast";
-import { generate32BitUUID } from "../../../../lib/service/generate32BitUUID";
-import { useRouter } from "next/navigation";
-import LoadingPage from "@/components/common/loading-page";
-import * as z from "zod";
+import { useHandleNotifications } from "@/hooks/useHandleNotifications";
+
 interface UpdatePostCategorieProps {
   id: string;
 }
 export default function UpdatePostCategorie({ id }: UpdatePostCategorieProps) {
-  const { data, error, isLoading } = useGetSingleQuery(id);
-  const {data:apidata}= data ||{};
-  const { imageitemData, files, fileData, setFileData, handleDrop } = useImageDrop();
   const router = useRouter();
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  // API Hooks
+  const { data, error, isLoading } = useGetSingleQuery(id);
+  const { data: apiData } = data || {};
+  const [update, { error: updateError, isSuccess, isLoading: isUpdating }] = useUpdateMutation();
+
+  // Local States
   const [keywords, setKeywords] = useState<string[]>([]);
-  const [update, { isSuccess }] = useUpdateMutation();
-  type FormValues = z.infer<typeof postSchema>;
-  // console.log(data)
-  // console.log(keywords)
+  const { imageitemData, files, fileData, setFileData, handleDrop } = useImageDrop();
+  useHandleNotifications({ error: error || updateError, isSuccess, successMessage: "Category updated successfully!", redirectPath: "/karnalwebtech/post/categorie" })
+
+  // Form Handling
   const {
     control,
     handleSubmit,
     formState: { errors },
     setValue,
     watch,
-  } = useForm<FormValues>({
+  } = useForm<z.infer<typeof postSchema>>({
     resolver: zodResolver(postSchema),
-    defaultValues: {
-      status: "",
-    },
+    defaultValues: { status: "" },
   });
-console.log(data)
-  // 2. Define the submit handler
-  const image_url = apidata?.feature_image._id;
-  const onSubmit: SubmitHandler<any> = async (data, e: any) => {
-    const images = files.length > 0 ? files : image_url;
-    const updated_data = { ...data, id: id, keywords, images };
-    await update(updated_data);
+
+  // Image URL
+  const imageURL = apiData?.feature_image?._id;
+
+  // Handle Form Submission
+  const onSubmit: SubmitHandler<any> = async (formData) => {
+    const images = files.length > 0 ? files : imageURL;
+    const updatedData = { ...formData, id, keywords, images };
+    await update(updatedData);
   };
 
+  // Populate Form Data
   useEffect(() => {
-    // Handle error messages
-    if (error) {
-      let errorMessage = "An unexpected error occurred."; // Default message
-
-      // Check if 'error' is defined and has the expected structure
-      if (error && "data" in error) {
-        errorMessage =
-          (error as { data?: { message?: string } }).data?.message ||
-          errorMessage;
-      }
-
-      toast.error(errorMessage);
-      return; // Exit early if there's an error
+    if (apiData) {
+      setValue("title", apiData.title);
+      setValue("status", apiData.status);
+      setValue("content", apiData.content);
+      setValue("metaTitle", apiData.seo?.title);
+      setValue("metaDescription", apiData.seo?.meta_description);
+      setValue("metaCanonicalUrl", apiData.seo?.canonical_url);
+      setKeywords(apiData.seo?.keywords || []);
+      setFileData(apiData.feature_image);
     }
-    // Handle success messages
-    // if (isSuccess) {
-    //   toast.success("Categorie added successfully");
-    //   router.push("/karnalwebtech/post/categorie");
-    // }
-  }, [error, isSuccess, router]);
-
-  useEffect(() => {
-    if (apidata) {
-      setValue("title", apidata.title);
-      setValue("status", apidata?.status);
-      setValue("content", apidata.content);
-      setValue("metaTitle", apidata?.seo?.title);
-      setValue("metaDescription", apidata?.seo?.meta_description);
-      setValue("metaCanonicalUrl", apidata?.seo?.canonical_url);
-      setKeywords(apidata?.seo?.keywords || []);
-      setFileData(apidata?.feature_image)
-    }
-  }, [apidata, setValue, setKeywords, setFileData]);
+  }, [apiData, setValue, setKeywords, setFileData]);
 
   return (
-    <>
-      <form onSubmit={handleSubmit(onSubmit)} className="dark-custom relative">
-        {isLoading ? (
-          <div className="pt-28">
-            <LoadingPage />
-          </div>
-        ) : (
-          <PostFromCard
-            control={control} // react form
-            errors={errors} // react form
-            setValue={setValue} // react form
-            watch={watch} // react form
-            imageitemData={imageitemData}
-            handleDrop={handleDrop}
-            setKeywords={setKeywords}
-            keywords={keywords}
-            selectedCategories={selectedCategories}
-            setSelectedCategories={setSelectedCategories}
-            isVisiableCategory={false} // optinoal
-            pageTitle={"Categorie"}
-            discard_link="/karnalwebtech/post/categorie"
-            image_files={fileData}
-          />
-        )}
-      </form>
-    </>
+    <form onSubmit={handleSubmit(onSubmit)} className="dark-custom relative">
+      {isLoading ? (
+        <div className="pt-28">
+          <LoadingPage />
+        </div>
+      ) : (
+        <PostFromCard
+          control={control}
+          errors={errors}
+          setValue={setValue}
+          watch={watch}
+          imageitemData={imageitemData}
+          handleDrop={handleDrop}
+          setKeywords={setKeywords}
+          keywords={keywords}
+          selectedCategories={[]}
+          setSelectedCategories={() => {}}
+          isVisiableCategory={false}
+          pageTitle="Categorie"
+          discard_link="/karnalwebtech/post/categorie"
+          image_files={fileData}
+          isLoading={isUpdating}
+        />
+      )}
+    </form>
   );
 }

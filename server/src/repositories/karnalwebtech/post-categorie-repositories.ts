@@ -7,7 +7,11 @@ import { generateRandomId } from "../../utils/generateRandomId";
 
 class CategorieRepository {
   // Reusable function to generate unique category ID
-  private generateCategoryId(uuid: string, randomId: string, categoryNumber: number): string {
+  private generateCategoryId(
+    uuid: string,
+    randomId: string,
+    categoryNumber: number
+  ): string {
     return `cate_${randomId.toLowerCase()}_${uuid}${categoryNumber}`;
   }
 
@@ -32,13 +36,13 @@ class CategorieRepository {
       const randomId = generateRandomId();
       const { title, content, uuid, status, metaCanonicalUrl } = data;
       const imageIds = image_data.map((item: any) => item._id);
-      
+
       // Get next category number
       const categoryNumber = await this.getNextCategoryNumber();
-      
+
       // Generate category ID
       const catId = this.generateCategoryId(uuid, randomId, categoryNumber);
-      
+
       // Prepare data to be saved
       const newCategoryData = {
         _no: categoryNumber,
@@ -68,7 +72,7 @@ class CategorieRepository {
   // Retrieve all categories with filters and pagination
   async all(query: any) {
     const resultPerPage = Number(query.rowsPerPage);
-    const apiFeatures = new ApiFeatures(PostCategorieModel.find(), query);
+    const apiFeatures = new ApiFeatures(PostCategorieModel.find({is_delete: { $ne: true } }), query);
     apiFeatures.search().filter().sort().pagination(resultPerPage);
 
     // Apply population and execute query
@@ -87,7 +91,7 @@ class CategorieRepository {
 
   // Get the total count of categories based on filters
   async data_counter(query: any) {
-    const apiFeatures = new ApiFeatures(PostCategorieModel.find(), query);
+    const apiFeatures = new ApiFeatures(PostCategorieModel.find({is_delete: { $ne: true } }), query);
     apiFeatures.search().filter();
     const result = await apiFeatures.exec();
     return result.length;
@@ -109,21 +113,27 @@ class CategorieRepository {
   // Update a category
   async update(data: any, image_data: any, user_id: string) {
     const { title, content, status, metaCanonicalUrl } = data;
-    const image_ids = image_data?.length ? image_data.map((item: any) => item._id) : data?.images;
+    const image_ids = image_data?.length
+      ? image_data.map((item: any) => item._id)
+      : data?.images;
 
     const updated_data = {
       title,
       content,
-      status,
+      status: status === "" ? "published" : status,
       slug: metaCanonicalUrl,
       feature_image: image_ids?.length ? image_ids : undefined,
       audit_log: user_id,
     };
-    const updated_category = await PostCategorieModel.findOneAndUpdate({cat_id:data.id}, updated_data, {
-      new: true,
-      runValidators: true,
-      useFindAndModify: false,
-    });
+    const updated_category = await PostCategorieModel.findOneAndUpdate(
+      { cat_id: data.id },
+      updated_data,
+      {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+      }
+    );
 
     if (!updated_category) {
       throw new Error("Category not found");
@@ -149,6 +159,18 @@ class CategorieRepository {
       return next(new ErrorHandler(`Category with ID ${id} not found`, 404));
     }
 
+    return category;
+  }
+  async removeItem(id: string, next: NextFunction) {
+    const category = await this.populateCategoryData(
+      PostCategorieModel.findOne({ cat_id: id })
+    );
+
+    if (!category) {
+      return next(new ErrorHandler(`Category with ID ${id} not found`, 404));
+    }
+    category.is_delete = true;
+    await category.save();
     return category;
   }
 }

@@ -1,60 +1,52 @@
-
-import List_table from "@/components/common/table/List_table";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { CircularProgress, Switch, Tooltip } from "@nextui-org/react";
-import toast from "react-hot-toast";
+import React, { useState } from "react";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useActionMutation } from "@/state/expenseApi";
-import { Expences_List_Props, Get_Response } from "@/types/expense_type";
-import { useAllQuery, useStatus_actionMutation } from "@/state/usersApi";
-import { columns, INITIAL_VISIBLE_COLUMNS } from "@/types/auth_type";
-import debounce from "lodash.debounce";
-import { useGetAllcategorieQuery } from "@/state/karnal-web-tech/categorieApi";
+import { useDeleteCateorieMutation, useGetAllcategorieQuery } from "@/state/karnal-web-tech/categorieApi";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { TimeAgo } from "@/lib/service/time/timeAgo";
-import { useSearch } from "@/hooks/useSearch";
 import Shadcn_table from "@/components/common/shadcn-table/table";
 import { useTableFilters } from "@/hooks/useTableFilters";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
+import { Trash2, MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useHandleNotifications } from "@/hooks/useHandleNotifications";
 
 interface Customer_list_props {
   set_open: (value: boolean) => void;
   edit_handler: (value: any) => void;
 }
 
-const CategorieList: React.FC<Customer_list_props> = ({
-  set_open,
-  edit_handler,
-}) => {
+const CategorieList: React.FC<Customer_list_props> = () => {
   const [rowsPerPage, setRowsPerPage] = useState<string>("25");
   const [page, setPage] = useState<number>(1);
   const [categoryFilter, setCategoryFilter] = useState<string>('All')
-  const router =useRouter();
-  const [searchField, setSearchField] = useState<'title' | 'category'>('title')
+  const router = useRouter();
+
+  //---------- all hookes
   const { data, error, isLoading } = useGetAllcategorieQuery({
     rowsPerPage: Number(rowsPerPage),
     page: page,
   });
-  const { data:api_data } = data || {}; 
+  const [deleteCateorie, { error: deleteError, isLoading: deleteLoading, isSuccess }] = useDeleteCateorieMutation()
+  useHandleNotifications({ error: error || deleteError, isSuccess, successMessage: "Category deleted successfully!" })
+  const { data: api_data } = data || {};
   const { searchTerm,
     setSearchTerm,
     statusFilter,
     setStatusFilter,
-    filteredItems, } = useTableFilters(api_data?.result, [searchField])
+    filteredItems, } = useTableFilters(api_data?.result, ["title"])
 
   const table_header: string[] = ["Title", "	Author", "Date", "Status", "Action"]
   const categorie_dropdown: any[] = []
-
+  const removeRow = async (remove_id: string) => {
+    await deleteCateorie(remove_id)
+  }
   function tabel_body() {
     return (
       filteredItems?.map((post: any) => (
@@ -73,13 +65,14 @@ const CategorieList: React.FC<Customer_list_props> = ({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem
+                <DropdownMenuItem className="cursor-pointer"
                   onClick={() => navigator.clipboard.writeText(post.cat_id)}
                 >
                   Copy ID
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={()=>router.push(`/karnalwebtech/post/categorie/${post.cat_id}`)}>Edit Categorie</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/karnalwebtech/post/categorie/${post.cat_id}`)}>Edit Categorie</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer flex items-center" onClick={() => removeRow(post.cat_id)}><Trash2 color="red" /> Delete</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -88,7 +81,6 @@ const CategorieList: React.FC<Customer_list_props> = ({
       ))
     )
   }
-  console.log(api_data)
   return (
     <Shadcn_table
       table_header={table_header}
@@ -106,7 +98,7 @@ const CategorieList: React.FC<Customer_list_props> = ({
       currentPage={page}
       setCurrentPage={setPage}
       data_length={api_data?.dataCounter}
-      isLoading={isLoading} />
+      isLoading={isLoading || deleteLoading} />
   );
 };
 

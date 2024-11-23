@@ -13,127 +13,103 @@ class CategorieService {
 
   // Utility function for centralized error handling
   private handleError(message: string, next: NextFunction, code: number = 404) {
-    return next(new ErrorHandler(message, code));
+    next(new ErrorHandler(message, code));
+  }
+
+  // Upload and save image with database entry
+  private async handleImage(files: any, user_id: string, next: NextFunction) {
+    const uploadedImage = await imageUploader.uploadImage(files, next, "karnalwebtech");
+    if (!uploadedImage) {
+      this.handleError("Image upload failed on the server", next);
+      return null;
+    }
+
+    const imageData = await add_image.createImage(
+      files,
+      uploadedImage,
+      user_id,
+      next,
+      "karnalwebtech"
+    );
+    if (!imageData) {
+      this.handleError("Image not added to database", next);
+      return null;
+    }
+
+    return { uploadedImage, imageData };
   }
 
   // Main method to create the category
   async create(data: any, files: any, user_id: string, next: NextFunction) {
     try {
-      // Image Upload
-      const uploadedImage = await imageUploader.uploadImage(
-        files,
-        next,
-        "karnalwebtech"
-      );
-      if (!uploadedImage) {
-        return this.handleError("Image upload failed on the server", next);
-      }
+      const imageResult = await this.handleImage(files, user_id, next);
+      if (!imageResult) return;
 
-      // Image Data Creation
-      const imageData = await add_image.createImage(
-        files,
-        uploadedImage,
-        user_id,
-        next,
-        "karnalwebtech"
-      );
-      if (!imageData) {
-        return this.handleError("Image not added to database", next);
-      }
+      const { uploadedImage, imageData } = imageResult;
 
-      // SEO Data Creation
       const seo = await seoRepositorie.create(data, uploadedImage, next);
       if (!seo) {
         return this.handleError("SEO data not added to database", next);
       }
 
-      // Category Creation
-      return await this.categorieRepository.create(
-        data,
-        imageData,
-        seo,
-        user_id
-      );
+      return await this.categorieRepository.create(data, imageData, seo, user_id);
     } catch (error: any) {
-      return next(
-        new ErrorHandler(error.message || "Internal Server Error", 500)
-      );
+      next(new ErrorHandler(error.message || "Internal Server Error", 500));
     }
   }
+
   async update(data: any, files: any, user_id: string, next: NextFunction) {
     try {
-      const idExist = await this.categorieRepository.findBYpageid(
-        data.id,
-        next
-      );
-      if (!idExist)
-        return next(new ErrorHandler("Categorie ID does not exist", 400));
-      const existingUrl = await this.categorieRepository.findBYUrl(
-        data.metaCanonicalUrl,
-        idExist._id
-      );
-      if (existingUrl)
-        return next(
-          new ErrorHandler("Categorie with this URL already exists", 400)
-        );
-      let image_uploader;
-      let image_data;
-      if (files && files.length > 0) {
-        // Image Upload
-        image_uploader = await imageUploader.uploadImage(
-          files,
-          next,
-          "karnalwebtech"
-        );
-        if (!image_uploader) {
-          return this.handleError("Image upload failed on the server", next);
-        }
-
-        // Image Data Creation
-        image_data = await add_image.createImage(
-          files,
-          image_uploader,
-          user_id,
-          next,
-          "karnalwebtech"
-        );
-        if (!image_data) {
-          return this.handleError("Image not added to database", next);
-        }
+      const existingCategory = await this.categorieRepository.findBYpageid(data.id, next);
+      if (!existingCategory) {
+        return this.handleError("Categorie ID does not exist", next, 400);
       }
-      // SEO Data Creation
-      const seo = await seoRepositorie.update(
-        data,
-        idExist?.seo,
-        image_data,
-        next
-      );
+
+      const existingUrl = await this.categorieRepository.findBYUrl(data.metaCanonicalUrl, existingCategory._id);
+      if (existingUrl) {
+        return this.handleError("Categorie with this URL already exists", next, 400);
+      }
+
+      let imageData = null;
+      if (files?.length) {
+        const imageResult = await this.handleImage(files, user_id, next);
+        if (!imageResult) return;
+
+        imageData = imageResult.imageData;
+      }
+
+      const seo = await seoRepositorie.update(data, existingCategory?.seo, imageData, next);
       if (!seo) {
         return this.handleError("SEO data not added to database", next);
       }
 
-      // Category Creation
-      return await this.categorieRepository.update(data, image_data, user_id);
+      return await this.categorieRepository.update(data, imageData, user_id);
     } catch (error: any) {
-      return next(
-        new ErrorHandler(error.message || "Internal Server Error", 500)
-      );
+      next(new ErrorHandler(error.message || "Internal Server Error", 500));
     }
   }
+
   async findByUrl(url: string) {
     return await this.categorieRepository.findByUrl(url);
   }
+
   async all(query: any) {
     return await this.categorieRepository.all(query);
   }
+
   async data_counter(query: any) {
     return await this.categorieRepository.data_counter(query);
   }
+
   async find_by_id(id: string, next: NextFunction) {
     return await this.categorieRepository.find_by_id(id, next);
   }
+
   async findBYpageid(id: string, next: NextFunction) {
     return await this.categorieRepository.findBYpageid(id, next);
+  }
+  async removeItem(id: string, next: NextFunction) {
+    return await this.categorieRepository.removeItem(id, next);
   }
 }
 

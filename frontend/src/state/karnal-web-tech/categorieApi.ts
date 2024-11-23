@@ -44,7 +44,7 @@ export const karnal_CategorieApi = createApi({
     }),
     update: builder.mutation<any, any>({
       query: (data) => {
-        console.log(data)
+        console.log(data);
         const formData = new FormData();
         for (let [key, value] of Object.entries(data)) {
           if (key === "images" && Array.isArray(value)) {
@@ -70,6 +70,13 @@ export const karnal_CategorieApi = createApi({
         method: "GET",
       }),
       providesTags: [{ type: "Categorie-karnal", id: "LIST" }],
+    }),
+    deleteCateorie: builder.mutation<any, any>({
+      query: (id) => ({
+        url: `v2/categorie/data/${id}`,
+        method: "DELETE", // Use DELETE instead of PUT
+      }),
+      invalidatesTags: [{ type: "Categorie-karnal", id: "LIST" }],
     }),
     getAllcategorie: builder.query<
       any,
@@ -113,5 +120,5 @@ export const {
   useAddNewCategorieMutation,
   useGetAllcategorieQuery,
   useGetSingleQuery,
-  useUpdateMutation,
+  useUpdateMutation,useDeleteCateorieMutation
 } = karnal_CategorieApi;
