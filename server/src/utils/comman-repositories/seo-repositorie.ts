@@ -19,8 +19,8 @@ const generateSeoData = (data: any, ogImageUrl: string) => ({
 
 class SeoRepositorie {
   // Create SEO record
-  create(data: any, image_uploader: any, next: NextFunction) {
-    const ogImageUrl = image_uploader[0]?.path || ""; // Fallback to an empty string if undefined
+  create(data: any, image_uploader: any, next: NextFunction,image_patgh?:string) {
+    const ogImageUrl = image_uploader[0]?.path || image_patgh; // Fallback to an empty string if undefined
 
     try {
       const seo_data = generateSeoData(data, ogImageUrl);

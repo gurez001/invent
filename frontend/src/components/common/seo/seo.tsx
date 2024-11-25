@@ -31,7 +31,7 @@ const Seo_form = ({disabled_path, control, errors, watch, setValue, keywords, se
   const addKeywords = useCallback((newKeywords: string[]) => {
     setKeywords((prev:any) => {
       const uniqueNewKeywords = newKeywords.filter(
-        (keyword) => keyword.trim() !== "" && !prev.includes(keyword.trim())
+        (keyword) => keyword.trim() !== "" && !prev?.includes(keyword.trim())
       );
       return [...prev, ...uniqueNewKeywords];
     });
@@ -127,7 +127,7 @@ const Seo_form = ({disabled_path, control, errors, watch, setValue, keywords, se
           />
 
           <div className="flex flex-wrap gap-2 mt-2">
-            {keywords.map((keyword:any, index:number) => (
+            {keywords?.map((keyword:any, index:number) => (
               <span
                 key={index}
                 className="bg-gray-300 text-black px-2 py-1 rounded-full text-sm flex items-center"

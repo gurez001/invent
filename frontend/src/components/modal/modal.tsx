@@ -12,7 +12,7 @@ interface ModalProps {
 export function Modal({ title, isOpen, onClose, children }: ModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[90%] lg:w-[50%] bg-transparent border-0 max-w-none">
+      <DialogContent className="w-[90%] max-h-[640px] px-0 overflow-hidden lg:w-[50%] bg-black text-white text-lg border-0 max-w-none">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>

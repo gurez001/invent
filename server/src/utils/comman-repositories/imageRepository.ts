@@ -1,6 +1,9 @@
 import { NextFunction } from "express";
 import { getImageModel } from "../models-handler/image-model-handler";
 import ApiFeatures from "../apiFeatuers";
+import ErrorHandler from "../ErrorHandler";
+import seoRepositorie from "./seo-repositorie";
+import User from "../../models/primary/userModel";
 
 class ImageRepository {
   async createImage(
@@ -97,6 +100,59 @@ class ImageRepository {
     apiFeatures.search().filter();
     const result = await apiFeatures.exec();
     return result.length;
+  }
+  async findById(id: string, image_key: string, next: NextFunction) {
+    const result = await getImageModel(image_key)
+      .findOne({ _id: id })
+      .populate([
+        { path: "audit_log", model: User },
+        { path: "seo", model: "Karnal_web_seo" },
+      ]);
+    if (!result) {
+      return next(new ErrorHandler(`Image with ID ${id} not found`, 404));
+    }
+    return result;
+  }
+  async update(data: any, image_key: string, next: NextFunction) {
+    const { title, description, alt, metaCanonicalUrl } = data;
+    const isExist: any = await getImageModel(image_key)
+      .findOne({
+        _id: data?.id,
+      })
+      .populate("seo");
+    if (!isExist) {
+      return next(new ErrorHandler(`Image with ID ${data?.id} not found`, 404));
+    }
+
+    let seo = null;
+    if (isExist?.seo?._id) {
+      seo = await seoRepositorie.update(data, isExist.seo, [], next); // Pass an empty array for imageData if not available
+    } else {
+      seo = await seoRepositorie.create(data, [], next, metaCanonicalUrl); // Fallback image_uploader to empty array
+    }
+    if (!seo?._id) {
+      return next(new ErrorHandler("SEO data not updated", 400)); // Ensure SEO was created or updated successfully
+    }
+    const updated_data = {
+      title,
+      caption: description,
+      altText: alt,
+      seo: seo?._id,
+    };
+
+    const result = await getImageModel(image_key).findByIdAndUpdate(
+      { _id: data?.id },
+      updated_data,
+      {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+      }
+    );
+    if (!result) {
+      return next(new ErrorHandler("Data not updated", 404));
+    }
+    return result;
   }
 }
 

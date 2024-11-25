@@ -49,10 +49,10 @@ class PortfolioController {
         next
       );
       if (result) {
-        return this.sendResponse(res,"Post created successfully", 201);
+        return this.sendResponse(res, "image created successfully", 201);
       }
 
-      return next(new ErrorHandler("Failed to create post", 500));
+      return next(new ErrorHandler("Failed to create image", 500));
     }
   );
 
@@ -105,7 +105,12 @@ class PortfolioController {
       }
 
       // Update post
-      const result = await this.portfoliotService.update(req.body, files, user, next);
+      const result = await this.portfoliotService.update(
+        req.body,
+        files,
+        user,
+        next
+      );
       if (result) {
         return this.sendResponse(res, "Post updated successfully", 200);
       }

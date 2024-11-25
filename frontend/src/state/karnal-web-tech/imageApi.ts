@@ -41,14 +41,15 @@ export const karnal_Image_Api = createApi({
       query: (data) => {
         const formData = new FormData();
         for (let [key, value] of Object.entries(data)) {
-          if (key === "images" && Array.isArray(value)) {
-            value.forEach((file: any) => formData.append("images", file));
-          } else if (value !== undefined && value !== null) {
+          // if (key === "images" && Array.isArray(value)) {
+          //   value.forEach((file: any) => formData.append("images", file));
+          // } else 
+          if (value !== undefined && value !== null) {
             formData.append(key, value.toString());
           }
         }
         return {
-          url: "v2/portfolio/update",
+          url: "v2/image/update",
           method: "PUT",
           body: formData, // Use formData as body
         };
@@ -57,10 +58,9 @@ export const karnal_Image_Api = createApi({
     }),
     getSingle: builder.query<any, string>({
       query: (id: string) => ({
-        url: `v2/portfolio/data/${id}`,
+        url: `v2/image/${id}`,
         method: "GET",
       }),
-      providesTags: [{ type: "Image-karnal", id: "LIST" }],
     }),
     deletePortfolio: builder.mutation<any, any>({
       query: (id) => ({
@@ -104,7 +104,7 @@ export const karnal_Image_Api = createApi({
 export const {
   useAddNewPortfolioMutation,
   useGetAllImagesQuery,
-  useGetSingleQuery,
+  useLazyGetSingleQuery,
   useUpdateMutation,
   useDeletePortfolioMutation,
 } = karnal_Image_Api;
