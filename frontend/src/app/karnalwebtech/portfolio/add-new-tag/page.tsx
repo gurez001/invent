@@ -1,4 +1,4 @@
-import AddNewPostTag from "@/modules/karnalwebtech/post/tag/add-new-tag";
+import AddNewPostTag from "@/modules/karnalwebtech/portfolio/tag/add-new-tag";
 
 const page = () => {
   return <AddNewPostTag />;

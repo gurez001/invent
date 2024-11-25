@@ -59,15 +59,17 @@ class PostRepository {
         title,
         content,
         status,
-        categorie: (categorie || "").split(","),
-        tag: (tags || "").split(","),
+        categorie: categorie
+          ? categorie.split(",")
+          : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID
+        tag: tags ? tags.split(",") : ["6741bd9d63fa4c1a8dd7549f"], // Default tag ID
         slug: metaCanonicalUrl,
         feature_image: imageIds[0],
         seo: seo?._id,
         post_id: catId,
         audit_log: user_id,
       };
-      //
+
       // Create and save the new post
       const post = new PostModel(newPostData);
       return await post.save();
@@ -128,19 +130,24 @@ class PostRepository {
 
   // Update a post
   async update(data: any, image_data: any, user_id: string) {
-    const { title, content, status, metaCanonicalUrl } = data;
+    const { title, content, categorie, tags, status, metaCanonicalUrl } = data;
     const image_ids = image_data?.length
       ? image_data.map((item: any) => item._id)
       : data?.images;
 
-    const updated_data = {
+    const updated_data: any = {
       title,
       content,
+      categorie: categorie
+        ? categorie.split(",")
+        : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID
+      tag: tags ? tags.split(",") : ["6741bd9d63fa4c1a8dd7549f"], // Default tag ID
       status: status === "" ? "published" : status,
       slug: metaCanonicalUrl,
       feature_image: image_ids?.length ? image_ids : undefined,
       audit_log: user_id,
     };
+
     const updated_post = await PostModel.findOneAndUpdate(
       { post_id: data.id },
       updated_data,

@@ -58,6 +58,10 @@ import karnal_repositoriesLoader from "./loaders/karnalwebtech/repositoriesLoade
 import karnal_servicesLoader from "./loaders/karnalwebtech/servicesLoader";
 import karnal_controllersLoader from "./loaders/karnalwebtech/controllersLoader";
 import karnal_routesLoader from "./app-routes/karnal-web-tech-loader";
+import ImageRepository from "./utils/comman-repositories/imageRepository";
+import ImageController from "./api/karnalwebtech/controllers/image-controller";
+import portfolioRoutes from "./api/karnalwebtech/routes/portfolio-route";
+import imageRoutes from "./api/karnalwebtech/routes/image-route";
 const karnal_repositories = karnal_repositoriesLoader();
 const karnal_services = karnal_servicesLoader(karnal_repositories);
 
@@ -65,6 +69,15 @@ const karnal_services = karnal_servicesLoader(karnal_repositories);
 const karnal_controllers = karnal_controllersLoader(karnal_services);
 karnal_routesLoader(app, karnal_controllers);
 
+
+
+//comman router
+// Initialize dependencies
+const imageRepository = new ImageRepository();
+const imageController = new ImageController(imageRepository);
+
+// Add routes
+app.use("/api/v2/image", imageRoutes(imageController));
 //--------------- allmiddleware
 app.use(errorMiddleware);
 

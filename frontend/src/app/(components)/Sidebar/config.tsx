@@ -120,6 +120,12 @@ export const navItems: MenuListProps[] = [
     key: "karnalwebtech",
     pages: [
       {
+        title: "Media",
+        label: "Media",
+        icon: 'Image',
+        href: paths.karnalwebtech.media,
+      },
+      {
         title: "Posts",
         label: "Posts",
         icon: 'CirclePlus',

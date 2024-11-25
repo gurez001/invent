@@ -15,10 +15,11 @@ interface SeoFormProps {
   watch: any;
   setValue: any;
   keywords: any;
-  setKeywords: any
+  setKeywords: any;
+  disabled_path?:any;
 }
 
-const Seo_form = ({ control, errors, watch, setValue, keywords, setKeywords }: SeoFormProps) => {
+const Seo_form = ({disabled_path, control, errors, watch, setValue, keywords, setKeywords }: SeoFormProps) => {
   const title = watch("metaTitle", "");
   const description = watch("metaDescription", "");
   const [keywordInput, setKeywordInput] = useState("");
@@ -144,7 +145,6 @@ const Seo_form = ({ control, errors, watch, setValue, keywords, setKeywords }: S
             ))}
           </div>
         </div>
-
         {/* Canonical URL */}
         <div className="space-y-2">
           <Label htmlFor="canonicalUrl" className="text-gray-300 text-lg">
@@ -156,6 +156,7 @@ const Seo_form = ({ control, errors, watch, setValue, keywords, setKeywords }: S
             <InputField
               control={control}
               errors={errors}
+              disabled_path={disabled_path==="canonical-url"?true:false} 
               name="metaCanonicalUrl"
               label="Enter meta Canonical Url"
               type="text"

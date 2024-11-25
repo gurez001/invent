@@ -19,6 +19,7 @@ interface SelectFieldProps<T extends FieldValues> {
     inputStyle?: string;
     handleInputChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; // Optional onChange handler
     maxLength?: number;
+    disabled_path?: boolean;
 }
 
 const Input_field = <T extends FieldValues>({
@@ -29,7 +30,7 @@ const Input_field = <T extends FieldValues>({
     type = "text",
     inputStyle,
     handleInputChange,
-    maxLength,
+    maxLength, disabled_path = false
 }: SelectFieldProps<T>) => {
     let errorMessage: string | undefined;
 
@@ -59,6 +60,7 @@ const Input_field = <T extends FieldValues>({
                         placeholder={label}
                         type={type}
                         className={inputStyle}
+                        disabled={disabled_path}
                         {...field}
                         onChange={(e) => {
                             // If there's an onChange handler, call it

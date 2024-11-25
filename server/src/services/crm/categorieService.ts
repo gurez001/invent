@@ -2,7 +2,7 @@ import { NextFunction } from "express";
 import CategorieRepository from "../../repositories/crm/categorieRepository";
 import ErrorHandler from "../../utils/ErrorHandler";
 import { ImageUploader } from "../../utils/ImageUpload";
-import ImageRepository from "../../repositories/crm/imageRepository";
+import ImageRepository from "../../utils/comman-repositories/imageRepository";
 const imageUploader = new ImageUploader();
 const add_image = new ImageRepository();
 

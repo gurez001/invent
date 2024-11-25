@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useRouter } from "next/navigation";
 import PostFromCard from "@/components/post/post-form-card";
 import LoadingPage from "@/components/common/loading-page";
 import { postSchema } from "@/zod-schemas/karnal-web-tech/post_zod_schema";
@@ -19,7 +18,6 @@ interface UpdatePostCategorieProps {
   id: string;
 }
 export default function UpdatePostCategorie({ id }: UpdatePostCategorieProps) {
-  const router = useRouter();
 
   // API Hooks
   const { data, error, isLoading } = useGetSingleQuery(id);

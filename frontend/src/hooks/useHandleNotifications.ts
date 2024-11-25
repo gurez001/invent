@@ -3,9 +3,9 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 
 type UseToastHandlerProps = {
-  error: unknown;
-  isSuccess: boolean;
-  successMessage: string;
+  error?: unknown;
+  isSuccess?: boolean;
+  successMessage?: string  | undefined;
   redirectPath?: string;
 };
 
@@ -26,7 +26,9 @@ export function useHandleNotifications({
     }
 
     if (isSuccess) {
-      toast.success(successMessage);
+      if (successMessage) {
+        toast.success(successMessage); // Ensure successMessage is a string
+      }
       if (redirectPath) {
         router.push(redirectPath);
       }

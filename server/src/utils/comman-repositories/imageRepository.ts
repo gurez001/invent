@@ -1,5 +1,6 @@
 import { NextFunction } from "express";
-import { getImageModel } from "../../utils/models-handler/image-model-handler";
+import { getImageModel } from "../models-handler/image-model-handler";
+import ApiFeatures from "../apiFeatuers";
 
 class ImageRepository {
   async createImage(
@@ -7,7 +8,7 @@ class ImageRepository {
     image_uploader: any,
     user_id: string,
     next: NextFunction,
-    image_key:string ="crm"
+    image_key: string = "crm"
   ) {
     try {
       // Create an array to hold image objects
@@ -57,7 +58,9 @@ class ImageRepository {
 
       // Insert multiple images into the database if images_arr is populated
       if (images_arr.length > 0) {
-        const createdImages = await getImageModel(image_key).insertMany(images_arr); // Insert the accumulated images array
+        const createdImages = await getImageModel(image_key).insertMany(
+          images_arr
+        ); // Insert the accumulated images array
         return createdImages; // Return saved images
       } else {
         return next(new Error("No images to insert.")); // Handle the case with no images
@@ -65,6 +68,35 @@ class ImageRepository {
     } catch (error) {
       next(error); // Handle the error
     }
+  }
+  async all(query: any, image_key: string, User: any) {
+    const resultPerPage = Number(query.rowsPerPage);
+    const apiFeatures = new ApiFeatures(
+      getImageModel(image_key).find({ is_delete: { $ne: true } }),
+      query
+    );
+    apiFeatures.search().filter().sort().pagination(resultPerPage);
+
+    // Apply population and execute query
+    const result = await apiFeatures
+      .getQuery()
+      .populate([
+        { path: "audit_log", model: User },
+        { path: "seo", model: "Karnal_web_seo" },
+      ])
+      .sort({ updated_at: -1 })
+      .exec();
+
+    return result;
+  }
+  async data_counter(query: any, image_key: any) {
+    const apiFeatures = new ApiFeatures(
+      getImageModel(image_key).find({ is_delete: { $ne: true } }),
+      query
+    );
+    apiFeatures.search().filter();
+    const result = await apiFeatures.exec();
+    return result.length;
   }
 }
 

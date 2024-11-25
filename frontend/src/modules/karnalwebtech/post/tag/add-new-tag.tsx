@@ -10,13 +10,19 @@ import { generate32BitUUID } from "../../../../lib/service/generate32BitUUID";
 import { z } from "zod";
 import { useHandleNotifications } from "@/hooks/useHandleNotifications";
 import { useAddNewTagMutation } from "../../../../state/karnal-web-tech/tagApi";
+import toast from "react-hot-toast";
 
 export default function AddNewPostTag() {
   const [keywords, setKeywords] = useState<string[]>([]);
   // -------------  use hookes
   const { imageitemData, files, handleDrop } = useImageDrop();
   const [addNewTag, { error, isLoading, isSuccess }] = useAddNewTagMutation();
-  useHandleNotifications({ error: error, isSuccess, successMessage: "Tag added successfully!", redirectPath: "/karnalwebtech/post/tag" })
+  useHandleNotifications({
+    error: error,
+    isSuccess,
+    successMessage: "Tag added successfully!",
+    redirectPath: "/karnalwebtech/post/tag",
+  });
   const {
     control,
     handleSubmit,
@@ -28,7 +34,13 @@ export default function AddNewPostTag() {
   });
 
   // Submit Handler
-  const onSubmit: SubmitHandler<z.infer<typeof postSchema>> = async (formData) => {
+  const onSubmit: SubmitHandler<z.infer<typeof postSchema>> = async (
+    formData
+  ) => {
+    if (files.length < 1) {
+      toast.error("Please add a image");
+      return;
+    }
     const updatedData = {
       ...formData,
       keywords,
@@ -51,7 +63,7 @@ export default function AddNewPostTag() {
         setKeywords={setKeywords}
         keywords={keywords}
         selectedCategories={[]}
-        setSelectedCategories={() => { }}
+        setSelectedCategories={() => {}}
         pageTitle="Tag"
         isLoading={isLoading}
         discard_link="/karnalwebtech/post/tag"

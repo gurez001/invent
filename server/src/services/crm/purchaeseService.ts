@@ -1,7 +1,7 @@
 import { NextFunction } from "express";
 import ErrorHandler from "../../utils/ErrorHandler";
 import { ImageUploader } from "../../utils/ImageUpload";
-import ImageRepository from "../../repositories/crm/imageRepository";
+import ImageRepository from "../../utils/comman-repositories/imageRepository";
 import OrderDetailsRepository from "../../repositories/crm/orderDetailsRepository";
 import PurchaseRepository from "../../repositories/crm/purchasesRepository";
 const imageUploader = new ImageUploader();

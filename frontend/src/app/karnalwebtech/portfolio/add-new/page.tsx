@@ -1,9 +1,9 @@
-import AddNewPost from '@/modules/karnalwebtech/post/add-new/add-new-post'
+import AddNewPortfolio from '@/modules/karnalwebtech/portfolio/add-new/add-new-post'
 import React from 'react'
 
 const page = () => {
   return (
-   <AddNewPost/>
+   <AddNewPortfolio/>
   )
 }
 export default page

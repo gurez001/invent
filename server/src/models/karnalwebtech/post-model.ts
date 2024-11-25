@@ -8,7 +8,7 @@ export interface IPost extends Document {
   title: string;
   slug: string;
   content?: string;
-  cat_id: string;
+  post_id: string;
   status: string;
   audit_log: mongoose.Types.ObjectId;
   feature_image: mongoose.Types.ObjectId;

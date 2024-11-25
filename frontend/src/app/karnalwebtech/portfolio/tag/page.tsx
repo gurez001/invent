@@ -1,4 +1,4 @@
-import Tag from "@/modules/karnalwebtech/post/tag/tag"
+import Tag from "@/modules/karnalwebtech/portfolio/tag/tag"
 
 const page = () => {
     return (

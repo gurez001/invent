@@ -14,8 +14,8 @@ const postRoutes = (postController: PostController) => {
   );
   router.get(
     "/",
-    // isAuthenticatedUser,
-    // authorizeRoles("admin", "employee"),
+    isAuthenticatedUser,
+    authorizeRoles("admin", "employee"),
     postController.all.bind(postController)
   );
   router.get(

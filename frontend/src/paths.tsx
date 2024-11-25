@@ -27,6 +27,7 @@ interface Paths {
   };
   karnalwebtech: {
     post: string;
+    media: string;
     post_categorie: string;
     post_tag: string;
     portfolio: string;
@@ -66,6 +67,7 @@ export const paths: Paths = {
   },
   karnalwebtech: {
     post: "/karnalwebtech/post",
+    media: "/karnalwebtech/media",
     post_categorie: "/karnalwebtech/post/categorie",
     post_tag: "/karnalwebtech/post/tag",
     users: "/streaming/users",

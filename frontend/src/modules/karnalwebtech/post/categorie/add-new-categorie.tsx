@@ -10,6 +10,7 @@ import { useAddNewCategorieMutation } from "@/state/karnal-web-tech/categorieApi
 import { generate32BitUUID } from "../../../../lib/service/generate32BitUUID";
 import { z } from "zod";
 import { useHandleNotifications } from "@/hooks/useHandleNotifications";
+import toast from "react-hot-toast";
 
 export default function AddNewPostCategorie() {
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -29,6 +30,10 @@ export default function AddNewPostCategorie() {
 
   // Submit Handler
   const onSubmit: SubmitHandler<z.infer<typeof postSchema>> = async (formData) => {
+    if (files.length < 1) {
+      toast.error("Please add a image");
+      return;
+    }
     const updatedData = {
       ...formData,
       keywords,

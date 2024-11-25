@@ -1,4 +1,4 @@
-import Categorie from "@/modules/karnalwebtech/post/categorie/categorie";
+import Categorie from "@/modules/karnalwebtech/portfolio/categorie/categorie";
 
 const page = () => {
   return <Categorie />;

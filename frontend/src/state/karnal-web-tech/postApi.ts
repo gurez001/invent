@@ -90,7 +90,7 @@ export const karnal_Post_Api = createApi({
         }
 
         return {
-          url: "v2/posts",
+          url: "v2/post",
           params, // Use the dynamically constructed params
           method: "GET",
         };

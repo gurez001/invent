@@ -1,4 +1,4 @@
-import AddNewPostCategorie from '@/modules/karnalwebtech/post/categorie/add-new-categorie'
+import AddNewPostCategorie from '@/modules/karnalwebtech/portfolio/categorie/add-new-categorie'
 import React from 'react'
 
 const page = () => {

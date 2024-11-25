@@ -1,8 +1,8 @@
-import Post from '@/modules/karnalwebtech/post/Post'
+import Portfolio from '@/modules/karnalwebtech/portfolio/Portfolio';
 import { Metadata } from 'next';
 import React from 'react'
 export const metadata: Metadata = {
-  title:"All post",
+  title:"All Protfolio",
   description: "Your go-to tech partner in Karnal, providing top-notch web development services and digital solutions.",
   keywords: ["web development", "Karnal web tech", "digital solutions", "SEO", "Next.js", "KarnalWebTech"],
   openGraph: {
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 
 const page = () => {
   return (
-    <Post/>
+    <Portfolio/>
   )
 }
 

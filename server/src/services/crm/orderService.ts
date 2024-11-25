@@ -1,7 +1,7 @@
 import { NextFunction } from "express";
 import ErrorHandler from "../../utils/ErrorHandler";
 import { ImageUploader } from "../../utils/ImageUpload";
-import ImageRepository from "../../repositories/crm/imageRepository";
+import ImageRepository from "../../utils/comman-repositories/imageRepository";
 import ProductRepository from "../../repositories/crm/productRepository";
 import OrderRepository from "../../repositories/crm/orderRepository";
 import OrderDetailsRepository from "../../repositories/crm/orderDetailsRepository";
