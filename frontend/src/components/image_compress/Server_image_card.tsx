@@ -27,7 +27,6 @@ interface ImageCardProps {
   isLoading?: boolean;
   isUpdateLoading?: boolean;
   isSuccess?: boolean;
-  setDilogOpen: (open: boolean) => void;
 }
 
 export default function Server_image_card({
@@ -49,40 +48,34 @@ export default function Server_image_card({
   isLoading = false,
   isUpdateLoading = false,
   isSuccess = false,
-  setDilogOpen,
 }: ImageCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Handle modal state and dialog state synchronization
+  // Close modal if submission is successful
   useEffect(() => {
-    if (isSuccess && isModalOpen) {
+    if (isSuccess) {
       setIsModalOpen(false);
     }
-    if (setDilogOpen && typeof setDilogOpen === "function") {
-      setDilogOpen(isModalOpen);
-    }
-  }, [isSuccess, isModalOpen, setDilogOpen]);
+  }, [isSuccess]);
 
-  // Function to handle card click
+  // Handle card click to fetch data and open modal
   const handleCardClick = () => {
     getSingleDataHandler(id);
     setIsModalOpen(true);
   };
 
-  // Function to close modal
-  const handleCloseModal = () => setIsModalOpen(false);
-
   return (
     <>
-      <Card className="cursor-pointer" onMouseDown={(e) => e.preventDefault()} onClick={handleCardClick}>
+      <Card className="cursor-pointer" onClick={handleCardClick}>
         <CardContent>
           <Image src={src} alt={alt} width={width} height={height} priority />
         </CardContent>
       </Card>
 
       {isVisible && (
-        <Modal title="" isOpen={isModalOpen} onClose={handleCloseModal}>
+        <Modal title="SEO Details" isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} aria-describedby="modal-description">
           <form
+            id="modal-description"
             className="overflow-y-auto h-[600px] scrollbar-hide relative"
             onSubmit={handleSubmit(onSubmit)}
           >

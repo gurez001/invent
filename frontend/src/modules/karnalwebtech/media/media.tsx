@@ -1,4 +1,5 @@
 "use client";
+
 import LoadingPage from "@/components/common/loading-page";
 import ShadcnTableFooter from "@/components/common/shadcn-table/table-footer";
 import Server_image_card from "@/components/image_compress/Server_image_card";
@@ -12,9 +13,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 export default function ImageGallery() {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<string>("25");
-  const [dilogOpen, setDilogOpen] = useState<boolean>(false);
-
   const [page, setPage] = useState<number>(1);
+
   const [getSingle, { data: single_data, isLoading: single_loading, isError: single_error }] = useLazyGetSingleQuery();
   const [update, { isLoading: update_loading, isSuccess, isError: update_error }] = useUpdateMutation();
 
@@ -23,30 +23,40 @@ export default function ImageGallery() {
     page: page,
   });
 
-  useHandleNotifications({ error: error || single_error || update_error, isSuccess, successMessage: "Image updated successfuly" });
+  useHandleNotifications({
+    error: error || single_error || update_error,
+    isSuccess,
+    successMessage: "Image updated successfully",
+  });
+
   const { data: api_data } = data || {};
   const { data: single_data_api_data } = single_data || {};
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    watch,
-  } = useForm<any>({
+  const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm<any>({
     resolver: zodResolver(imageSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      alt: "",
+      metaTitle: "",
+      metaDescription: "",
+      metaCanonicalUrl: "",
+    },
   });
+
   const onSubmit: SubmitHandler<any> = async (data) => {
     const updated_data = {
       ...data,
       keywords,
       id: single_data_api_data?._id,
     };
-    await update(updated_data)
+    await update(updated_data);
   };
+
   const getSingleDataHandler = async (id: string) => {
-    await getSingle(id)
-  }
+    await getSingle(id);
+  };
+
   useEffect(() => {
     const resetValues = () => {
       setValue("title", "");
@@ -57,24 +67,24 @@ export default function ImageGallery() {
       setValue("metaCanonicalUrl", "");
       setKeywords([]);
     };
-  
+
     const populateValues = (data: typeof single_data_api_data) => {
-      setValue("title", data?.title || "");
-      setValue("description", data?.caption || "");
-      setValue("alt", data?.altText || "");
-      setValue("metaTitle", data?.seo?.title || "");
-      setValue("metaDescription", data?.seo?.title || ""); // Assuming `metaDescription` should come from `seo.title`.
-      setValue("metaCanonicalUrl", data?.path || "");
-      setKeywords(Array.isArray(data?.seo?.keywords) && data?.seo?.keywords.length > 0 ? data.seo.keywords : []);
+      setValue("title", data?.title ?? "");
+      setValue("description", data?.caption ?? "");
+      setValue("alt", data?.altText ?? "");
+      setValue("metaTitle", data?.seo?.title ?? "");
+      setValue("metaDescription", data?.seo?.meta_description ?? "");
+      setValue("metaCanonicalUrl", data?.path ?? "");
+      setKeywords(Array.isArray(data?.seo?.keywords) ? data.seo.keywords : []);
     };
-  
-    if (single_data_api_data && dilogOpen) {
+
+    if (single_data_api_data) {
       populateValues(single_data_api_data);
     } else {
       resetValues();
     }
-  }, [single_data_api_data, setValue, setKeywords, dilogOpen]);
-  
+  }, [single_data_api_data, setValue, setKeywords]);
+
   return (
     <div className="container mx-auto py-8 relative">
       {isLoading ? (
@@ -98,12 +108,12 @@ export default function ImageGallery() {
                 errors={errors}
                 setValue={setValue}
                 watch={watch}
-                keywords={keywords} setKeywords={setKeywords}
+                keywords={keywords}
+                setKeywords={setKeywords}
                 getSingleDataHandler={getSingleDataHandler}
                 isLoading={single_loading}
                 isUpdateLoading={update_loading}
                 isSuccess={isSuccess}
-                setDilogOpen={setDilogOpen}
               />
             ))}
           </div>
@@ -112,7 +122,6 @@ export default function ImageGallery() {
             totalPages={api_data?.resultPerPage}
             setCurrentPage={setPage}
             data_length={api_data?.dataCounter}
-
           />
         </>
       )}
