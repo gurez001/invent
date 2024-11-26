@@ -76,7 +76,7 @@ export default function UpdatePortfolio({ id }: UpdatePortfolioProps) {
       setValue("title", apiData.title);
       setValue("status", apiData.status);
       setValue("content", apiData.content);
-      setValue("metaTitle", apiData.seo?.title);
+      setValue("metaTitle", apiData.seo?.title);      setValue("description", apiData.description);
       setValue("metaDescription", apiData.seo?.meta_description);
       setValue("metaCanonicalUrl", apiData.seo?.canonical_url);
       setKeywords(apiData.seo?.keywords || []);

@@ -37,6 +37,12 @@ const postRoutes = (postController: PostController) => {
     authorizeRoles("admin", "employee"),
     postController.update.bind(postController)
   );
+  //--------------------- store
+  router.get(
+    "/store/data/:id",
+    postController.get_single_data.bind(postController)
+  );
+  router.get("/store", postController.all.bind(postController));
   return router;
 };
 export default postRoutes;

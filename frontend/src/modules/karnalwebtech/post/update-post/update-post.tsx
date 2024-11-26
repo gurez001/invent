@@ -81,6 +81,7 @@ export default function UpdatePost({ id }: UpdatePostProps) {
       setValue("title", apiData.title);
       setValue("status", apiData.status);
       setValue("content", apiData.content);
+      setValue("description", apiData.description);
       setValue("metaTitle", apiData.seo?.title);
       setValue("metaDescription", apiData.seo?.meta_description);
       setValue("metaCanonicalUrl", apiData.seo?.canonical_url);

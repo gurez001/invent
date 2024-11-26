@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import AsyncHandler from "../../../middlewares/AsyncHandler";
 import ErrorHandler from "../../../utils/ErrorHandler";
 import PostService from "../../../services/karnalwebtech/post-service";
+import { redisClient1 } from "../../../loaders/redis";
 
 class PostController {
   constructor(private postService: PostService) {}
@@ -25,7 +26,10 @@ class PostController {
     async (req: Request, res: Response, next: NextFunction) => {
       const userId = (req as any).user?._id; // Use the correct type for the request user
       const files = req.files;
-
+      const cacheKey = `posts_rowsPerPage=6&page=1`;
+  
+      // Check if data is in Redis cache
+   await redisClient1.del(cacheKey);
       // Check if URL already exists
       const isExistingUrl = await this.postService.findByUrl(
         req.body.metaCanonicalUrl
@@ -61,13 +65,30 @@ class PostController {
     async (req: Request, res: Response, next: NextFunction) => {
       const query = req.query;
       const resultPerPage = Number(query.rowsPerPage);
-
-      // Fetch post and data counter
+      const cacheKey = `posts_${new URLSearchParams(query as any).toString()}`;
+  
+      // Check if data is in Redis cache
+      const cachedPosts = await redisClient1.get(cacheKey);
+      if (cachedPosts) {
+        return res.json(JSON.parse(cachedPosts)); // Return cached posts
+      }
       const [result, dataCounter] = await Promise.all([
         this.postService.all(query),
         this.postService.data_counter(query),
       ]);
-
+      const cacheData = {
+        success: true,
+        message: "Post fetched successfully",
+        data: {
+          result: result, // Assuming result is plain data
+          rowsPerPage: resultPerPage,
+          dataCounter: dataCounter,
+        },
+      };
+  
+      // Store the result data in Redis cache (cache for 1 hour)
+        await redisClient1.setEx(cacheKey, 3600, JSON.stringify(cacheData));
+       
       return this.sendResponse(res, "Post fetched successfully", 200, {
         result,
         resultPerPage,
@@ -99,7 +120,10 @@ class PostController {
     async (req: Request, res: Response, next: NextFunction) => {
       const user: string = (req as any).user._id;
       const files = req.files;
-
+      const cacheKey = `posts_rowsPerPage=6&page=1`;
+  
+      // Check if data is in Redis cache
+   await redisClient1.del(cacheKey);
       if (!user) {
         return next(new ErrorHandler("User not authenticated", 401)); // Changed to 401
       }

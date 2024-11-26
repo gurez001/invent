@@ -41,7 +41,7 @@ class PortfoliotRepository {
         content,
         uuid,
         categorie,
-        tags,
+        tags,description,
         status,
         metaCanonicalUrl,
       } = data;
@@ -58,7 +58,7 @@ class PortfoliotRepository {
         _no: postNumber,
         title,
         content,
-        status,
+        status,description,
         categorie: categorie
           ? categorie.split(",")
           : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID
@@ -130,14 +130,14 @@ class PortfoliotRepository {
 
   // Update a portfolio
   async update(data: any, image_data: any, user_id: string) {
-    const { title, content, categorie, tags, status, metaCanonicalUrl } = data;
+    const { title, content, categorie,description, tags, status, metaCanonicalUrl } = data;
     const image_ids = image_data?.length
       ? image_data.map((item: any) => item._id)
       : data?.images;
 
     const updated_data: any = {
       title,
-      content,
+      content,description,
       categorie: categorie
         ? categorie.split(",")
         : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID

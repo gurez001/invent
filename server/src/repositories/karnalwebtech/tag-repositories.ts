@@ -34,7 +34,7 @@ class TagRepository {
   async create(data: any, image_data: any, seo: any, user_id: string) {
     try {
       const randomId = generateRandomId();
-      const { title, content, uuid, type, status, metaCanonicalUrl } = data;
+      const { title, description,content, uuid, type, status, metaCanonicalUrl } = data;
       const imageIds = image_data.map((item: any) => item._id);
 
       // Get next category number
@@ -46,7 +46,7 @@ class TagRepository {
       // Prepare data to be saved
       const newData = {
         _no: counter,
-        title,
+        title,description,
         content,
         status,
         type: type,
@@ -117,14 +117,14 @@ class TagRepository {
 
   // Update a tag
   async update(data: any, image_data: any, user_id: string) {
-    const { title, content, status, metaCanonicalUrl } = data;
+    const { title, description,content, status, metaCanonicalUrl } = data;
     const image_ids = image_data?.length
       ? image_data.map((item: any) => item._id)
       : data?.images;
 
     const updated_data = {
       title,
-      content,
+      content,description,
       status: status === "" ? "published" : status,
       slug: metaCanonicalUrl,
       feature_image: image_ids?.length ? image_ids : undefined,

@@ -7,6 +7,7 @@ export interface IPost extends Document {
   _no: number;
   title: string;
   slug: string;
+  description?:string;
   content?: string;
   post_id: string;
   status: string;
@@ -27,6 +28,7 @@ const PostSchema: Schema = new Schema(
     _no: { type: Number, default: 0 },
     post_id: { type: String, default: null },
     title: { type: String, default: null },
+    description: { type: String, default: null },
     slug: { type: String, default: null },
     content: { type: String, default: null },
     categorie: [{ type: Schema.Types.ObjectId, ref: "Karnal_categorie" }],

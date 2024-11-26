@@ -6,6 +6,7 @@ import slugify from "slugify";
 export interface IPost extends Document {
   _no: number;
   title: string;
+  description?:string;
   slug: string;
   content?: string;
   tag_id: string;
@@ -25,6 +26,7 @@ const PostSchema: Schema = new Schema(
   {
     _no: { type: Number, default: 0 },
     tag_id: { type: String, default: null },
+    description: { type: String, default: null },
     type: { type: String, default: null },
     title: { type: String, default: null },
     slug: { type: String, default: null },

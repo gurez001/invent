@@ -34,7 +34,7 @@ class CategorieRepository {
   async create(data: any, image_data: any, seo: any, user_id: string) {
     try {
       const randomId = generateRandomId();
-      const { title, content, uuid,type, status, metaCanonicalUrl } = data;
+      const { title, content,description, uuid,type, status, metaCanonicalUrl } = data;
       const imageIds = image_data.map((item: any) => item._id);
 
       // Get next category number
@@ -46,7 +46,7 @@ class CategorieRepository {
       // Prepare data to be saved
       const newCategoryData = {
         _no: categoryNumber,
-        title,
+        title,description,
         content,
         status,
         type:type,
@@ -113,14 +113,14 @@ class CategorieRepository {
 
   // Update a category
   async update(data: any, image_data: any, user_id: string) {
-    const { title, content, status, metaCanonicalUrl } = data;
+    const { title, content, status,description, metaCanonicalUrl } = data;
     const image_ids = image_data?.length
       ? image_data.map((item: any) => item._id)
       : data?.images;
 
     const updated_data = {
       title,
-      content,
+      content,description,
       status: status === "" ? "published" : status,
       slug: metaCanonicalUrl,
       feature_image: image_ids?.length ? image_ids : undefined,
