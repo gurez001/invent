@@ -22,7 +22,7 @@ app.use(helmet());
 app.use(limiter);
 app.use(
   cors({
-    origin: ["http://localhost:3000","http://localhost:3001", "https://inventory-7773.vercel.app"], // Allow only your frontend to access the API
+    origin: ["http://localhost:3000","http://localhost:3001","https://karnalwebtech.vercel.app/", "https://inventory-7773.vercel.app"], // Allow only your frontend to access the API
     methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed methods
     exposedHeaders: "Set-Cookie",
     allowedHeaders: [
