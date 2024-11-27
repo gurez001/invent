@@ -27,9 +27,9 @@ class PostController {
       const userId = (req as any).user?._id; // Use the correct type for the request user
       const files = req.files;
       const cacheKey = `posts_rowsPerPage=6&page=1`;
-  
+
       // Check if data is in Redis cache
-   await redisClient1.del(cacheKey);
+      await redisClient1.del(cacheKey);
       // Check if URL already exists
       const isExistingUrl = await this.postService.findByUrl(
         req.body.metaCanonicalUrl
@@ -66,7 +66,7 @@ class PostController {
       const query = req.query;
       const resultPerPage = Number(query.rowsPerPage);
       const cacheKey = `posts_${new URLSearchParams(query as any).toString()}`;
-  
+
       // Check if data is in Redis cache
       const cachedPosts = await redisClient1.get(cacheKey);
       if (cachedPosts) {
@@ -85,10 +85,10 @@ class PostController {
           dataCounter: dataCounter,
         },
       };
-  
+
       // Store the result data in Redis cache (cache for 1 hour)
-        await redisClient1.setEx(cacheKey, 3600, JSON.stringify(cacheData));
-       
+      await redisClient1.setEx(cacheKey, 3600, JSON.stringify(cacheData));
+
       return this.sendResponse(res, "Post fetched successfully", 200, {
         result,
         resultPerPage,
@@ -97,21 +97,53 @@ class PostController {
     }
   );
 
-  // Get single post by ID
   get_single_data = AsyncHandler.handle(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { id } = req.params;
-      if (!id) {
-        return next(new ErrorHandler("ID parameter is required.", 400));
+      const { id, slug } = req.params;
+      if (!id && !slug) {
+        return next(new ErrorHandler("Either ID or slug parameter is required.", 400));
       }
-
-      // Fetch post by ID
-      const result = await this.postService.findBYpageid(id, next);
-      if (result) {
-        return this.sendResponse(res, "Post fetched successfully", 200, result);
+  
+      // Generate cache key based on the id or slug
+      const cacheKey = id ? `post:${id}` : `post:${slug}`;
+      console.log(`Checking cache for key: ${cacheKey}`);
+  
+      try {
+        // Check if data is in Redis cache
+        const cachedPosts = await redisClient1.get(cacheKey);
+        if (cachedPosts) {
+          console.log("Cache hit");
+          return res.json(JSON.parse(cachedPosts)); // Return cached posts
+        }
+        console.log("Cache miss");
+  
+        // Fetch post data from database
+        const result = id
+          ? await this.postService.findBYpageid(id, next)
+          : await this.postService.findBYSlug(slug, next);
+  
+        if (result) {
+          // Store the result in Redis cache
+          const cacheData = {
+            success: true,
+            message: "Post fetched successfully",
+            result,
+          };
+          try {
+            await redisClient1.setEx(cacheKey, 3600, JSON.stringify(cacheData)); // Cache for 1 hour
+            console.log("Data cached successfully");
+          } catch (cacheError) {
+            console.log("Cache set failed", cacheError);
+          }
+  
+          return this.sendResponse(res, "Post fetched successfully", 200, result);
+        }
+  
+        return next(new ErrorHandler("Post not found", 404));
+      } catch (error) {
+        console.log("Error in fetching post", error);
+        return next(new ErrorHandler("Internal Server Error", 500));
       }
-
-      return next(new ErrorHandler("Post not found", 404));
     }
   );
 
@@ -121,9 +153,9 @@ class PostController {
       const user: string = (req as any).user._id;
       const files = req.files;
       const cacheKey = `posts_rowsPerPage=6&page=1`;
-  
+
       // Check if data is in Redis cache
-   await redisClient1.del(cacheKey);
+      await redisClient1.del(cacheKey);
       if (!user) {
         return next(new ErrorHandler("User not authenticated", 401)); // Changed to 401
       }

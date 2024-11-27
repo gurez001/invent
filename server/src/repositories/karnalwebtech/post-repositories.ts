@@ -184,6 +184,18 @@ class PostRepository {
 
     return result;
   }
+   // Find post by page ID
+   async findBYSlug(id: string, next: NextFunction) {
+    const result = await this.populatePostData(
+      PostModel.findOne({ slug: id })
+    );
+
+    if (!result) {
+      return next(new ErrorHandler(`Post with ID ${id} not found`, 404));
+    }
+
+    return result;
+  }
   async removeItem(id: string, next: NextFunction) {
     const result = await this.populatePostData(
       PostModel.findOne({ post_id: id })

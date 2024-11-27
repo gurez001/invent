@@ -20,8 +20,8 @@ const postRoutes = (postController: PostController) => {
   );
   router.get(
     "/data/:id",
-    isAuthenticatedUser,
-    authorizeRoles("admin", "employee"),
+    // isAuthenticatedUser,
+    // authorizeRoles("admin", "employee"),
     postController.get_single_data.bind(postController)
   );
   router.delete(
@@ -39,7 +39,9 @@ const postRoutes = (postController: PostController) => {
   );
   //--------------------- store
   router.get(
-    "/store/data/:id",
+    "/blog/:slug",
+    // isAuthenticatedUser,
+    // authorizeRoles("admin", "employee"),
     postController.get_single_data.bind(postController)
   );
   router.get("/store", postController.all.bind(postController));

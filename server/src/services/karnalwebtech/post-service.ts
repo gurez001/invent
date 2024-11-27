@@ -109,6 +109,10 @@ class PostService {
   async findBYpageid(id: string, next: NextFunction) {
     return await this.PostRepository.findBYpageid(id, next);
   }
+  
+  async findBYSlug(id: string, next: NextFunction) {
+    return await this.PostRepository.findBYSlug(id, next);
+  }
   async removeItem(id: string, next: NextFunction) {
     return await this.PostRepository.removeItem(id, next);
   }
