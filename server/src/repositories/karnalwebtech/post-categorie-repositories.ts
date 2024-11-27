@@ -34,7 +34,15 @@ class CategorieRepository {
   async create(data: any, image_data: any, seo: any, user_id: string) {
     try {
       const randomId = generateRandomId();
-      const { title, content,description, uuid,type, status, metaCanonicalUrl } = data;
+      const {
+        title,
+        content,
+        description,
+        uuid,
+        type,
+        status,
+        metaCanonicalUrl,
+      } = data;
       const imageIds = image_data.map((item: any) => item._id);
 
       // Get next category number
@@ -46,10 +54,11 @@ class CategorieRepository {
       // Prepare data to be saved
       const newCategoryData = {
         _no: categoryNumber,
-        title,description,
+        title,
+        description,
         content,
         status,
-        type:type,
+        type: type,
         slug: metaCanonicalUrl,
         feature_image: imageIds[0],
         seo: seo?._id,
@@ -66,14 +75,26 @@ class CategorieRepository {
   }
 
   // Find category by URL
-  async findByUrl(url: string) {
-    return await PostCategorieModel.findOne({ slug: url });
+  async findByUrl(url: string, next: NextFunction) {
+    const category = await this.populateCategoryData(
+      PostCategorieModel.findOne({ slug: url })
+    );
+
+    if (!category) {
+      return next(
+        new ErrorHandler(`Category with ID ${category} not found`, 404)
+      );
+    }
+    return category;
   }
 
   // Retrieve all categories with filters and pagination
   async all(query: any) {
     const resultPerPage = Number(query.rowsPerPage);
-    const apiFeatures = new ApiFeatures(PostCategorieModel.find({is_delete: { $ne: true } }), query);
+    const apiFeatures = new ApiFeatures(
+      PostCategorieModel.find({ is_delete: { $ne: true } }),
+      query
+    );
     apiFeatures.search().filter().sort().pagination(resultPerPage);
 
     // Apply population and execute query
@@ -92,7 +113,10 @@ class CategorieRepository {
 
   // Get the total count of categories based on filters
   async data_counter(query: any) {
-    const apiFeatures = new ApiFeatures(PostCategorieModel.find({is_delete: { $ne: true } }), query);
+    const apiFeatures = new ApiFeatures(
+      PostCategorieModel.find({ is_delete: { $ne: true } }),
+      query
+    );
     apiFeatures.search().filter();
     const result = await apiFeatures.exec();
     return result.length;
@@ -113,14 +137,15 @@ class CategorieRepository {
 
   // Update a category
   async update(data: any, image_data: any, user_id: string) {
-    const { title, content, status,description, metaCanonicalUrl } = data;
+    const { title, content, status, description, metaCanonicalUrl } = data;
     const image_ids = image_data?.length
       ? image_data.map((item: any) => item._id)
       : data?.images;
 
     const updated_data = {
       title,
-      content,description,
+      content,
+      description,
       status: status === "" ? "published" : status,
       slug: metaCanonicalUrl,
       feature_image: image_ids?.length ? image_ids : undefined,

@@ -14,16 +14,22 @@ const categorieRoutes = (postCategorieConroller: CategorieController) => {
   );
   router.get(
     "/",
-    isAuthenticatedUser,
-    authorizeRoles("admin", "employee"),
+    // isAuthenticatedUser,
+    // authorizeRoles("admin", "employee"),
     postCategorieConroller.all.bind(postCategorieConroller)
   );
   router.get(
     "/data/:id",
-    isAuthenticatedUser,
-    authorizeRoles("admin", "employee"),
+    // isAuthenticatedUser,
+    // authorizeRoles("admin", "employee"),
     postCategorieConroller.get_single_data.bind(postCategorieConroller)
   );
+  // router.get(
+  //   "/shop/:slug",
+  //   // isAuthenticatedUser,
+  //   // authorizeRoles("admin", "employee"),
+  //   postCategorieConroller.get_single_data.bind(postCategorieConroller)
+  // );
   router.delete(
     "/data/:id",
     isAuthenticatedUser,

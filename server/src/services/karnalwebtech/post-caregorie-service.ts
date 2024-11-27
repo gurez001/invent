@@ -89,8 +89,8 @@ class CategorieService {
     }
   }
 
-  async findByUrl(url: string) {
-    return await this.categorieRepository.findByUrl(url);
+  async findByUrl(url: string,next: NextFunction) {
+    return await this.categorieRepository.findByUrl(url,next);
   }
 
   async all(query: any) {
