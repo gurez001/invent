@@ -75,16 +75,21 @@ class CategorieRepository {
   }
 
   // Find category by URL
-  async findByUrl(url: string, next: NextFunction) {
+  async findBySlug(url: string, next: NextFunction) {
     const category = await this.populateCategoryData(
       PostCategorieModel.findOne({ slug: url })
     );
-
     if (!category) {
       return next(
         new ErrorHandler(`Category with ID ${category} not found`, 404)
       );
     }
+    return category;
+  }
+  async findByExistUrl(url: string, next: NextFunction) {
+    const category = await this.populateCategoryData(
+      PostCategorieModel.findOne({ slug: url })
+    );
     return category;
   }
 
