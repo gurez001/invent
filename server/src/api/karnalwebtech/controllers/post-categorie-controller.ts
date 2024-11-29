@@ -88,7 +88,6 @@ class CategorieController {
       const result = id
         ? await this.categorieService.findBYpageid(id, next)
         : await this.categorieService.findBySlug(slug, next);
-
       if (result) {
         return this.sendResponse(
           res,

@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 class ApiFeatures {
   private query: any;
   private queryStr: any;
@@ -26,7 +28,27 @@ class ApiFeatures {
     // Removing some fields for category
     const removeField = ["keyword", "page", "limit", "rowsPerPage"];
     removeField.forEach((key) => delete queryCopy[key]);
+    if (queryCopy.categorie) {
+      let categories = queryCopy["categorie"];
 
+      // Ensure it's an array (handle comma-separated string)
+      if (typeof categories === "string") {
+        categories = categories.split(",");
+      }
+
+      // Convert each category to ObjectId
+      categories = categories.map((category: any) => {
+        if (mongoose.Types.ObjectId.isValid(category)) {
+          return new mongoose.Types.ObjectId(category);
+        } else {
+          throw new Error(`Invalid ObjectId format: ${category}`);
+        }
+      });
+
+      // Use $in to match any category from the list of ObjectIds
+      this.query = this.query.find({ categorie: { $in: categories } });
+      delete queryCopy["categorie"];
+    }
     if (queryCopy["user.role"]) {
       this.query = this.query.find({ role: queryCopy["user.role"] });
       delete queryCopy["user.role"];
