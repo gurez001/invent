@@ -4,6 +4,7 @@ import ApiFeatures from "../../utils/apiFeatuers";
 import ErrorHandler from "../../utils/ErrorHandler";
 import { generateRandomId } from "../../utils/generateRandomId";
 import TagModel from "../../models/karnalwebtech/tag";
+import { getImageModel } from "../../utils/models-handler/image-model-handler";
 
 class TagRepository {
   // Reusable function to generate unique category ID
@@ -56,6 +57,27 @@ class TagRepository {
         tag_id: tag_id,
         audit_log: user_id,
       };
+      // Prepare image update promises for updating the displayed path and activating the image
+      const imageUpdatePromises = imageIds.map((id: any) =>
+        getImageModel("karnalwebtech")
+          .findByIdAndUpdate(
+            id,
+            {
+              displayedpath: `tag/${newData.slug}`, // Update the displayed path to the category slug
+              is_active: true, // Mark the image as active
+            },
+            { new: true } // Return the updated document
+          )
+          .catch((error) => {
+            // Log any error that occurs during the update of each image
+            console.error(
+              `Error updating image with ID ${id}: ${error.message}`
+            );
+            throw new Error(`Error updating image with ID ${id}`);
+          })
+      );
+      // Wait for all image updates to finish
+      await Promise.all(imageUpdatePromises);
 
       // Create and save the new tag
       const new_data = new TagModel(newData);

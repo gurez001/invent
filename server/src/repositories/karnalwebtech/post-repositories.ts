@@ -4,6 +4,7 @@ import ApiFeatures from "../../utils/apiFeatuers";
 import ErrorHandler from "../../utils/ErrorHandler";
 import { generateRandomId } from "../../utils/generateRandomId";
 import PostModel from "../../models/karnalwebtech/post-model";
+import { getImageModel } from "../../utils/models-handler/image-model-handler";
 
 class PostRepository {
   // Reusable function to generate unique post ID
@@ -38,7 +39,8 @@ class PostRepository {
       const randomId = generateRandomId();
       const {
         title,
-        content,description,
+        content,
+        description,
         uuid,
         categorie,
         tags,
@@ -58,7 +60,8 @@ class PostRepository {
         _no: postNumber,
         title,
         content,
-        status,description,
+        status,
+        description,
         categorie: categorie
           ? categorie.split(",")
           : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID
@@ -72,7 +75,33 @@ class PostRepository {
 
       // Create and save the new post
       const post = new PostModel(newPostData);
-      return await post.save();
+      const savedPost: any = await post.save(); // Save the post first to get the post with populated fields
+
+      // Now populate the categories after the post is saved
+      await savedPost.populate("Karnal_categorie");
+      // Prepare image update promises for updating the displayed path and activating the image
+      const imageUpdatePromises = imageIds.map((id: any) =>
+        getImageModel("karnalwebtech")
+          .findByIdAndUpdate(
+            id,
+            {
+              displayedpath: `${savedPost?.categorie[0]?.slug}/${newPostData.slug}`, // Use the populated category slug
+              is_active: true, // Mark the image as active
+            },
+            { new: true } // Return the updated document
+          )
+          .catch((error) => {
+            // Log any error that occurs during the update of each image
+            console.error(
+              `Error updating image with ID ${id}: ${error.message}`
+            );
+            throw new Error(`Error updating image with ID ${id}`);
+          })
+      );
+
+      // Wait for all image updates to finish
+      await Promise.all(imageUpdatePromises);
+      return await savedPost;
     } catch (error: any) {
       throw new Error(`Error creating post: ${error.message}`);
     }
@@ -130,14 +159,23 @@ class PostRepository {
 
   // Update a post
   async update(data: any, image_data: any, user_id: string) {
-    const { title, content, description,categorie, tags, status, metaCanonicalUrl } = data;
+    const {
+      title,
+      content,
+      description,
+      categorie,
+      tags,
+      status,
+      metaCanonicalUrl,
+    } = data;
     const image_ids = image_data?.length
       ? image_data.map((item: any) => item._id)
       : data?.images;
 
     const updated_data: any = {
       title,
-      content,description,
+      content,
+      description,
       categorie: categorie
         ? categorie.split(",")
         : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID
@@ -184,11 +222,9 @@ class PostRepository {
 
     return result;
   }
-   // Find post by page ID
-   async findBYSlug(id: string, next: NextFunction) {
-    const result = await this.populatePostData(
-      PostModel.findOne({ slug: id })
-    );
+  // Find post by page ID
+  async findBYSlug(id: string, next: NextFunction) {
+    const result = await this.populatePostData(PostModel.findOne({ slug: id }));
 
     if (!result) {
       return next(new ErrorHandler(`Post with ID ${id} not found`, 404));

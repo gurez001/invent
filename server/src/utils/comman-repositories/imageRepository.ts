@@ -154,6 +154,23 @@ class ImageRepository {
     }
     return result;
   }
+  async updateImage(
+    id: string,
+    updateData: any,
+    key: string,
+    next: NextFunction
+  ) {
+    try {
+      return await getImageModel(key).findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true }
+      );
+    } catch (error: any) {
+      console.error(`Error updating image with ID ${id}: ${error.message}`);
+      return next(new ErrorHandler(`Error updating image with ID ${id}`, 404));
+    }
+  }
 }
 
 export default ImageRepository;
