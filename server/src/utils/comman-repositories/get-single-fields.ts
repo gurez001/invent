@@ -22,8 +22,15 @@ class PostService {
   static async getImageUrls(req: Request, res: Response, next: NextFunction) {
     try {
       const urls = await KarnalwebtechImageModel.find(
-        { is_delete: { $ne: true } },
-        { path: 1, title: 1, caption: 1, _id: 0 }
+        { is_delete: { $ne: true }, is_active: { $ne: false } },
+        {
+          path: 1,
+          title: 1,
+          displayedpath: 1,
+          caption: 1,
+          updatedAt: 1,
+          _id: 0,
+        }
       );
       return res.status(200).json(urls);
     } catch (error) {

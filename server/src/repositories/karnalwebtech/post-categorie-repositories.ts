@@ -4,8 +4,8 @@ import User from "../../models/primary/userModel";
 import ApiFeatures from "../../utils/apiFeatuers";
 import ErrorHandler from "../../utils/ErrorHandler";
 import { generateRandomId } from "../../utils/generateRandomId";
-import { getImageModel } from "../../utils/models-handler/image-model-handler";
-
+import ImageRepository from "../../utils/comman-repositories/imageRepository";
+const imageRepository = new ImageRepository();
 class CategorieRepository {
   // Reusable function to generate unique category ID
   private generateCategoryId(
@@ -32,7 +32,13 @@ class CategorieRepository {
   }
 
   // Create a new category
-  async create(data: any, image_data: any, seo: any, user_id: string) {
+  async create(
+    data: any,
+    image_data: any,
+    seo: any,
+    user_id: string,
+    next: NextFunction
+  ) {
     try {
       const randomId = generateRandomId();
       const {
@@ -66,27 +72,21 @@ class CategorieRepository {
         cat_id: catId,
         audit_log: user_id,
       };
-      // Prepare image update promises for updating the displayed path and activating the image
-      const imageUpdatePromises = imageIds.map((id: any) =>
-        getImageModel("karnalwebtech")
-          .findByIdAndUpdate(
-            id,
-            {
-              displayedpath: newCategoryData.slug, // Update the displayed path to the category slug
-              is_active: true, // Mark the image as active
-            },
-            { new: true } // Return the updated document
-          )
-          .catch((error) => {
-            // Log any error that occurs during the update of each image
-            console.error(
-              `Error updating image with ID ${id}: ${error.message}`
-            );
-            throw new Error(`Error updating image with ID ${id}`);
-          })
-      );
-      // Wait for all image updates to finish
-      await Promise.all(imageUpdatePromises);
+
+      if (imageIds) {
+        const updateData = {
+          displayedpath: newCategoryData.slug, // Set the displayed path to the category slug
+          is_active: true, // Mark the image as active
+        };
+        const oldImageId = "";
+        await imageRepository.updateImage(
+          imageIds,
+          "karnalwebtech",
+          oldImageId,
+          updateData,
+          next
+        );
+      }
       // Create and save the new category
       const newCategory = new PostCategorieModel(newCategoryData);
       return await newCategory.save();
@@ -162,7 +162,12 @@ class CategorieRepository {
   }
 
   // Update a category
-  async update(data: any, image_data: any, user_id: string) {
+  async update(
+    data: any,
+    image_data: any,
+    user_id: string,
+    next: NextFunction
+  ) {
     const { title, content, status, description, metaCanonicalUrl } = data;
     const image_ids = image_data?.length
       ? image_data.map((item: any) => item._id)
@@ -182,7 +187,7 @@ class CategorieRepository {
       cat_id: data.id,
     });
     if (!post_prev_data) {
-      throw new Error("Post not found");
+      return next(new ErrorHandler("Post not found", 404));
     }
     const updated_category = await PostCategorieModel.findOneAndUpdate(
       { cat_id: data.id },
@@ -198,43 +203,20 @@ class CategorieRepository {
       throw new Error("Category not found");
     }
     // Helper function for image updates with error handling
-    const updateImage = async (id: string, updateData: any) => {
-      try {
-        return await getImageModel("karnalwebtech").findByIdAndUpdate(
-          id,
-          updateData,
-          { new: true }
-        );
-      } catch (error: any) {  
-        console.error(`Error updating image with ID ${id}: ${error.message}`);
-        throw new Error(`Error updating image with ID ${id}`);
-      }
-    };
 
-    if (Array.isArray(image_ids)) {
-      // Deactivate old image and update displayedpath
-      if (post_prev_data.feature_image) {
-        const oldImageId = post_prev_data.feature_image._id;
-
-        // Deactivate the old image if it is not in the new image list
-        if (!image_ids.includes(oldImageId)) {
-          await updateImage(oldImageId, { is_active: false });
-        }
-
-        // Update the displayed path of the old image
-        await updateImage(oldImageId, { displayedpath: updated_category.slug });
-      }
-
-      // Now, activate the new images
-      const imageUpdatePromises = image_ids.map((id: any) =>
-        updateImage(id, {
-          displayedpath: updated_category.slug, // Set the displayed path to the category slug
-          is_active: true, // Mark the image as active
-        })
+    if (image_ids) {
+      const updateData = {
+        displayedpath: updated_category.slug, // Set the displayed path to the category slug
+        is_active: true, // Mark the image as active
+      };
+      const oldImageId = post_prev_data.feature_image._id;
+      await imageRepository.updateImage(
+        image_ids,
+        "karnalwebtech",
+        oldImageId,
+        updateData,
+        next
       );
-
-      // Wait for all image updates to finish
-      await Promise.all(imageUpdatePromises);
     }
     return updated_category;
   }
