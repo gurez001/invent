@@ -74,6 +74,7 @@ import ImageRepository from "./utils/comman-repositories/imageRepository";
 import ImageController from "./api/karnalwebtech/controllers/image-controller";
 import portfolioRoutes from "./api/karnalwebtech/routes/portfolio-route";
 import imageRoutes from "./api/karnalwebtech/routes/image-route";
+import cacheRouter from "./api/karnalwebtech/routes/cache-route";
 const karnal_repositories = karnal_repositoriesLoader();
 const karnal_services = karnal_servicesLoader(karnal_repositories);
 
@@ -88,6 +89,7 @@ const imageController = new ImageController(imageRepository);
 
 // Add routes
 app.use("/api/v2/image", imageRoutes(imageController));
+app.use("/api/v2/", cacheRouter);
 //--------------- allmiddleware
 app.use(errorMiddleware);
 

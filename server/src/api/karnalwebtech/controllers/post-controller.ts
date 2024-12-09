@@ -186,3 +186,41 @@ class PostController {
 }
 
 export default PostController;
+
+
+async function scan(cursor: number = 0): Promise<void> {
+  console.log("Starting scan with cursor:", cursor);
+  try {
+    const reply = await redisClient1.scan(cursor, {
+      MATCH: "posts_*",
+      COUNT: 100,
+    });
+
+    console.log("Scan result:", reply);
+    console.log("Next cursor:", reply.cursor);
+    console.log("Keys returned:", reply.keys);
+  // Update cursor for next scan
+  cursor = reply.cursor;
+ // Check if there were no keys found or if cursor didn't progress
+ if (reply.keys.length === 0) {
+  console.log("No keys found for the pattern 'posts_*'.");
+}
+
+  
+
+    // Process the keys
+    for (const key of reply.keys) {
+      console.log(`Deleting key: ${key}`);
+      await redisClient1.del(key); 
+    };
+
+    // If there are more keys to fetch, recursively call scan with the updated cursor
+    if (cursor !== 0) {
+      await scan(cursor);
+    } else {
+      console.log("Scan complete");
+    }
+  } catch (err) {
+    console.error("Scan error:", err);
+  }
+}
