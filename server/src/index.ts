@@ -1,50 +1,43 @@
 import app from "./app";
 import cluster from "cluster";
 import os from "os";
-import dotent from "dotenv";
+import dotenv from "dotenv";
 import { connectRedis } from "./loaders/redis";
-dotent.config();
-connectRedis();
-const PORT = process.env.PORT || 9000
-const numCPUs = os.cpus().length;
-// if (cluster.isMaster) {
-//   console.log(`Master ${process.pid} is running`);
-//   for (let i = 0; i < numCPUs; i++) {
-//     cluster.fork();
-//   }
-//   // Listen for dying workers and restart them
-//   cluster.on("exit", (worker, code, signal) => {
-//     console.log(`Worker ${worker.process.pid} died`);
-//     cluster.fork(); // Replace the dead worker
-//   });
-// } else {
-//   const start_server = async () => {
-//     const PORT = process.env.PORT || 7000;
-//     await new Promise<void>((resolve, rejects) => {
-//       app.listen(PORT, (err?: Error) => {
-//         if (err) {
-//           console.log(err);
-//           return rejects(err);
-//         }
-//         console.log(`Worker ${process.pid} is listening on port ${PORT}`);
-//         resolve();
-//       });
-//     });
-//   };
-//   start_server()
-//     .then(() => {
-//       console.log(`Server started successfully in worker ${process.pid}`);
-//     })
-//     .catch((err?: Error | undefined) => {
-//       console.error(
-//         `Failed to start server in worker ${process.pid}: ${err?.message}`
-//       );
-//     });
-// }
 
-app.listen(PORT, (err?: Error) => {
-  if (err) {
-    console.log(err);
+dotenv.config();
+connectRedis();
+
+const PORT = process.env.PORT || 8000;
+const numCPUs = os.cpus().length;
+
+if (cluster.isPrimary) {
+  console.log(`Primary ${process.pid} is running`);
+
+  // Fork workers
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
   }
-  console.log(`Worker ${process.pid} is listening on port ${process.env.PORT}`);
+
+  cluster.on("exit", (worker, code, signal) => {
+    console.log(`Worker ${worker.process.pid} died`);
+    cluster.fork(); // Replace the dead worker
+  });
+} else {
+  // Workers can share any TCP connection
+  // In this case, it is an HTTP server
+  app.listen(PORT, () => {
+    console.log(`Worker ${process.pid} is listening on port ${PORT}`);
+  });
+}
+
+// Error handling for the primary process
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception:", error);
+  // Perform any cleanup operations here
+  process.exit(1);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+  // Perform any cleanup operations here
 });
