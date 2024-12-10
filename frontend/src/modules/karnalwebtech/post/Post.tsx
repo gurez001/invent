@@ -4,6 +4,7 @@ import PostList from "./post-list";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import CacheRemover from "@/components/common/CacheRemover";
+import { cache_keys } from "@/lib/service/custom_keys";
 
 const Post = () => {
   const router = useRouter();
@@ -18,7 +19,7 @@ const Post = () => {
         >
           Add new post
         </Button>
-        <CacheRemover pattern={["posts"]} />
+        <CacheRemover pattern={[cache_keys.posts]} />
       </div>
       <PostList />
     </div>

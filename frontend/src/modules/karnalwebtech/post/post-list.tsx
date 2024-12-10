@@ -20,6 +20,8 @@ import {
   useGetAllPostQuery,
 } from "@/state/karnal-web-tech/postApi";
 import CacheRemover from "@/components/common/CacheRemover";
+import { useRemoveCacheMutation } from "@/state/api";
+import { cache_keys } from "@/lib/service/custom_keys";
 
 interface list_props { }
 
@@ -30,6 +32,7 @@ const PostList: React.FC<list_props> = () => {
   const router = useRouter();
 
   //---------- all hookes
+  const [update] = useRemoveCacheMutation()
   const { data, error, isLoading } = useGetAllPostQuery({
     rowsPerPage: Number(rowsPerPage),
     page: page,
@@ -61,7 +64,7 @@ const PostList: React.FC<list_props> = () => {
   ];
   const categorie_dropdown: any[] = [];
   const removeRow = async (remove_id: string, slug: string) => {
-    const pattern: string[] = [remove_id, slug]
+    const pattern: string[] = [remove_id, slug,cache_keys.posts]
     for (const item of pattern) {
       const updatedData = { pattern: item };
       await update(updatedData).unwrap(); // Ensure the mutation completes before continuing

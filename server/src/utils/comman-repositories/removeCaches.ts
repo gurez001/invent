@@ -72,8 +72,8 @@ class CacheManager {
           .json({ success: true, message: "All cache cleared." });
       }
       res
-        .status(404)
-        .json({ success: false, message: "Cache matching keys found." });
+        .status(200)
+        .json({ success: true, message: "Cache matching keys found." });
     } catch (error) {
       console.error("Error removing cache:", error);
 
