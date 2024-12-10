@@ -3,10 +3,11 @@ import React from "react";
 import PostList from "./post-list";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Trash } from "lucide-react";
+import CacheRemover from "@/components/common/CacheRemover";
 
 const Post = () => {
   const router = useRouter();
+
 
   return (
     <div>
@@ -17,14 +18,8 @@ const Post = () => {
         >
           Add new post
         </Button>
-        <Button
-          className="bg-red border text-black hover:bg-gray-200"
-          onClick={() => router.push("/karnalwebtech/post/add-new")}
-        >
-          <Trash color="red" />  Clear cache
-        </Button>
+        <CacheRemover pattern={["posts"]} />
       </div>
-
       <PostList />
     </div>
   );
