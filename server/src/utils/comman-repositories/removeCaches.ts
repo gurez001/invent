@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Redis from "redis"; // Ensure you have installed ioredis
-import { redisClient1 } from "../../loaders/redis";
+import { redisClient1, redisClient2 } from "../../loaders/redis";
 import ErrorHandler from "../ErrorHandler";
 
 class CacheManager {
@@ -23,41 +23,41 @@ class CacheManager {
   ): Promise<any> {
     console.log("Starting scan with cursor:", cursor);
     let keysDeleted = false;
+    const clients = [redisClient1, redisClient2]; // Array of Redis clients
+  
     try {
-      const reply = await redisClient1.scan(cursor, {
-        MATCH: `${pattern}*`,
-        COUNT: 100,
-      });
-
-      console.log("Scan result:", reply);
-      console.log("Next cursor:", reply.cursor);
-      console.log("Keys returned:", reply.keys);
-      // Update cursor for next scan
-      cursor = reply.cursor;
-      // Check if there were no keys found or if cursor didn't progress
-      if (reply.keys.length === 0) {
-        console.log(`No keys found for the pattern '${pattern}*'.`);
+      for (const client of clients) {
+        let currentCursor = cursor;
+        do {
+          const reply = await client.scan(currentCursor, {
+            MATCH: `${pattern}*`,
+            COUNT: 100,
+          });
+  
+          console.log("Scan result:", reply);
+          console.log("Next cursor:", reply.cursor);
+          console.log("Keys returned:", reply.keys);
+  
+          // Process the keys
+          for (const key of reply.keys) {
+            console.log(`Deleting key from client: ${key}`);
+            await client.del(key);
+            keysDeleted = true;
+          }
+  
+          // Update cursor for the current client
+          currentCursor = reply.cursor;
+        } while (currentCursor !== 0);
       }
-
-      // Process the keys
-      for (const key of reply.keys) {
-        console.log(`Deleting key: ${key}`);
-        await redisClient1.del(key);
-        keysDeleted = true;
-      }
-
-      // If there are more keys to fetch, recursively call scan with the updated cursor
-      if (cursor !== 0) {
-        await this.scanAndDelete(cursor, pattern);
-      } else {
-        console.log("Scan complete");
-        return keysDeleted;
-      }
+  
+      console.log("Scan complete across all clients");
+      return keysDeleted;
     } catch (err) {
       console.error("Error clearing keys:", err);
       throw err;
     }
   }
+  
   async removeCache(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(req.body);

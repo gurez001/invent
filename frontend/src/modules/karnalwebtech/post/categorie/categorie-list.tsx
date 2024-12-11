@@ -16,7 +16,7 @@ import { TimeAgo } from "@/lib/service/time/timeAgo";
 import Shadcn_table from "@/components/common/shadcn-table/table";
 import { useTableFilters } from "@/hooks/useTableFilters";
 import { Button } from "@/components/ui/button";
-import { Trash2, MoreHorizontal } from "lucide-react";
+import { Trash2, Pencil, Copy, MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useHandleNotifications } from "@/hooks/useHandleNotifications";
 import CacheRemover from "@/components/common/CacheRemover";
@@ -93,12 +93,12 @@ const CategorieList: React.FC<Customer_list_props> = () => {
                 className="cursor-pointer"
                 onClick={() => navigator.clipboard.writeText(post.cat_id)}
               >
-                Copy ID
+               <Copy/> Copy ID
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
               >
-                <CacheRemover pattern={[`${post.tag_id}`, `cate_${post.slug}`]} buttonStyle="bg-transparent text-black hover:bg-transparent p-0 border-hidden" />
+                <CacheRemover pattern={[`${post.cat_id}`, `cate_${post.slug}`]} buttonStyle="bg-transparent text-black hover:bg-transparent p-0 border-hidden" />
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -107,7 +107,7 @@ const CategorieList: React.FC<Customer_list_props> = () => {
                   router.push(`/karnalwebtech/post/categorie/${post.cat_id}`)
                 }
               >
-                Edit Categorie
+               <Pencil/> Edit Categorie
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer flex items-center"
