@@ -1,3 +1,4 @@
+import contactUsRoutes from "../api/karnalwebtech/routes/contact-us-route";
 import portfolioRoutes from "../api/karnalwebtech/routes/portfolio-route";
 import categorieRoutes from "../api/karnalwebtech/routes/post-categorie-route";
 import postRoutes from "../api/karnalwebtech/routes/post-route";
@@ -8,6 +9,7 @@ const karnalwebteh_routesLoader = (app: any, controllers: any) => {
   app.use("/api/v2/tag", tagRoutes(controllers.tagController));
   app.use("/api/v2/post", postRoutes(controllers.postController));
   app.use("/api/v2/portfolio", portfolioRoutes(controllers.portfolioController));
+  app.use("/api/v2/contact-us", contactUsRoutes(controllers.contactUsController));
 };
 
 export default karnalwebteh_routesLoader;

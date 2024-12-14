@@ -1,3 +1,4 @@
+import ContactUsRepository from "../../repositories/karnalwebtech/contact-us-repositories";
 import PortfoliotRepository from "../../repositories/karnalwebtech/portfolio-repositories";
 import CategorieRepository from "../../repositories/karnalwebtech/post-categorie-repositories";
 import PostRepository from "../../repositories/karnalwebtech/post-repositories";
@@ -8,11 +9,12 @@ const repositoriesLoader = () => {
   const tagRepository = new TagRepository();
   const postRepository = new PostRepository();
   const portfoliotRepository = new PortfoliotRepository();
+  const contactUsRepository = new ContactUsRepository();
   return {
     categorieRepository,
     tagRepository,
     postRepository,
-    portfoliotRepository,
+    portfoliotRepository,contactUsRepository
   };
 };
 export default repositoriesLoader;
