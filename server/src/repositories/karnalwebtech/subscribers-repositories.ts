@@ -3,26 +3,26 @@ import User from "../../models/primary/userModel";
 import ApiFeatures from "../../utils/apiFeatuers";
 import ErrorHandler from "../../utils/ErrorHandler";
 import { generateRandomId } from "../../utils/generateRandomId";
-import contactUsModel from "../../models/karnalwebtech/contact-us-model";
+import subscribersModel from "../../models/karnalwebtech/subscribers";
 
-class ContactUsRepository {
+class SubscribersRepository {
   // Reusable function to generate unique post ID
   private generatePostId(
     uuid: string,
     randomId: string,
     number: number
   ): string {
-    return `cont_${randomId.toLowerCase()}_${uuid}${number}`;
+    return `susb_${randomId.toLowerCase()}_${uuid}${number}`;
   }
 
   // Reusable function to get the next post number
   private async getNextNumber(): Promise<number> {
-    const count = await contactUsModel.countDocuments();
+    const count = await subscribersModel.countDocuments();
     return count + 1;
   }
 
   // Helper function for populating category data
-  private async populateContactData(query: any) {
+  private async populateData(query: any) {
     return query.populate([{ path: "audit_log", model: User }]);
   }
 
@@ -30,8 +30,7 @@ class ContactUsRepository {
   async create(data: any, next: NextFunction) {
     try {
       const randomId = generateRandomId();
-      console.log(data)
-      const { name, uuid, email, mobile, message } = data;
+      const { uuid, email } = data;
 
       // Get next post number
       const contactNumber = await this.getNextNumber();
@@ -40,18 +39,15 @@ class ContactUsRepository {
       const catId = this.generatePostId(uuid, randomId, contactNumber);
 
       // Prepare data to be saved
-      const newPostData = {
+      const newData = {
         _no: contactNumber,
-        name,
         email,
-        mobile,
-        description: message,
-        cont_id: catId,
+        susb_id: catId,
       };
-      const post = new contactUsModel(newPostData);
-      return await post.save();
+      const result = new subscribersModel(newData);
+      return await result.save();
     } catch (error: any) {
-      throw new Error(`Error creating Contact us: ${error.message}`);
+      throw new Error(`Error creating subscribers us: ${error.message}`);
     }
   }
 
@@ -59,7 +55,7 @@ class ContactUsRepository {
   async all(query: any) {
     const resultPerPage = Number(query.rowsPerPage);
     const apiFeatures = new ApiFeatures(
-      contactUsModel.find({ is_delete: { $ne: true } }),
+      subscribersModel.find({ is_delete: { $ne: true } }),
       query
     );
     apiFeatures.search().filter().sort().pagination(resultPerPage);
@@ -76,7 +72,7 @@ class ContactUsRepository {
   // Get the total count of [pst] based on filters
   async data_counter(query: any) {
     const apiFeatures = new ApiFeatures(
-      contactUsModel.find({ is_delete: { $ne: true } }),
+      subscribersModel.find({ is_delete: { $ne: true } }),
       query
     );
     apiFeatures.search().filter();
@@ -86,66 +82,36 @@ class ContactUsRepository {
 
   // Find portfolio by ID
   async find_by_id(id: string, next: NextFunction) {
-    const result = await this.populateContactData(contactUsModel.findById(id));
+    const result = await this.populateData(subscribersModel.findById(id));
     if (!result) {
       return next(new ErrorHandler(`portfolio with ID ${id} not found`, 404));
     }
     return result;
   }
-
-  // Update a portfolio
-  async update(data: any, user_id: string, next: NextFunction) {
-    const { name, mobile, message, email } = data;
-
-    const updated_data: any = {
-      name,
-      email,
-      mobile,
-      description: message,
-      audit_log: user_id,
-    };
-    const updated_post = await contactUsModel.findOneAndUpdate(
-      { cont_id: data.id },
-      updated_data,
-      {
-        new: true,
-        runValidators: true,
-        useFindAndModify: false,
-      }
-    );
-
-    if (!updated_post) {
-      throw new Error("Contact not found");
-    }
-
-    return updated_post;
-  }
-
-  // Find post by URL and exclude certain ID
-  async findBYUrl(url: string, excludeId: string) {
-    const query: any = { slug: url };
-    if (excludeId) query._id = { $ne: excludeId }; // Exclude specified ID
-    return await contactUsModel.findOne(query);
+  // Find by email
+  async find_by_email(email: string) {
+    const result = await this.populateData(subscribersModel.findOne({ email }));
+    return result;
   }
 
   // Find post by page ID
   async findBYpageid(id: string, next: NextFunction) {
-    const result = await this.populateContactData(
-      contactUsModel.findOne({ cont_id: id })
+    const result = await this.populateData(
+      subscribersModel.findOne({ susb_id: id })
     );
 
     if (!result) {
-      return next(new ErrorHandler(`Contact with ID ${id} not found`, 404));
+      return next(new ErrorHandler(`Subscriber with ID ${id} not found`, 404));
     }
     return result;
   }
   async removeItem(id: string, next: NextFunction) {
-    const result = await this.populateContactData(
-      contactUsModel.findOne({ cont_id: id })
+    const result = await this.populateData(
+      subscribersModel.findOne({ susb_id: id })
     );
 
     if (!result) {
-      return next(new ErrorHandler(`Contact with ID ${id} not found`, 404));
+      return next(new ErrorHandler(`Subscriber with ID ${id} not found`, 404));
     }
     result.is_delete = true;
     await result.save();
@@ -153,4 +119,4 @@ class ContactUsRepository {
   }
 }
 
-export default ContactUsRepository;
+export default SubscribersRepository;

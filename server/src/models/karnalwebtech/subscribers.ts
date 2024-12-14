@@ -2,26 +2,20 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 import { thardConnection } from "../../loaders/config";
 
 // Interface for Post document
-export interface IContactUs extends Document {
+export interface Isubscribers extends Document {
   _no: number;
-  name: string;
-  description?: string;
   email?: string;
-  mobile?: number;
-  cont_id: string;
-  audit_log: mongoose.Types.ObjectId;
+  susb_id: string;
   is_active?: boolean;
   is_delete?: boolean;
+  audit_log: mongoose.Types.ObjectId;
 }
 
 // Define the Post Schema
-const ContactUsSchema: Schema<IContactUs> = new Schema(
+const SubscribersSchema: Schema<Isubscribers> = new Schema(
   {
     _no: { type: Number, default: 0 },
-    mobile: { type: Number, default: 1234567890 },
-    cont_id: { type: String, default: null },
-    name: { type: String, default: null },
-    description: { type: String, default: null },
+    susb_id: { type: String, default: null },
     email: { type: String, default: null },
     is_active: { type: Boolean, default: true },
     is_delete: { type: Boolean, default: false },
@@ -36,9 +30,7 @@ const ContactUsSchema: Schema<IContactUs> = new Schema(
 );
 
 // Create and export the model
-const contactUsModel: Model<IContactUs> = thardConnection.model<IContactUs>(
-  "karnal_contact_us",
-  ContactUsSchema
-);
+const subscribersModel: Model<Isubscribers> =
+  thardConnection.model<Isubscribers>("karnal_subscribers", SubscribersSchema);
 
-export default contactUsModel;
+export default subscribersModel;
