@@ -126,6 +126,12 @@ export const navItems: MenuListProps[] = [
         href: paths.karnalwebtech.media,
       },
       {
+        title: "Contacts",
+        label: "Contacts",
+        icon: 'Contact',
+        href: paths.karnalwebtech.contacts,
+      },
+      {
         title: "Posts",
         label: "Posts",
         icon: 'CirclePlus',

@@ -30,6 +30,7 @@ interface Paths {
     media: string;
     post_categorie: string;
     post_tag: string;
+    contacts: string;
     portfolio: string;
     portfolio_categorie: string;
     portfolio_tag: string;
@@ -70,6 +71,7 @@ export const paths: Paths = {
     media: "/karnalwebtech/media",
     post_categorie: "/karnalwebtech/post/categorie",
     post_tag: "/karnalwebtech/post/tag",
+    contacts: "/karnalwebtech/contacts",
     users: "/streaming/users",
     inventory: "/streaming/inventory",
     portfolio: "/karnalwebtech/portfolio",
