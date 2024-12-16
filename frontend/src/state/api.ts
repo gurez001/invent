@@ -53,6 +53,7 @@ export const api = createApi({
 
         return {
           url: "v2/contact-us",
+          params,
           method: "GET",
         };
       },
