@@ -1,6 +1,4 @@
 import { Input } from "@/components/ui/input";
-import React from "react";
-
 import {
     Control,
     Controller,
@@ -9,44 +7,36 @@ import {
     Path,
 } from "react-hook-form";
 
-// Updated SelectFieldProps with generics
-interface SelectFieldProps<T extends FieldValues> {
+interface CalendarFieldProps<T extends FieldValues> {
     control: Control<T>;
     errors: FieldErrors<T>;
-    name: Path<T>; // Ensure name is a valid path in T
-    label: string; // Label for the select field
-    type?: string; // Label for the select field
+    name: Path<T>;
+    label: string;
     inputStyle?: string;
-    handleInputChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; // Optional onChange handler
+    handleInputChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     maxLength?: number;
-    disabled_path?: boolean;
+    disabledPath?: boolean;
 }
 
-const Input_field = <T extends FieldValues>({
+const CalendarField = <T extends FieldValues>({
     control,
     errors,
     name,
     label,
-    type = "text",
     inputStyle,
     handleInputChange,
-    maxLength, disabled_path = false
-}: SelectFieldProps<T>) => {
+    maxLength,
+    disabledPath = false
+}: CalendarFieldProps<T>) => {
     let errorMessage: string | undefined;
 
-    // Check if name contains a dot for nested errors
     if (name.includes(".")) {
-        const nameParts = name.split(".");
-        const parentKey = nameParts[0]; // e.g., 'shipping_address'
-        const childKey = nameParts[1]; // e.g., 'city'
-
-        // Check if the parent key exists in errors
+        const [parentKey, childKey] = name.split(".");
         const parentErrors = errors[parentKey] as FieldErrors<T>;
         if (parentErrors && parentErrors[childKey]) {
             errorMessage = (parentErrors[childKey] as { message?: string }).message;
         }
     } else {
-        // Accessing direct errors
         errorMessage = (errors[name] as { message?: string })?.message;
     }
 
@@ -58,18 +48,16 @@ const Input_field = <T extends FieldValues>({
                 <div>
                     <Input
                         placeholder={label}
-                        type={type}
+                        type="date"
                         className={inputStyle}
-                        disabled={disabled_path}
+                        disabled={disabledPath}
                         {...field}
                         onChange={(e) => {
-                            const value = type === "number" ? parseFloat(e.target.value) || null : e.target.value;
                             handleInputChange?.(e);
-                            field.onChange(value);
+                            field.onChange(e);
                         }}
                         maxLength={maxLength}
                     />
-
                     {errorMessage && (
                         <p className="text-red-600 text-s pt-[3px]">{errorMessage}</p>
                     )}
@@ -79,4 +67,5 @@ const Input_field = <T extends FieldValues>({
     );
 };
 
-export default Input_field;
+export default CalendarField;
+
