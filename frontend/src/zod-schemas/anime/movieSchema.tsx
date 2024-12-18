@@ -23,9 +23,7 @@ export enum AgeRating {
 
 // Form schema
 export const MovieformSchema = z.object({
-    title: z.string().min(1, "Title is required"),
     publish_status: z.string(),
-    description: z.string().min(1, "Description is required"),
     rating: z.nativeEnum(Rating),
     duration: z.number().min(1, "Duration must be at least 1 minute"),
     airedFrom: z.string().min(1, "Aired From date is required"),
@@ -33,5 +31,13 @@ export const MovieformSchema = z.object({
     status: z.nativeEnum(AnimeStatus),
     score: z.number().min(0).max(10).optional(),
     ageRating: z.nativeEnum(AgeRating),
+    title: z.string().min(5, { message: "Title must be at least 5 characters long." }),
+    description: z.string().min(5, { message: "Title must be at least 5 characters long." }),
     content: z.string().min(20, { message: "Content must be at least 20 characters long." }),
+    metaTitle: z.string().min(10, { message: "Meta title must be at least 10 characters long." }).max(60, { message: "Meta title must not exceed 60 characters." }).optional(),
+    metaDescription: z.string().min(50, { message: "Meta description must be at least 50 characters long." }).max(160, { message: "Meta description must not exceed 160 characters." }).optional(),
+    metaCanonicalUrl: z.string()
+    .regex(/^[a-zA-Z0-9-_\/\.]*$/, {
+            message: "The string contains invalid characters. Only letters, numbers, hyphens, underscores, and slashes are allowed.",
+        })
 });

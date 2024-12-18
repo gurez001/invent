@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import * as z from "zod";
 import MoviePostFromCard from "@/components/movie-post/post-form-card";
 import { useImageDrop } from "@/hooks/handleMediaDrop";
@@ -11,8 +11,13 @@ import { generate32BitUUID } from "@/lib/service/generate32BitUUID";
 import { useHandleNotifications } from "@/hooks/useHandleNotifications";
 import toast from "react-hot-toast";
 import { MovieformSchema } from "@/zod-schemas/anime/movieSchema";
+import Popup_model from "@/components/movie-post/popup_model";
+import { SeasonForm } from "./SeasonForm";
 
 export const AddNew = () => {
+  const [isvisiable, setIsvisiable] = useState(false)
+  const [open, setopen] = useState(false)
+  const [tab, setTab] = useState<string>("")
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [keywords, setKeywords] = useState<string[]>([]);
   //----------------- use hookes
@@ -39,14 +44,14 @@ export const AddNew = () => {
     setValue,
     watch,
   } = useForm<z.infer<typeof MovieformSchema>>({
-    resolver: zodResolver(MovieformSchema),
+    // resolver: zodResolver(MovieformSchema),
   });
   // 2. Define the submit handler
   const onSubmit: SubmitHandler<any> = async (data) => {
-    if (files.length < 1) {
-      toast.error("Please add a image");
-      return;
-    }
+    // if (files.length < 1) {
+    //   toast.error("Please add a image");
+    //   return;
+    // }
     const updated_data = {
       ...data,
       keywords,
@@ -54,11 +59,18 @@ export const AddNew = () => {
       images: files,
       categorie: selectedCategories,
     };
+    console.log(updated_data)
+    setIsvisiable(true)
+    setopen(true)
     // await addNewPost(updated_data);
   };
-
+  const closeHandler = () => {
+    setopen(false)
+    setIsvisiable(false)
+  }
   return (
     <>
+      {tab === "seasons" ? <SeasonForm /> : null}
       <form onSubmit={handleSubmit(onSubmit)} className="dark-custom">
         <MoviePostFromCard
           control={control} // react form
@@ -79,6 +91,9 @@ export const AddNew = () => {
           isLoading={false}
         />
       </form>
+
+      {isvisiable && <Popup_model isOpen={open} onClose={closeHandler}  setTab={setTab}
+      />}
     </>
   );
 };
