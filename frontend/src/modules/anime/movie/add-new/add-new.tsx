@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import { MovieformSchema } from "@/zod-schemas/anime/movieSchema";
 import Popup_model from "@/components/movie-post/popup_model";
 import { SeasonForm } from "./SeasonForm";
+import { useAddnewMutation } from "@/state/anime/animeApi";
 
 export const AddNew = () => {
   const [isvisiable, setIsvisiable] = useState(false)
@@ -21,6 +22,7 @@ export const AddNew = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [keywords, setKeywords] = useState<string[]>([]);
   //----------------- use hookes
+  const [addnew, { isLoading, isSuccess, error }] = useAddnewMutation();
   const { imageitemData, files, handleDrop } = useImageDrop();
   const { data: categorie_data, error: categorie_error } =
     useGetAllcategorieQuery({
@@ -31,9 +33,9 @@ export const AddNew = () => {
   const { data: categorieApiData } = categorie_data || {};
 
   useHandleNotifications({
-    error: categorie_error
-    // isSuccess,
-    // successMessage: "Portfolio Added successfully!",
+    error: categorie_error || error,
+    isSuccess,
+    successMessage: "Anime Added successfully!",
     // redirectPath: "/karnalwebtech/portfolio",
   });
 
@@ -48,10 +50,10 @@ export const AddNew = () => {
   });
   // 2. Define the submit handler
   const onSubmit: SubmitHandler<any> = async (data) => {
-    // if (files.length < 1) {
-    //   toast.error("Please add a image");
-    //   return;
-    // }
+    if (files.length < 1) {
+      toast.error("Please add a image");
+      return;
+    }
     const updated_data = {
       ...data,
       keywords,
@@ -59,10 +61,11 @@ export const AddNew = () => {
       images: files,
       categorie: selectedCategories,
     };
-    console.log(updated_data)
-    setIsvisiable(true)
-    setopen(true)
-    // await addNewPost(updated_data);
+    // console.log(updated_data)
+    // setIsvisiable(true)
+    // setopen(true)
+    const response = await addnew(updated_data);
+    console.log(response)
   };
   const closeHandler = () => {
     setopen(false)
@@ -88,11 +91,11 @@ export const AddNew = () => {
           pageTitle={"Anime"}
           discard_link={"/karnalwebtech/portfolio"}
           categorieList={categorieApiData?.result}
-          isLoading={false}
+          isLoading={isLoading}
         />
       </form>
 
-      {isvisiable && <Popup_model isOpen={open} onClose={closeHandler}  setTab={setTab}
+      {isvisiable && <Popup_model isOpen={open} onClose={closeHandler} setTab={setTab}
       />}
     </>
   );
