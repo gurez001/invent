@@ -34,7 +34,7 @@ export const anime_Api = createApi({
           }
         }
         return {
-          url: "/v1/anime/",
+          url: "/v1/anime",
           method: "POST",
           body: formData, // Use formData as body
         };

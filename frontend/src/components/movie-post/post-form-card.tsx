@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ImageIcon, Link2Icon, FileTextIcon } from "lucide-react";
+import { ImageIcon, Link2Icon, FileTextIcon, Clapperboard } from "lucide-react";
 import { PostForm } from "./index-form";
 import CategorySelector from "./post-categorie";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -15,6 +15,7 @@ import SelectFields from "../common/fields-shadcn/select-field";
 import { useRouter } from "next/navigation";
 import Server_image_card from "../image_compress/Server_image_card";
 import TagSelector from "./post-tag";
+import VideoUploader from "./video-upload";
 
 interface MoviePostFromCardProps {
   imageitemData?: { img: string; name: string }[]; // Corrected to match the useState structure
@@ -96,6 +97,7 @@ export default function PostFromCard({
                   {[
                     { value: pageTitle, label: pageTitle, icon: FileTextIcon },
                     { value: "image", label: "Image", icon: ImageIcon },
+                    { value: "video", label: "Video", icon: Clapperboard },
                     { value: "seo", label: "SEO", icon: Link2Icon },
                   ].map(({ value, label, icon: Icon }) => (
                     <TabsTrigger
@@ -119,6 +121,9 @@ export default function PostFromCard({
 
                 <TabsContent value="image">
                   <Drag_input_field onDrop={handleDrop} color_class={"white"} />
+                </TabsContent>
+                <TabsContent value="video">
+                  <VideoUploader />
                 </TabsContent>
 
                 <TabsContent value="seo">

@@ -1,6 +1,5 @@
 "use client";
-
-import { use, useState } from "react";
+import { useEffect, useState } from "react";
 import * as z from "zod";
 import MoviePostFromCard from "@/components/movie-post/post-form-card";
 import { useImageDrop } from "@/hooks/handleMediaDrop";
@@ -12,17 +11,15 @@ import { useHandleNotifications } from "@/hooks/useHandleNotifications";
 import toast from "react-hot-toast";
 import { MovieformSchema } from "@/zod-schemas/anime/movieSchema";
 import Popup_model from "@/components/movie-post/popup_model";
-import { SeasonForm } from "./SeasonForm";
 import { useAddnewMutation } from "@/state/anime/animeApi";
 
 export const AddNew = () => {
   const [isvisiable, setIsvisiable] = useState(false)
   const [open, setopen] = useState(false)
-  const [tab, setTab] = useState<string>("")
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [keywords, setKeywords] = useState<string[]>([]);
   //----------------- use hookes
-  const [addnew, { isLoading, isSuccess, error }] = useAddnewMutation();
+  const [addnew, { data: itemData, isLoading, isSuccess, error }] = useAddnewMutation();
   const { imageitemData, files, handleDrop } = useImageDrop();
   const { data: categorie_data, error: categorie_error } =
     useGetAllcategorieQuery({
@@ -33,12 +30,10 @@ export const AddNew = () => {
   const { data: categorieApiData } = categorie_data || {};
 
   useHandleNotifications({
-    error: categorie_error || error,
+    error: error || categorie_error,
     isSuccess,
     successMessage: "Anime Added successfully!",
-    // redirectPath: "/karnalwebtech/portfolio",
   });
-
   const {
     control,
     handleSubmit,
@@ -46,7 +41,7 @@ export const AddNew = () => {
     setValue,
     watch,
   } = useForm<z.infer<typeof MovieformSchema>>({
-    // resolver: zodResolver(MovieformSchema),
+    resolver: zodResolver(MovieformSchema),
   });
   // 2. Define the submit handler
   const onSubmit: SubmitHandler<any> = async (data) => {
@@ -61,19 +56,21 @@ export const AddNew = () => {
       images: files,
       categorie: selectedCategories,
     };
-    // console.log(updated_data)
-    // setIsvisiable(true)
-    // setopen(true)
-    const response = await addnew(updated_data);
-    console.log(response)
+    await addnew(updated_data).unwrap();
+
   };
   const closeHandler = () => {
     setopen(false)
     setIsvisiable(false)
   }
+  useEffect(() => {
+    if (isSuccess) {
+      setIsvisiable(true)
+      setopen(true)
+    }
+  }, [isSuccess])
   return (
     <>
-      {tab === "seasons" ? <SeasonForm /> : null}
       <form onSubmit={handleSubmit(onSubmit)} className="dark-custom">
         <MoviePostFromCard
           control={control} // react form
@@ -89,13 +86,13 @@ export const AddNew = () => {
           selectedCategories={selectedCategories}
           setSelectedCategories={setSelectedCategories}
           pageTitle={"Anime"}
-          discard_link={"/karnalwebtech/portfolio"}
+          discard_link={"/anime/movie"}
           categorieList={categorieApiData?.result}
           isLoading={isLoading}
         />
       </form>
 
-      {isvisiable && <Popup_model isOpen={open} onClose={closeHandler} setTab={setTab}
+      {isvisiable && <Popup_model isOpen={open} url={itemData && itemData?.data?.mov_id} onClose={closeHandler}
       />}
     </>
   );
